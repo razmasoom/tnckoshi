@@ -1,1 +1,946 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>T&C Koshi - PTR Test Report System</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: linear-gradient(135deg, #0f2c3b, #1b4f6e); min-height: 100vh; }
+        
+        .login-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        .login-card {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            width: 400px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+        .login-card h2 { margin-bottom: 10px; color: #1a4a5f; text-align: center; }
+        .login-card h3 { text-align: center; margin-bottom: 30px; color: #666; font-size: 14px; }
+        .input-group { margin-bottom: 20px; }
+        .input-group label { display: block; margin-bottom: 5px; font-weight: bold; color: #333; }
+        .input-group input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+        .login-btn {
+            width: 100%;
+            padding: 12px;
+            background: #f39c12;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+        }
+        .login-btn:hover { background: #e67e22; }
+        .error-msg { color: red; margin-bottom: 15px; display: none; text-align: center; }
+        
+        .app-container { display: none; }
+        .header {
+            background: linear-gradient(135deg, #0b2b3b, #1a4a5f);
+            color: white;
+            padding: 15px 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        .header h2 i { margin-right: 10px; }
+        .user-info { display: flex; align-items: center; gap: 15px; }
+        .btn-logout {
+            background: #e74c3c;
+            color: white;
+            padding: 8px 16px;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+        }
+        
+        .container { padding: 20px; max-width: 1400px; margin: 0 auto; }
+        
+        .grid-section {
+            background: white;
+            border-radius: 12px;
+            padding: 15px 20px;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        .grid-buttons { display: flex; gap: 10px; flex-wrap: wrap; }
+        .grid-btn {
+            padding: 8px 20px;
+            border: 1px solid #ddd;
+            border-radius: 25px;
+            cursor: pointer;
+            background: #f8f9fa;
+        }
+        .grid-btn.active {
+            background: #1a4a5f;
+            color: white;
+            border-color: #1a4a5f;
+        }
+        .btn-add {
+            background: #28a745;
+            color: white;
+            padding: 8px 20px;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+        }
+        
+        .main-layout { display: flex; gap: 20px; }
+        .sidebar {
+            width: 280px;
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            height: fit-content;
+        }
+        .content-area {
+            flex: 1;
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+        }
+        
+        .menu-section { margin-bottom: 25px; }
+        .menu-title {
+            font-size: 14px;
+            font-weight: bold;
+            padding: 10px;
+            background: #1a4a5f;
+            color: white;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+        .equipment-list {
+            list-style: none;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        .equipment-list li {
+            padding: 10px;
+            margin: 5px 0;
+            cursor: pointer;
+            border-radius: 8px;
+            background: #f8f9fa;
+            border: 1px solid #e0e0e0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .equipment-list li.active {
+            background: #667eea;
+            color: white;
+        }
+        .btn-add-equipment {
+            width: 100%;
+            padding: 8px;
+            background: #28a745;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        .btn-delete {
+            background: #dc3545;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            padding: 2px 8px;
+            cursor: pointer;
+        }
+        
+        /* Test Form Styles - Matching PDF Format */
+        .current-equipment {
+            background: linear-gradient(135deg, #667eea15, #764ba215);
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            border-left: 4px solid #f39c12;
+        }
+        .test-group {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border: 1px solid #e0e0e0;
+        }
+        .test-group h4 {
+            color: #1a4a5f;
+            margin-bottom: 15px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid #f39c12;
+        }
+        .test-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+            font-size: 13px;
+        }
+        .test-table th, .test-table td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: center;
+        }
+        .test-table th {
+            background: #e9ecef;
+            font-weight: bold;
+        }
+        .test-table input {
+            width: 80px;
+            padding: 5px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            text-align: center;
+        }
+        .inline-input {
+            display: inline-block;
+            margin: 0 15px 10px 0;
+        }
+        .inline-input input {
+            width: 100px;
+            padding: 5px;
+            margin-left: 5px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-family: inherit;
+            resize: vertical;
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+            justify-content: center;
+        }
+        .btn-save {
+            background: #28a745;
+            color: white;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 30px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        .btn-pdf {
+            background: #dc3545;
+            color: white;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 30px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        .btn-print {
+            background: #17a2b8;
+            color: white;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 30px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        .modal-content {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            width: 450px;
+        }
+        .modal-content input, .modal-content select {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        .modal-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        
+        .status {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            padding: 12px 24px;
+            border-radius: 8px;
+            display: none;
+            z-index: 1000;
+            color: white;
+            font-weight: bold;
+        }
+        
+        @media print {
+            .sidebar, .grid-section, .action-buttons, .header, .btn-add-equipment, .btn-delete, .user-info {
+                display: none;
+            }
+            .content-area {
+                margin: 0;
+                padding: 0;
+            }
+            .test-group {
+                break-inside: avoid;
+                page-break-inside: avoid;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="loginPage" class="login-container">
+        <div class="login-card">
+            <h2><i class="fas fa-bolt"></i> T&C Koshi</h2>
+            <h3>PTR Test Report Management System</h3>
+            <div id="loginError" class="error-msg"></div>
+            <div class="input-group">
+                <label>Username</label>
+                <input type="text" id="username" placeholder="Enter username">
+            </div>
+            <div class="input-group">
+                <label>Password</label>
+                <input type="password" id="password" placeholder="Enter password">
+            </div>
+            <button class="login-btn" onclick="login()"><i class="fas fa-sign-in-alt"></i> Login</button>
+            <p style="text-align: center; margin-top: 20px; color: #666;">Demo: admin / admin123</p>
+        </div>
+    </div>
 
+    <div id="mainApp" class="app-container">
+        <div class="header">
+            <h2><i class="fas fa-microchip"></i> T&C Koshi - PTR Test Report Management</h2>
+            <div class="user-info">
+                <span><i class="fas fa-user"></i> <span id="userNameDisplay"></span></span>
+                <button class="btn-logout" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Logout</button>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="grid-section">
+                <div class="grid-buttons" id="gridButtons"></div>
+                <button class="btn-add" onclick="showAddGridModal()"><i class="fas fa-plus"></i> New Grid</button>
+            </div>
+
+            <div class="main-layout">
+                <div class="sidebar">
+                    <div class="menu-section">
+                        <div class="menu-title"><i class="fas fa-tachometer-alt"></i> POWER TRANSFORMERS</div>
+                        <ul class="equipment-list" id="transformerList"></ul>
+                        <button class="btn-add-equipment" onclick="showAddEquipmentModal('transformer')"><i class="fas fa-plus"></i> Add PTR</button>
+                    </div>
+                </div>
+
+                <div class="content-area">
+                    <div id="testArea">
+                        <div class="current-equipment" id="currentEquipmentDisplay">
+                            <i class="fas fa-info-circle"></i> Select a PTR from the menu to begin testing
+                        </div>
+                        <div id="testForm"></div>
+                        <div class="action-buttons" id="actionButtons" style="display: none;">
+                            <button class="btn-save" onclick="saveTestData()"><i class="fas fa-save"></i> Save Test Results</button>
+                            <button class="btn-pdf" onclick="generatePDF()"><i class="fas fa-file-pdf"></i> Download PDF</button>
+                            <button class="btn-print" onclick="printReport()"><i class="fas fa-print"></i> Print Report</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="addGridModal" class="modal">
+        <div class="modal-content">
+            <h3>Add New Grid</h3>
+            <input type="text" id="gridName" placeholder="Grid Name">
+            <input type="text" id="gridLocation" placeholder="Location">
+            <div class="modal-buttons">
+                <button class="btn-save" onclick="addGrid()">Add</button>
+                <button class="btn-pdf" onclick="closeModal('addGridModal')">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="addEquipmentModal" class="modal">
+        <div class="modal-content">
+            <h3>Add Power Transformer (PTR)</h3>
+            <input type="text" id="eqId" placeholder="Equipment ID (e.g., PTR-01)">
+            <input type="text" id="eqRating" placeholder="Rating (e.g., 20 MVA)">
+            <input type="text" id="eqMake" placeholder="Make (e.g., CGL, BHEL)">
+            <input type="text" id="eqSerial" placeholder="Serial Number">
+            <select id="eqVoltage">
+                <option value="132/33kV">Voltage Ratio: 132/33 kV</option>
+                <option value="220/132kV">Voltage Ratio: 220/132 kV</option>
+            </select>
+            <div class="modal-buttons">
+                <button class="btn-save" onclick="addEquipment()">Add PTR</button>
+                <button class="btn-pdf" onclick="closeModal('addEquipmentModal')">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="statusMsg" class="status"></div>
+
+    <script>
+        const API_URL = '/api';
+        let authToken = localStorage.getItem('token');
+        let currentGrid = null;
+        let currentEquipment = null;
+        let currentUser = null;
+
+        // Test data structure matching your PDF exactly
+        let testData = {
+            dateOfTesting: new Date().toISOString().split('T')[0],
+            coreBalance: { VRY: '', VYB: '', VRB: '' },
+            magnetisingCurrent: {
+                tap0: { VRN: '', VYN: '', VBN: '', Vrn: '', Vyn: '', Vbn: '' },
+                tap5: { VRN: '', VYN: '', VBN: '', Vrn: '', Vyn: '', Vbn: '' },
+                tap17: { VRN: '', VYN: '', VBN: '', Vrn: '', Vyn: '', Vbn: '' }
+            },
+            shortCircuit: {
+                tap0: { IR: '', IY: '', IB: '', Ir: '', Iy: '', Ib: '', IN: '', In: '' },
+                tap5: { IR: '', IY: '', IB: '', Ir: '', Iy: '', Ib: '', IN: '', In: '' },
+                tap17: { IR: '', IY: '', IB: '', Ir: '', Iy: '', Ib: '', IN: '', In: '' }
+            },
+            vectorGroup: { v1v2: '', v1w2: '', w1v2: '', w1w2: '', un: '' },
+            windingResistanceHV: { tap0_U: '', tap0_V: '', tap0_W: '', tap5_U: '', tap5_V: '', tap5_W: '', tap17_U: '', tap17_V: '', tap17_W: '' },
+            windingResistanceLV: { tap0_u: '', tap0_v: '', tap0_w: '', tap5_u: '', tap5_v: '', tap5_w: '', tap17_u: '', tap17_v: '', tap17_w: '' },
+            insulationResistance: {
+                hv_lv_60: '', hv_lv_600: '', hv_lv_pi: '',
+                hv_e_60: '', hv_e_600: '', hv_e_pi: '',
+                lv_e_60: '', lv_e_600: '', lv_e_pi: ''
+            },
+            cftInsulation: { core_frame: '', frame_tank: '', core_tank: '' },
+            turnRatio: { tap0_U: '', tap0_V: '', tap0_W: '', tap5_U: '', tap5_V: '', tap5_W: '', tap17_U: '', tap17_V: '', tap17_W: '' },
+            tanDelta: {
+                r_5kv: '', r_10kv: '', r_current5: '', r_current10: '', r_cap5: '', r_cap10: '',
+                y_5kv: '', y_10kv: '', y_current5: '', y_current10: '', y_cap5: '', y_cap10: '',
+                b_5kv: '', b_10kv: '', b_current5: '', b_current10: '', b_cap5: '', b_cap10: '',
+                winding_5kv: '', winding_10kv: '', winding_current5: '', winding_current10: '', winding_cap5: '', winding_cap10: ''
+            },
+            dcVoltage: { positive_negative: '', positive_earth: '', negative_earth: '' },
+            earthingResistance: { hv_e: '', lv_e: '', body: '' },
+            notes: ''
+        };
+
+        async function login() {
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            
+            try {
+                const response = await fetch(`${API_URL}/login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, password })
+                });
+                
+                const data = await response.json();
+                if (response.ok) {
+                    localStorage.setItem('token', data.token);
+                    localStorage.setItem('user', JSON.stringify(data.user));
+                    authToken = data.token;
+                    currentUser = data.user;
+                    document.getElementById('loginPage').style.display = 'none';
+                    document.getElementById('mainApp').style.display = 'block';
+                    document.getElementById('userNameDisplay').innerHTML = data.user.fullName || data.user.username;
+                    await loadGrids();
+                    showStatus('Login successful!', 'success');
+                } else {
+                    showError(data.error);
+                }
+            } catch (error) {
+                showError('Cannot connect to server. Make sure server is running.');
+            }
+        }
+
+        async function loadGrids() {
+            try {
+                const response = await fetch(`${API_URL}/grids`, {
+                    headers: { 'Authorization': `Bearer ${authToken}` }
+                });
+                const grids = await response.json();
+                const container = document.getElementById('gridButtons');
+                container.innerHTML = '';
+                
+                grids.forEach(grid => {
+                    const btn = document.createElement('button');
+                    btn.className = 'grid-btn';
+                    btn.textContent = grid.name;
+                    btn.onclick = () => {
+                        document.querySelectorAll('.grid-btn').forEach(b => b.classList.remove('active'));
+                        btn.classList.add('active');
+                        currentGrid = grid;
+                        loadEquipment();
+                    };
+                    container.appendChild(btn);
+                });
+                
+                if (grids.length > 0 && !currentGrid) {
+                    document.querySelector('.grid-btn').click();
+                }
+            } catch (error) {
+                showStatus('Error loading grids', 'error');
+            }
+        }
+
+        async function loadEquipment() {
+            if (!currentGrid) return;
+            try {
+                const response = await fetch(`${API_URL}/equipment/${currentGrid._id}/transformer`, {
+                    headers: { 'Authorization': `Bearer ${authToken}` }
+                });
+                const equipment = await response.json();
+                const container = document.getElementById('transformerList');
+                container.innerHTML = '';
+                
+                if (equipment.length === 0) {
+                    container.innerHTML = '<li style="text-align: center; color: #999;">No PTRs. Click "Add PTR"</li>';
+                    return;
+                }
+                
+                equipment.forEach(eq => {
+                    const li = document.createElement('li');
+                    li.innerHTML = `
+                        <div style="flex:1">
+                            <strong>${eq.equipmentId}</strong>
+                            <div style="font-size: 11px; color: #666;">${eq.rating || ''} | ${eq.make || ''}</div>
+                        </div>
+                        <button class="btn-delete" onclick="event.stopPropagation(); deleteEquipment('${eq._id}')">✖</button>
+                    `;
+                    li.onclick = () => {
+                        document.querySelectorAll('.equipment-list li').forEach(l => l.classList.remove('active'));
+                        li.classList.add('active');
+                        currentEquipment = eq;
+                        if (eq.testValues && eq.testValues[0]) {
+                            try {
+                                Object.assign(testData, JSON.parse(eq.testValues[0]));
+                            } catch(e) {}
+                        }
+                        if (eq.remarks) testData.notes = eq.remarks;
+                        loadTestForm();
+                        document.getElementById('actionButtons').style.display = 'flex';
+                    };
+                    container.appendChild(li);
+                });
+            } catch (error) {
+                console.error(error);
+            }
+        }
+
+        function loadTestForm() {
+            const html = `
+                <div class="current-equipment">
+                    <strong>${currentEquipment.rating || ''} ${currentEquipment.equipmentId} (Make- ${currentEquipment.make || 'N/A'})</strong><br>
+                    Date of Testing: <input type="date" id="testDate" value="${testData.dateOfTesting}">
+                </div>
+                
+                <!-- 1. Core Balance and Magnetising Current Test -->
+                <div class="test-group">
+                    <h4>(1) Core Balance and Magnetising Current Test</h4>
+                    <div style="margin-bottom: 10px;">
+                        <span class="inline-input">VRY: <input type="text" id="cb_vry" value="${testData.coreBalance.VRY}" style="width:80px"> V</span>
+                        <span class="inline-input">VYB: <input type="text" id="cb_vyb" value="${testData.coreBalance.VYB}" style="width:80px"> V</span>
+                        <span class="inline-input">VRB: <input type="text" id="cb_vrb" value="${testData.coreBalance.VRB}" style="width:80px"> V</span>
+                    </div>
+                    <table class="test-table">
+                        <tr><th>TAP POSITION</th><th>VRN</th><th>VYN</th><th>VBN</th><th>Vrn</th><th>Vyn</th><th>Vbn</th></tr>
+                        ${[0,5,17].map(tap => `
+                            <tr>
+                                <td><b>${tap === 5 ? '05(Normal)' : tap}</b></td>
+                                ${['VRN','VYN','VBN','Vrn','Vyn','Vbn'].map(field => `
+                                    <td><input type="text" id="mc_${tap}_${field}" value="${testData.magnetisingCurrent[`tap${tap}`][field] || ''}" style="width:70px"></td>
+                                `).join('')}
+                            </tr>
+                        `).join('')}
+                    </table>
+                    <div><small>All values are in volt.</small></div>
+                </div>
+
+                <!-- 2. Short Circuit Test -->
+                <div class="test-group">
+                    <h4>(2) Short Circuit Test</h4>
+                    <table class="test-table">
+                        <tr><th>TAP POSITION</th><th>IR</th><th>IY</th><th>IB</th><th>Ir</th><th>Iy</th><th>Ib</th><th>IN</th><th>In</th></tr>
+                        ${[0,5,17].map(tap => `
+                            <tr>
+                                <td><b>${tap === 5 ? '05(Normal)' : tap}</b></td>
+                                ${['IR','IY','IB','Ir','Iy','Ib','IN','In'].map(field => `
+                                    <td><input type="text" id="sc_${tap}_${field}" value="${testData.shortCircuit[`tap${tap}`][field] || ''}" style="width:60px"></td>
+                                `).join('')}
+                            </tr>
+                        `).join('')}
+                    </table>
+                    <div><small>All values are in Ampere</small></div>
+                </div>
+
+                <!-- 3. Vector Group -->
+                <div class="test-group">
+                    <h4>(3) Vector Group (YNyn0)</h4>
+                    <table class="test-table">
+                        <tr><th>1V-2V</th><th>1V-2W</th><th>1W-2V</th><th>1W-2W</th><th>1UN = 2Un + Nn</th></tr>
+                        <tr>
+                            <td><input type="text" id="vg_v1v2" value="${testData.vectorGroup.v1v2}" style="width:80px"></td>
+                            <td><input type="text" id="vg_v1w2" value="${testData.vectorGroup.v1w2}" style="width:80px"></td>
+                            <td><input type="text" id="vg_w1v2" value="${testData.vectorGroup.w1v2}" style="width:80px"></td>
+                            <td><input type="text" id="vg_w1w2" value="${testData.vectorGroup.w1w2}" style="width:80px"></td>
+                            <td><input type="text" id="vg_un" value="${testData.vectorGroup.un}" style="width:80px"></td>
+                        </tr>
+                    </table>
+                    <div><small>All values are in volt.</small></div>
+                </div>
+
+                <!-- 4. Winding Resistance Test -->
+                <div class="test-group">
+                    <h4>(4) Winding Resistance Test</h4>
+                    <div><small>Applied Current: 10 A</small></div>
+                    <table class="test-table">
+                        <tr><th>Tap Position</th><th>1U-N (HV)</th><th>1V-N (HV)</th><th>1W-N (HV)</th><th>2U-n (LV)</th><th>2V-n (LV)</th><th>2W-n (LV)</th></tr>
+                        ${[0,5,17].map(tap => `
+                            <tr>
+                                <td><b>${tap === 5 ? '05(Normal)' : tap}</b></td>
+                                <td><input type="text" id="wr_hv_${tap}_U" value="${testData.windingResistanceHV[`tap${tap}_U`] || ''}" style="width:70px"></td>
+                                <td><input type="text" id="wr_hv_${tap}_V" value="${testData.windingResistanceHV[`tap${tap}_V`] || ''}" style="width:70px"></td>
+                                <td><input type="text" id="wr_hv_${tap}_W" value="${testData.windingResistanceHV[`tap${tap}_W`] || ''}" style="width:70px"></td>
+                                <td><input type="text" id="wr_lv_${tap}_u" value="${testData.windingResistanceLV[`tap${tap}_u`] || ''}" style="width:70px"></td>
+                                <td><input type="text" id="wr_lv_${tap}_v" value="${testData.windingResistanceLV[`tap${tap}_v`] || ''}" style="width:70px"></td>
+                                <td><input type="text" id="wr_lv_${tap}_w" value="${testData.windingResistanceLV[`tap${tap}_w`] || ''}" style="width:70px"></td>
+                            </tr>
+                        `).join('')}
+                    </table>
+                    <div><small>All values are in ohm.</small></div>
+                </div>
+
+                <!-- 5. Insulation Resistance Test -->
+                <div class="test-group">
+                    <h4>(5) Insulation Resistance Test of Transformer</h4>
+                    <div><small>Applied Voltage: 5 kV</small></div>
+                    <table class="test-table">
+                        <tr><th></th><th>60 Sec</th><th>600 Sec</th><th>PI</th></tr>
+                        <tr>
+                            <td>HV-LV</td>
+                            ${['hv_lv_60','hv_lv_600','hv_lv_pi'].map(f => `<td><input type="text" id="ir_${f}" value="${testData.insulationResistance[f] || ''}" style="width:70px"></td>`).join('')}
+                        </tr>
+                        <tr>
+                            <td>HV-E</td>
+                            ${['hv_e_60','hv_e_600','hv_e_pi'].map(f => `<td><input type="text" id="ir_${f}" value="${testData.insulationResistance[f] || ''}" style="width:70px"></td>`).join('')}
+                        </tr>
+                        <tr>
+                            <td>LV-E</td>
+                            ${['lv_e_60','lv_e_600','lv_e_pi'].map(f => `<td><input type="text" id="ir_${f}" value="${testData.insulationResistance[f] || ''}" style="width:70px"></td>`).join('')}
+                        </tr>
+                    </table>
+                    <div><small>All values are in Giga ohm.</small></div>
+                </div>
+
+                <!-- 6. CFT Insulation Resistance Test -->
+                <div class="test-group">
+                    <h4>(6) Insulation Resistance Test of CFT</h4>
+                    <div><small>Applied Voltage: 500V</small></div>
+                    <table class="test-table">
+                        <tr><th>Core-Frame</th><th>Frame-Tank</th><th>Core-Tank</th></tr>
+                        <tr>
+                            <td><input type="text" id="cft_cf" value="${testData.cftInsulation.core_frame}" style="width:80px"></td>
+                            <td><input type="text" id="cft_ft" value="${testData.cftInsulation.frame_tank}" style="width:80px"></td>
+                            <td><input type="text" id="cft_ct" value="${testData.cftInsulation.core_tank}" style="width:80px"></td>
+                        </tr>
+                    </table>
+                    <div><small>All values are in Giga ohm.</small></div>
+                </div>
+
+                <!-- 7. Turn Ratio Test -->
+                <div class="test-group">
+                    <h4>(7) Turn Ratio Test</h4>
+                    <table class="test-table">
+                        <tr><th>Tap Position</th><th>Phase U</th><th>Phase V</th><th>Phase W</th></tr>
+                        ${[0,5,17].map(tap => `
+                            <tr>
+                                <td><b>${tap === 5 ? '05(Normal)' : tap}</b></td>
+                                <td><input type="text" id="tr_${tap}_U" value="${testData.turnRatio[`tap${tap}_U`] || ''}" style="width:80px"></td>
+                                <td><input type="text" id="tr_${tap}_V" value="${testData.turnRatio[`tap${tap}_V`] || ''}" style="width:80px"></td>
+                                <td><input type="text" id="tr_${tap}_W" value="${testData.turnRatio[`tap${tap}_W`] || ''}" style="width:80px"></td>
+                            </tr>
+                        `).join('')}
+                    </table>
+                </div>
+
+                <!-- 8. DC Voltage -->
+                <div class="test-group">
+                    <h4>(9) DC Voltage</h4>
+                    <span class="inline-input">+VE to -VE: <input type="text" id="dc_pn" value="${testData.dcVoltage.positive_negative}" style="width:80px"> V</span>
+                    <span class="inline-input">+VE to Earth: <input type="text" id="dc_pe" value="${testData.dcVoltage.positive_earth}" style="width:80px"> V</span>
+                    <span class="inline-input">-VE to Earth: <input type="text" id="dc_ne" value="${testData.dcVoltage.negative_earth}" style="width:80px"> V</span>
+                </div>
+
+                <!-- 9. Earthing Resistance -->
+                <div class="test-group">
+                    <h4>(10) Earthing Resistance</h4>
+                    <span class="inline-input">HV-E: <input type="text" id="er_hve" value="${testData.earthingResistance.hv_e}" style="width:80px"> ohm</span>
+                    <span class="inline-input">LV-E: <input type="text" id="er_lve" value="${testData.earthingResistance.lv_e}" style="width:80px"> ohm</span>
+                    <span class="inline-input">Body: <input type="text" id="er_body" value="${testData.earthingResistance.body}" style="width:80px"> ohm</span>
+                </div>
+
+                <!-- Remarks -->
+                <div class="test-group">
+                    <h4>Note / Remarks</h4>
+                    <textarea id="notes" rows="3">${testData.notes}</textarea>
+                </div>
+            `;
+            document.getElementById('testForm').innerHTML = html;
+        }
+
+        function collectFormData() {
+            testData.dateOfTesting = document.getElementById('testDate')?.value || new Date().toISOString().split('T')[0];
+            testData.coreBalance = {
+                VRY: document.getElementById('cb_vry')?.value || '',
+                VYB: document.getElementById('cb_vyb')?.value || '',
+                VRB: document.getElementById('cb_vrb')?.value || ''
+            };
+            
+            for (let tap of [0,5,17]) {
+                for (let field of ['VRN','VYN','VBN','Vrn','Vyn','Vbn']) {
+                    const val = document.getElementById(`mc_${tap}_${field}`)?.value || '';
+                    testData.magnetisingCurrent[`tap${tap}`][field] = val;
+                }
+            }
+            
+            for (let tap of [0,5,17]) {
+                for (let field of ['IR','IY','IB','Ir','Iy','Ib','IN','In']) {
+                    const val = document.getElementById(`sc_${tap}_${field}`)?.value || '';
+                    testData.shortCircuit[`tap${tap}`][field] = val;
+                }
+            }
+            
+            testData.vectorGroup = {
+                v1v2: document.getElementById('vg_v1v2')?.value || '',
+                v1w2: document.getElementById('vg_v1w2')?.value || '',
+                w1v2: document.getElementById('vg_w1v2')?.value || '',
+                w1w2: document.getElementById('vg_w1w2')?.value || '',
+                un: document.getElementById('vg_un')?.value || ''
+            };
+            
+            testData.notes = document.getElementById('notes')?.value || '';
+        }
+
+        async function saveTestData() {
+            if (!currentEquipment) { showStatus('No PTR selected', 'error'); return; }
+            collectFormData();
+            
+            try {
+                const response = await fetch(`${API_URL}/equipment/${currentEquipment._id}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${authToken}`
+                    },
+                    body: JSON.stringify({ 
+                        testValues: [JSON.stringify(testData)], 
+                        remarks: testData.notes 
+                    })
+                });
+                if (response.ok) {
+                    showStatus('Test data saved successfully!', 'success');
+                } else {
+                    showStatus('Error saving data', 'error');
+                }
+            } catch (error) {
+                showStatus('Error saving data', 'error');
+            }
+        }
+
+        async function addEquipment() {
+            const equipmentId = document.getElementById('eqId').value.trim();
+            if (!equipmentId) { showStatus('Equipment ID required', 'error'); return; }
+            
+            const equipmentData = {
+                gridId: currentGrid._id,
+                equipmentType: 'transformer',
+                equipmentId: equipmentId,
+                name: equipmentId,
+                rating: document.getElementById('eqRating').value,
+                make: document.getElementById('eqMake').value,
+                serialNumber: document.getElementById('eqSerial').value,
+                voltageRatio: document.getElementById('eqVoltage').value,
+                testValues: []
+            };
+            
+            try {
+                const response = await fetch(`${API_URL}/equipment`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${authToken}`
+                    },
+                    body: JSON.stringify(equipmentData)
+                });
+                if (response.ok) {
+                    closeModal('addEquipmentModal');
+                    showStatus('PTR added successfully!', 'success');
+                    loadEquipment();
+                } else {
+                    const error = await response.json();
+                    showStatus(error.error || 'Error adding PTR', 'error');
+                }
+            } catch (error) {
+                showStatus('Error adding PTR', 'error');
+            }
+        }
+
+        async function deleteEquipment(id) {
+            if (confirm('Delete this PTR? All test data will be lost!')) {
+                try {
+                    await fetch(`${API_URL}/equipment/${id}`, {
+                        method: 'DELETE',
+                        headers: { 'Authorization': `Bearer ${authToken}` }
+                    });
+                    loadEquipment();
+                    if (currentEquipment && currentEquipment._id === id) {
+                        currentEquipment = null;
+                        document.getElementById('testForm').innerHTML = '';
+                        document.getElementById('actionButtons').style.display = 'none';
+                    }
+                    showStatus('PTR deleted', 'success');
+                } catch (error) {
+                    showStatus('Error deleting', 'error');
+                }
+            }
+        }
+
+        function showAddGridModal() {
+            document.getElementById('addGridModal').style.display = 'flex';
+        }
+
+        async function addGrid() {
+            const name = document.getElementById('gridName').value.trim();
+            if (!name) { showStatus('Grid name required', 'error'); return; }
+            
+            try {
+                const response = await fetch(`${API_URL}/grids`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${authToken}`
+                    },
+                    body: JSON.stringify({ name, location: document.getElementById('gridLocation').value })
+                });
+                if (response.ok) {
+                    closeModal('addGridModal');
+                    showStatus('Grid added!', 'success');
+                    loadGrids();
+                } else {
+                    const error = await response.json();
+                    showStatus(error.error, 'error');
+                }
+            } catch (error) {
+                showStatus('Error adding grid', 'error');
+            }
+        }
+
+        function generatePDF() {
+            if (!currentEquipment) { showStatus('No PTR selected', 'error'); return; }
+            collectFormData();
+            
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF('p', 'mm', 'a4');
+            let y = 20;
+            
+            doc.setFontSize(16);
+            doc.text("T&C Koshi - PTR Test Report", 20, y);
+            y += 10;
+            doc.setFontSize(12);
+            doc.text(`${currentEquipment.rating || ''} ${currentEquipment.equipmentId} (Make- ${currentEquipment.make || 'N/A'})`, 20, y);
+            y += 7;
+            doc.text(`Date of Testing: ${testData.dateOfTesting}`, 20, y);
+            y += 12;
+            
+            // Core Balance
+            doc.setFontSize(11);
+            doc.text("(1) Core Balance and Magnetising Current Test:", 20, y);
+            y += 6;
+            doc.text(`VRY: ${testData.coreBalance.VRY}V  VYB: ${testData.coreBalance.VYB}V  VRB: ${testData.coreBalance.VRB}V`, 25, y);
+            y += 8;
+            
+            doc.save(`PTR_Test_Report_${currentEquipment.equipmentId}.pdf`);
+            showStatus('PDF Generated!', 'success');
+        }
+
+        function printReport() {
+            if (!currentEquipment) { showStatus('No PTR selected', 'error'); return; }
+            window.print();
+        }
+
+        function showAddEquipmentModal(type) {
+            if (!currentGrid) { showStatus('Please select a grid first', 'error'); return; }
+            document.getElementById('addEquipmentModal').style.display = 'flex';
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).style.display = 'none';
+        }
+
+        function logout() {
+            localStorage.clear();
+            location.reload();
+        }
+
+        function showStatus(msg, type) {
+            const div = document.getElementById('statusMsg');
+            div.textContent = msg;
+            div.style.backgroundColor = type === 'success' ? '#28a745' : '#dc3545';
+            div.style.display = 'block';
+            setTimeout(() => div.style.display = 'none', 3000);
+        }
+
+        function showError(msg) {
+            const div = document.getElementById('loginError');
+            div.textContent = msg;
+            div.style.display = 'block';
+        }
+
+        if (authToken) {
+            const user = JSON.parse(localStorage.getItem('user') || '{}');
+            currentUser = user;
+            document.getElementById('loginPage').style.display = 'none';
+            document.getElementById('mainApp').style.display = 'block';
+            document.getElementById('userNameDisplay').innerHTML = user.fullName || user.username;
+            loadGrids();
+        }
+    </script>
+</body>
+</html>
