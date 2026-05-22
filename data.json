@@ -1,0 +1,38 @@
+{
+  "users": [
+    {
+      "id": "1",
+      "username": "admin",
+      "password": "$2a$10$gm/1s0WCeXSXV5/3rYR68uHvyjkq3F3Fr1s10meVnZEUghdeb1prK",
+      "fullName": "Administrator",
+      "role": "admin"
+    }
+  ],
+  "grids": [
+    {
+      "_id": "1",
+      "name": "Grid Alpha",
+      "location": "Substation A"
+    },
+    {
+      "_id": "2",
+      "name": "Grid Beta",
+      "location": "Substation B"
+    }
+  ],
+  "equipment": [
+    {
+      "_id": "1779471024165",
+      "gridId": "1",
+      "equipmentType": "transformer",
+      "equipmentId": "Tr-1",
+      "name": "Tr-1",
+      "rating": "20",
+      "make": "erwer",
+      "serialNumber": "rwer",
+      "testValues": [],
+      "voltageRatio": "220/132kV",
+      "createdAt": "2026-05-22T17:30:24.165Z"
+    }
+  ]
+}
