@@ -171,7 +171,6 @@
             cursor: pointer;
         }
         
-        /* Test Form Styles - Matching PDF Format */
         .current-equipment {
             background: linear-gradient(135deg, #667eea15, #764ba215);
             padding: 15px;
@@ -311,18 +310,84 @@
             font-weight: bold;
         }
         
+        /* PDF Print Styles */
         @media print {
-            .sidebar, .grid-section, .action-buttons, .header, .btn-add-equipment, .btn-delete, .user-info {
-                display: none;
+            .sidebar, .grid-section, .action-buttons, .header, .btn-add-equipment, .btn-delete, .user-info, .modal, .status {
+                display: none !important;
             }
             .content-area {
                 margin: 0;
                 padding: 0;
+                width: 100%;
             }
             .test-group {
                 break-inside: avoid;
                 page-break-inside: avoid;
             }
+            .test-table input {
+                border: none;
+                background: transparent;
+                text-align: center;
+                width: 70px;
+            }
+            .current-equipment {
+                background: #f0f0f0;
+            }
+        }
+        
+        /* Report Preview for PDF */
+        .report-preview {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: white;
+            z-index: 2000;
+            overflow-y: auto;
+            padding: 30px;
+        }
+        .report-preview .report-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .report-preview table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+        }
+        .report-preview th, .report-preview td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: center;
+        }
+        .report-preview th {
+            background: #f5f5f5;
+        }
+        .close-preview {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #dc3545;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            z-index: 2001;
+        }
+        .download-pdf {
+            position: fixed;
+            top: 20px;
+            right: 150px;
+            background: #28a745;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            z-index: 2001;
         }
     </style>
 </head>
@@ -377,13 +442,19 @@
                         <div id="testForm"></div>
                         <div class="action-buttons" id="actionButtons" style="display: none;">
                             <button class="btn-save" onclick="saveTestData()"><i class="fas fa-save"></i> Save Test Results</button>
-                            <button class="btn-pdf" onclick="generatePDF()"><i class="fas fa-file-pdf"></i> Download PDF</button>
-                            <button class="btn-print" onclick="printReport()"><i class="fas fa-print"></i> Print Report</button>
+                            <button class="btn-pdf" onclick="generateFullPDF()"><i class="fas fa-file-pdf"></i> Download PDF</button>
+                            <button class="btn-print" onclick="printFullReport()"><i class="fas fa-print"></i> Print Report</button>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
+    </div>
+
+    <div id="reportPreview" class="report-preview">
+        <button class="close-preview" onclick="closePreview()"><i class="fas fa-times"></i> Close</button>
+        <button class="download-pdf" onclick="downloadPDFFromPreview()"><i class="fas fa-download"></i> Download PDF</button>
+        <div id="previewContent"></div>
     </div>
 
     <div id="addGridModal" class="modal">
@@ -425,7 +496,6 @@
         let currentEquipment = null;
         let currentUser = null;
 
-        // Test data structure matching your PDF exactly
         let testData = {
             dateOfTesting: new Date().toISOString().split('T')[0],
             coreBalance: { VRY: '', VYB: '', VRB: '' },
@@ -486,7 +556,7 @@
                     showError(data.error);
                 }
             } catch (error) {
-                showError('Cannot connect to server. Make sure server is running.');
+                showError('Cannot connect to server.');
             }
         }
 
@@ -571,7 +641,6 @@
                     Date of Testing: <input type="date" id="testDate" value="${testData.dateOfTesting}">
                 </div>
                 
-                <!-- 1. Core Balance and Magnetising Current Test -->
                 <div class="test-group">
                     <h4>(1) Core Balance and Magnetising Current Test</h4>
                     <div style="margin-bottom: 10px;">
@@ -593,7 +662,6 @@
                     <div><small>All values are in volt.</small></div>
                 </div>
 
-                <!-- 2. Short Circuit Test -->
                 <div class="test-group">
                     <h4>(2) Short Circuit Test</h4>
                     <table class="test-table">
@@ -610,7 +678,6 @@
                     <div><small>All values are in Ampere</small></div>
                 </div>
 
-                <!-- 3. Vector Group -->
                 <div class="test-group">
                     <h4>(3) Vector Group (YNyn0)</h4>
                     <table class="test-table">
@@ -626,7 +693,6 @@
                     <div><small>All values are in volt.</small></div>
                 </div>
 
-                <!-- 4. Winding Resistance Test -->
                 <div class="test-group">
                     <h4>(4) Winding Resistance Test</h4>
                     <div><small>Applied Current: 10 A</small></div>
@@ -647,9 +713,8 @@
                     <div><small>All values are in ohm.</small></div>
                 </div>
 
-                <!-- 5. Insulation Resistance Test -->
                 <div class="test-group">
-                    <h4>(5) Insulation Resistance Test of Transformer</h4>
+                    <h4>(5) Insulation Resistance Test</h4>
                     <div><small>Applied Voltage: 5 kV</small></div>
                     <table class="test-table">
                         <tr><th></th><th>60 Sec</th><th>600 Sec</th><th>PI</th></tr>
@@ -669,9 +734,8 @@
                     <div><small>All values are in Giga ohm.</small></div>
                 </div>
 
-                <!-- 6. CFT Insulation Resistance Test -->
                 <div class="test-group">
-                    <h4>(6) Insulation Resistance Test of CFT</h4>
+                    <h4>(6) CFT Insulation Resistance Test</h4>
                     <div><small>Applied Voltage: 500V</small></div>
                     <table class="test-table">
                         <tr><th>Core-Frame</th><th>Frame-Tank</th><th>Core-Tank</th></tr>
@@ -684,7 +748,6 @@
                     <div><small>All values are in Giga ohm.</small></div>
                 </div>
 
-                <!-- 7. Turn Ratio Test -->
                 <div class="test-group">
                     <h4>(7) Turn Ratio Test</h4>
                     <table class="test-table">
@@ -700,25 +763,22 @@
                     </table>
                 </div>
 
-                <!-- 8. DC Voltage -->
                 <div class="test-group">
-                    <h4>(9) DC Voltage</h4>
+                    <h4>(8) DC Voltage</h4>
                     <span class="inline-input">+VE to -VE: <input type="text" id="dc_pn" value="${testData.dcVoltage.positive_negative}" style="width:80px"> V</span>
                     <span class="inline-input">+VE to Earth: <input type="text" id="dc_pe" value="${testData.dcVoltage.positive_earth}" style="width:80px"> V</span>
                     <span class="inline-input">-VE to Earth: <input type="text" id="dc_ne" value="${testData.dcVoltage.negative_earth}" style="width:80px"> V</span>
                 </div>
 
-                <!-- 9. Earthing Resistance -->
                 <div class="test-group">
-                    <h4>(10) Earthing Resistance</h4>
+                    <h4>(9) Earthing Resistance</h4>
                     <span class="inline-input">HV-E: <input type="text" id="er_hve" value="${testData.earthingResistance.hv_e}" style="width:80px"> ohm</span>
                     <span class="inline-input">LV-E: <input type="text" id="er_lve" value="${testData.earthingResistance.lv_e}" style="width:80px"> ohm</span>
                     <span class="inline-input">Body: <input type="text" id="er_body" value="${testData.earthingResistance.body}" style="width:80px"> ohm</span>
                 </div>
 
-                <!-- Remarks -->
                 <div class="test-group">
-                    <h4>Note / Remarks</h4>
+                    <h4>Remarks / Notes</h4>
                     <textarea id="notes" rows="3">${testData.notes}</textarea>
                 </div>
             `;
@@ -755,6 +815,43 @@
                 un: document.getElementById('vg_un')?.value || ''
             };
             
+            for (let tap of [0,5,17]) {
+                testData.windingResistanceHV[`tap${tap}_U`] = document.getElementById(`wr_hv_${tap}_U`)?.value || '';
+                testData.windingResistanceHV[`tap${tap}_V`] = document.getElementById(`wr_hv_${tap}_V`)?.value || '';
+                testData.windingResistanceHV[`tap${tap}_W`] = document.getElementById(`wr_hv_${tap}_W`)?.value || '';
+                testData.windingResistanceLV[`tap${tap}_u`] = document.getElementById(`wr_lv_${tap}_u`)?.value || '';
+                testData.windingResistanceLV[`tap${tap}_v`] = document.getElementById(`wr_lv_${tap}_v`)?.value || '';
+                testData.windingResistanceLV[`tap${tap}_w`] = document.getElementById(`wr_lv_${tap}_w`)?.value || '';
+            }
+            
+            for (let field of ['hv_lv_60','hv_lv_600','hv_lv_pi','hv_e_60','hv_e_600','hv_e_pi','lv_e_60','lv_e_600','lv_e_pi']) {
+                testData.insulationResistance[field] = document.getElementById(`ir_${field}`)?.value || '';
+            }
+            
+            testData.cftInsulation = {
+                core_frame: document.getElementById('cft_cf')?.value || '',
+                frame_tank: document.getElementById('cft_ft')?.value || '',
+                core_tank: document.getElementById('cft_ct')?.value || ''
+            };
+            
+            for (let tap of [0,5,17]) {
+                testData.turnRatio[`tap${tap}_U`] = document.getElementById(`tr_${tap}_U`)?.value || '';
+                testData.turnRatio[`tap${tap}_V`] = document.getElementById(`tr_${tap}_V`)?.value || '';
+                testData.turnRatio[`tap${tap}_W`] = document.getElementById(`tr_${tap}_W`)?.value || '';
+            }
+            
+            testData.dcVoltage = {
+                positive_negative: document.getElementById('dc_pn')?.value || '',
+                positive_earth: document.getElementById('dc_pe')?.value || '',
+                negative_earth: document.getElementById('dc_ne')?.value || ''
+            };
+            
+            testData.earthingResistance = {
+                hv_e: document.getElementById('er_hve')?.value || '',
+                lv_e: document.getElementById('er_lve')?.value || '',
+                body: document.getElementById('er_body')?.value || ''
+            };
+            
             testData.notes = document.getElementById('notes')?.value || '';
         }
 
@@ -782,6 +879,233 @@
             } catch (error) {
                 showStatus('Error saving data', 'error');
             }
+        }
+
+        function generateFullReportHTML() {
+            return `
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <title>PTR Test Report - ${currentEquipment.equipmentId}</title>
+                    <meta charset="UTF-8">
+                    <style>
+                        body { font-family: 'Segoe UI', Arial, sans-serif; margin: 40px; font-size: 12px; }
+                        h1 { color: #1a4a5f; text-align: center; }
+                        .header { text-align: center; margin-bottom: 30px; }
+                        .info-box { background: #f0f0f0; padding: 15px; margin: 20px 0; border-radius: 5px; }
+                        table { border-collapse: collapse; width: 100%; margin: 15px 0; }
+                        th, td { border: 1px solid #ddd; padding: 8px; text-align: center; }
+                        th { background: #f5f5f5; font-weight: bold; }
+                        .section { margin: 25px 0; page-break-inside: avoid; }
+                        .section h3 { background: #1a4a5f; color: white; padding: 8px; border-radius: 5px; }
+                        .footer { margin-top: 30px; text-align: center; font-size: 10px; color: #999; }
+                        .small-note { font-size: 10px; color: #666; margin-top: 5px; }
+                    </style>
+                </head>
+                <body>
+                    <h1>T&C Koshi - PTR Test Report</h1>
+                    <div class="header">
+                        <p><strong>${currentEquipment.rating || ''} ${currentEquipment.equipmentId} (Make: ${currentEquipment.make || 'N/A'})</strong></p>
+                        <p>Date of Testing: ${testData.dateOfTesting}</p>
+                    </div>
+                    
+                    <div class="section">
+                        <h3>(1) Core Balance and Magnetising Current Test</h3>
+                        <p>VRY: ${testData.coreBalance.VRY}V &nbsp; VYB: ${testData.coreBalance.VYB}V &nbsp; VRB: ${testData.coreBalance.VRB}V</p>
+                        <table>
+                            <tr><th>TAP POSITION</th><th>VRN</th><th>VYN</th><th>VBN</th><th>Vrn</th><th>Vyn</th><th>Vbn</th></tr>
+                            ${[0,5,17].map(tap => `
+                                <tr>
+                                    <td><b>${tap === 5 ? '05(Normal)' : tap}</b></td>
+                                    ${['VRN','VYN','VBN','Vrn','Vyn','Vbn'].map(f => `<td>${testData.magnetisingCurrent[`tap${tap}`][f] || '-'}</td>`).join('')}
+                                </tr>
+                            `).join('')}
+                        </table>
+                        <div class="small-note">All values are in volt.</div>
+                    </div>
+
+                    <div class="section">
+                        <h3>(2) Short Circuit Test</h3>
+                        <table>
+                            <tr><th>TAP POSITION</th><th>IR</th><th>IY</th><th>IB</th><th>Ir</th><th>Iy</th><th>Ib</th><th>IN</th><th>In</th></tr>
+                            ${[0,5,17].map(tap => `
+                                <tr>
+                                    <td><b>${tap === 5 ? '05(Normal)' : tap}</b></td>
+                                    ${['IR','IY','IB','Ir','Iy','Ib','IN','In'].map(f => `<td>${testData.shortCircuit[`tap${tap}`][f] || '-'}</td>`).join('')}
+                                </tr>
+                            `).join('')}
+                        </table>
+                        <div class="small-note">All values are in Ampere.</div>
+                    </div>
+
+                    <div class="section">
+                        <h3>(3) Vector Group (YNyn0)</h3>
+                        <table>
+                            <tr><th>1V-2V</th><th>1V-2W</th><th>1W-2V</th><th>1W-2W</th><th>1UN = 2Un + Nn</th></tr>
+                            <tr>
+                                <td>${testData.vectorGroup.v1v2 || '-'}</td>
+                                <td>${testData.vectorGroup.v1w2 || '-'}</td>
+                                <td>${testData.vectorGroup.w1v2 || '-'}</td>
+                                <td>${testData.vectorGroup.w1w2 || '-'}</td>
+                                <td>${testData.vectorGroup.un || '-'}</td>
+                            </tr>
+                        </table>
+                        <div class="small-note">All values are in volt.</div>
+                    </div>
+
+                    <div class="section">
+                        <h3>(4) Winding Resistance Test</h3>
+                        <div class="small-note">Applied Current: 10 A</div>
+                        <table>
+                            <tr><th>Tap Position</th><th>1U-N (HV)</th><th>1V-N (HV)</th><th>1W-N (HV)</th><th>2U-n (LV)</th><th>2V-n (LV)</th><th>2W-n (LV)</th></tr>
+                            ${[0,5,17].map(tap => `
+                                <tr>
+                                    <td><b>${tap === 5 ? '05(Normal)' : tap}</b></td>
+                                    <td>${testData.windingResistanceHV[`tap${tap}_U`] || '-'}</td>
+                                    <td>${testData.windingResistanceHV[`tap${tap}_V`] || '-'}</td>
+                                    <td>${testData.windingResistanceHV[`tap${tap}_W`] || '-'}</td>
+                                    <td>${testData.windingResistanceLV[`tap${tap}_u`] || '-'}</td>
+                                    <td>${testData.windingResistanceLV[`tap${tap}_v`] || '-'}</td>
+                                    <td>${testData.windingResistanceLV[`tap${tap}_w`] || '-'}</td>
+                                </tr>
+                            `).join('')}
+                        </table>
+                        <div class="small-note">All values are in ohm.</div>
+                    </div>
+
+                    <div class="section">
+                        <h3>(5) Insulation Resistance Test</h3>
+                        <div class="small-note">Applied Voltage: 5 kV</div>
+                        <table>
+                            <tr><th></th><th>60 Sec</th><th>600 Sec</th><th>PI</th></tr>
+                            <tr><td>HV-LV</td>
+                                <td>${testData.insulationResistance.hv_lv_60 || '-'}</td>
+                                <td>${testData.insulationResistance.hv_lv_600 || '-'}</td>
+                                <td>${testData.insulationResistance.hv_lv_pi || '-'}</td>
+                            </tr>
+                            <tr><td>HV-E</td>
+                                <td>${testData.insulationResistance.hv_e_60 || '-'}</td>
+                                <td>${testData.insulationResistance.hv_e_600 || '-'}</td>
+                                <td>${testData.insulationResistance.hv_e_pi || '-'}</td>
+                            </tr>
+                            <tr><td>LV-E</td>
+                                <td>${testData.insulationResistance.lv_e_60 || '-'}</td>
+                                <td>${testData.insulationResistance.lv_e_600 || '-'}</td>
+                                <td>${testData.insulationResistance.lv_e_pi || '-'}</td>
+                            </tr>
+                        </table>
+                        <div class="small-note">All values are in Giga ohm.</div>
+                    </div>
+
+                    <div class="section">
+                        <h3>(6) CFT Insulation Resistance Test</h3>
+                        <div class="small-note">Applied Voltage: 500V</div>
+                        <table>
+                            <tr><th>Core-Frame</th><th>Frame-Tank</th><th>Core-Tank</th></tr>
+                            <tr>
+                                <td>${testData.cftInsulation.core_frame || '-'}</td>
+                                <td>${testData.cftInsulation.frame_tank || '-'}</td>
+                                <td>${testData.cftInsulation.core_tank || '-'}</td>
+                            </tr>
+                        </table>
+                        <div class="small-note">All values are in Giga ohm.</div>
+                    </div>
+
+                    <div class="section">
+                        <h3>(7) Turn Ratio Test</h3>
+                        <table>
+                            <tr><th>Tap Position</th><th>Phase U</th><th>Phase V</th><th>Phase W</th></tr>
+                            ${[0,5,17].map(tap => `
+                                <tr>
+                                    <td><b>${tap === 5 ? '05(Normal)' : tap}</b></td>
+                                    <td>${testData.turnRatio[`tap${tap}_U`] || '-'}</td>
+                                    <td>${testData.turnRatio[`tap${tap}_V`] || '-'}</td>
+                                    <td>${testData.turnRatio[`tap${tap}_W`] || '-'}</td>
+                                </tr>
+                            `).join('')}
+                        </table>
+                    </div>
+
+                    <div class="section">
+                        <h3>(8) DC Voltage</h3>
+                        <p>+VE to -VE: ${testData.dcVoltage.positive_negative || '-'} V &nbsp; 
+                           +VE to Earth: ${testData.dcVoltage.positive_earth || '-'} V &nbsp; 
+                           -VE to Earth: ${testData.dcVoltage.negative_earth || '-'} V</p>
+                    </div>
+
+                    <div class="section">
+                        <h3>(9) Earthing Resistance</h3>
+                        <p>HV-E: ${testData.earthingResistance.hv_e || '-'} ohm &nbsp;
+                           LV-E: ${testData.earthingResistance.lv_e || '-'} ohm &nbsp;
+                           Body: ${testData.earthingResistance.body || '-'} ohm</p>
+                    </div>
+
+                    <div class="section">
+                        <h3>Remarks / Notes</h3>
+                        <p>${testData.notes || 'No remarks'}</p>
+                    </div>
+
+                    <div class="footer">
+                        Generated by T&C Koshi Test Management System on ${new Date().toLocaleString()}
+                    </div>
+                </body>
+                </html>
+            `;
+        }
+
+        function generateFullPDF() {
+            if (!currentEquipment) { showStatus('No PTR selected', 'error'); return; }
+            collectFormData();
+            
+            const reportHtml = generateFullReportHTML();
+            const previewDiv = document.getElementById('previewContent');
+            previewDiv.innerHTML = reportHtml;
+            document.getElementById('reportPreview').style.display = 'block';
+        }
+
+        function downloadPDFFromPreview() {
+            const element = document.getElementById('previewContent');
+            html2canvas(element, {
+                scale: 2,
+                backgroundColor: '#ffffff',
+                logging: false
+            }).then(canvas => {
+                const imgData = canvas.toDataURL('image/png');
+                const { jsPDF } = window.jspdf;
+                const pdf = new jsPDF('p', 'mm', 'a4');
+                const imgWidth = 210;
+                const pageHeight = 297;
+                const imgHeight = (canvas.height * imgWidth) / canvas.width;
+                let heightLeft = imgHeight;
+                let position = 0;
+                
+                pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+                heightLeft -= pageHeight;
+                
+                while (heightLeft > 0) {
+                    position = heightLeft - imgHeight;
+                    pdf.addPage();
+                    pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+                    heightLeft -= pageHeight;
+                }
+                
+                pdf.save(`PTR_Test_Report_${currentEquipment.equipmentId}_${testData.dateOfTesting}.pdf`);
+                showStatus('PDF downloaded successfully!', 'success');
+            });
+        }
+
+        function closePreview() {
+            document.getElementById('reportPreview').style.display = 'none';
+        }
+
+        function printFullReport() {
+            if (!currentEquipment) { showStatus('No PTR selected', 'error'); return; }
+            collectFormData();
+            
+            const printWindow = window.open('', '_blank');
+            printWindow.document.write(generateFullReportHTML());
+            printWindow.document.close();
+            printWindow.print();
         }
 
         async function addEquipment() {
@@ -870,39 +1194,6 @@
             } catch (error) {
                 showStatus('Error adding grid', 'error');
             }
-        }
-
-        function generatePDF() {
-            if (!currentEquipment) { showStatus('No PTR selected', 'error'); return; }
-            collectFormData();
-            
-            const { jsPDF } = window.jspdf;
-            const doc = new jsPDF('p', 'mm', 'a4');
-            let y = 20;
-            
-            doc.setFontSize(16);
-            doc.text("T&C Koshi - PTR Test Report", 20, y);
-            y += 10;
-            doc.setFontSize(12);
-            doc.text(`${currentEquipment.rating || ''} ${currentEquipment.equipmentId} (Make- ${currentEquipment.make || 'N/A'})`, 20, y);
-            y += 7;
-            doc.text(`Date of Testing: ${testData.dateOfTesting}`, 20, y);
-            y += 12;
-            
-            // Core Balance
-            doc.setFontSize(11);
-            doc.text("(1) Core Balance and Magnetising Current Test:", 20, y);
-            y += 6;
-            doc.text(`VRY: ${testData.coreBalance.VRY}V  VYB: ${testData.coreBalance.VYB}V  VRB: ${testData.coreBalance.VRB}V`, 25, y);
-            y += 8;
-            
-            doc.save(`PTR_Test_Report_${currentEquipment.equipmentId}.pdf`);
-            showStatus('PDF Generated!', 'success');
-        }
-
-        function printReport() {
-            if (!currentEquipment) { showStatus('No PTR selected', 'error'); return; }
-            window.print();
         }
 
         function showAddEquipmentModal(type) {
