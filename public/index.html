@@ -302,55 +302,6 @@
                 break-inside: avoid;
                 page-break-inside: avoid;
             }
-            .test-table input {
-                border: none;
-                background: transparent;
-            }
-        }
-        
-        /* Report Print Styles */
-        .report-container {
-            font-family: 'Times New Roman', Arial, sans-serif;
-            max-width: 100%;
-            margin: 0 auto;
-            padding: 20px;
-        }
-        .report-header {
-            text-align: center;
-            margin-bottom: 20px;
-        }
-        .report-header h1 {
-            font-size: 18px;
-            margin-bottom: 5px;
-        }
-        .report-info {
-            margin-bottom: 15px;
-            font-size: 12px;
-        }
-        .report-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin: 10px 0;
-            font-size: 10px;
-        }
-        .report-table th, .report-table td {
-            border: 1px solid #000;
-            padding: 6px;
-            text-align: center;
-        }
-        .report-table th {
-            background: #f0f0f0;
-            font-weight: bold;
-        }
-        .report-section {
-            margin: 20px 0;
-            page-break-inside: avoid;
-        }
-        .report-section h3 {
-            font-size: 13px;
-            margin-bottom: 8px;
-            padding-bottom: 3px;
-            border-bottom: 1px solid #000;
         }
     </style>
 </head>
@@ -626,7 +577,7 @@
                 <div class="test-group">
                     <h4>2. Short Circuit Test</h4>
                     <table class="test-table">
-                        <tr><th>Tap</th><th>IR</th><th>IY</th><th>IB</th><th>Ir</th><th>Iy</th><th>Ib</th><th>IN</th><th>In</th><tr>
+                        <tr><th>Tap</th><th>IR</th><th>IY</th><th>IB</th><th>Ir</th><th>Iy</th><th>Ib</th><th>IN</th><th>In</th></tr>
                         ${[0,1,2].map(i => `<tr>
                             <td><input type="text" id="sc_tap_${i}" value="${testData.scRows[i].tap}" placeholder="Tap" style="width:60px"></td>
                             <td><input type="text" id="sc_${i}_ir" value="${testData.scRows[i].ir}" style="width:60px"></td>
@@ -889,178 +840,118 @@
             }
         }
 
-        function generateReportHTML() {
-            return `
+        function generateFullReport() {
+            if (!currentEquipment) { showStatus('No PTR selected', '#e74c3c'); return; }
+            collectFormData();
+            
+            const reportHtml = `
                 <!DOCTYPE html>
                 <html>
                 <head>
                     <meta charset="UTF-8">
                     <title>PTR Test Report - ${currentEquipment.equipmentId}</title>
                     <style>
-                        body { font-family: 'Times New Roman', Arial, sans-serif; margin: 20mm; font-size: 11px; line-height: 1.3; }
+                        body { font-family: 'Times New Roman', Arial, sans-serif; margin: 20mm; font-size: 11px; }
                         h1 { font-size: 18px; text-align: center; margin-bottom: 5px; }
                         h2 { font-size: 14px; text-align: center; margin-bottom: 15px; font-weight: normal; }
-                        .report-header { text-align: center; margin-bottom: 20px; }
                         .equipment-info { margin: 15px 0; padding: 8px; border: 1px solid #000; background: #f9f9f9; }
                         .equipment-info p { margin: 3px 0; }
                         table { width: 100%; border-collapse: collapse; margin: 12px 0; }
-                        th, td { border: 1px solid #000; padding: 6px; text-align: center; vertical-align: top; }
+                        th, td { border: 1px solid #000; padding: 6px; text-align: center; }
                         th { background: #f0f0f0; font-weight: bold; }
                         .section { margin: 20px 0; page-break-inside: avoid; }
                         .section-title { font-size: 13px; font-weight: bold; margin: 10px 0 5px 0; padding-bottom: 3px; border-bottom: 1px solid #000; }
-                        .signature-table td { border: none; vertical-align: top; width: 33%; }
                         .footer { margin-top: 25px; text-align: center; font-size: 9px; border-top: 1px solid #ccc; padding-top: 10px; }
-                        @media print {
-                            body { margin: 0; padding: 10mm; }
-                            .no-print { display: none; }
-                        }
+                        @media print { body { margin: 0; padding: 10mm; } }
                     </style>
                 </head>
                 <body>
-                    <div class="report-header">
-                        <h1>T&C KOSHI - PTR TEST REPORT</h1>
-                        <h2>Power Transformer Routine Test Certificate</h2>
-                    </div>
+                    <h1>T&C KOSHI - PTR TEST REPORT</h1>
+                    <h2>Power Transformer Routine Test Certificate</h2>
                     
                     <div class="equipment-info">
                         <p><strong>Equipment ID:</strong> ${currentEquipment.equipmentId} &nbsp;|&nbsp; <strong>Rating:</strong> ${currentEquipment.rating || 'N/A'} &nbsp;|&nbsp; <strong>Make:</strong> ${currentEquipment.make || 'N/A'}</p>
                         <p><strong>Serial Number:</strong> ${currentEquipment.serialNumber || 'N/A'} &nbsp;|&nbsp; <strong>Voltage Ratio:</strong> ${currentEquipment.voltageRatio || 'N/A'} &nbsp;|&nbsp; <strong>Test Date:</strong> ${testData.dateOfTesting}</p>
                     </div>
                     
-                    <!-- Section 1: Core Balance -->
+                    <!-- Section 1 -->
                     <div class="section">
                         <div class="section-title">1. Core Balance and Magnetising Current Test</div>
                         <p><strong>VRY:</strong> ${testData.coreBalance.VRY || '-'} V &nbsp;|&nbsp; <strong>VYB:</strong> ${testData.coreBalance.VYB || '-'} V &nbsp;|&nbsp; <strong>VRB:</strong> ${testData.coreBalance.VRB || '-'} V</p>
-                        <table>
-                            <tr><th>Tap</th><th>VRN (HV)</th><th>VYN (HV)</th><th>VBN (HV)</th><th>Vrn (LV)</th><th>Vyn (LV)</th><th>Vbn (LV)</th></tr>
-                            ${testData.magRows.map(r => `<tr><td>${r.tap || '-'}</td><td>${r.vrn || '-'}</td><td>${r.vyn || '-'}</td><td>${r.vbn || '-'}</td><td>${r.vrn_lv || '-'}</td><td>${r.vyn_lv || '-'}</td><td>${r.vbn_lv || '-'}</td></tr>`).join('')}
+                        <table><th>Tap</th><th>VRN (HV)</th><th>VYN (HV)</th><th>VBN (HV)</th><th>Vrn (LV)</th><th>Vyn (LV)</th><th>Vbn (LV)</th></tr>
+                        ${testData.magRows.map(r => `<tr><td>${r.tap || '-'}</td><td>${r.vrn || '-'}</td><td>${r.vyn || '-'}</td><td>${r.vbn || '-'}</td><td>${r.vrn_lv || '-'}</td><td>${r.vyn_lv || '-'}</td><td>${r.vbn_lv || '-'}</td></tr>`).join('')}
                         </table>
                     </div>
                     
-                    <!-- Section 2: Short Circuit -->
+                    <!-- Section 2 -->
                     <div class="section">
                         <div class="section-title">2. Short Circuit Test</div>
-                        <table>
-                            <tr><th>Tap</th><th>IR</th><th>IY</th><th>IB</th><th>Ir</th><th>Iy</th><th>Ib</th><th>IN</th><th>In</th></tr>
-                            ${testData.scRows.map(r => `<tr><td>${r.tap || '-'}</td><td>${r.ir || '-'}</td><td>${r.iy || '-'}</td><td>${r.ib || '-'}</td><td>${r.ir_lv || '-'}</td><td>${r.iy_lv || '-'}</td><td>${r.ib_lv || '-'}</td><td>${r.in_hv || '-'}</td><td>${r.in_lv || '-'}</td></tr>`).join('')}
+                        <table><th>Tap</th><th>IR</th><th>IY</th><th>IB</th><th>Ir</th><th>Iy</th><th>Ib</th><th>IN</th><th>In</th></tr>
+                        ${testData.scRows.map(r => `<tr><td>${r.tap || '-'}</td><td>${r.ir || '-'}</td><td>${r.iy || '-'}</td><td>${r.ib || '-'}</td><td>${r.ir_lv || '-'}</td><td>${r.iy_lv || '-'}</td><td>${r.ib_lv || '-'}</td><td>${r.in_hv || '-'}</td><td>${r.in_lv || '-'}</td></tr>`).join('')}
                         </table>
                     </div>
                     
-                    <!-- Section 3: Vector Group -->
+                    <!-- Section 3 -->
                     <div class="section">
                         <div class="section-title">3. Vector Group (YNyn0)</div>
-                        <table>
-                            <tr><th>1V-2V</th><th>1V-2W</th><th>1W-2V</th><th>1W-2W</th><th>1UN = 2Un + Nn</th></tr>
-                            <tr>
-                                <td>${testData.vectorGroup.v1v2 || '-'} V</td
-                                <td>${testData.vectorGroup.v1w2 || '-'} V</td
-                                <td>${testData.vectorGroup.w1v2 || '-'} V</td
-                                <td>${testData.vectorGroup.w1w2 || '-'} V</td
-                                <td>${testData.vectorGroup.un || '-'} V</td
-                            </tr>
+                        <table><th>1V-2V</th><th>1V-2W</th><th>1W-2V</th><th>1W-2W</th><th>1UN = 2Un + Nn</th></tr>
+                        <tr><td>${testData.vectorGroup.v1v2 || '-'} V</td><td>${testData.vectorGroup.v1w2 || '-'} V</td><td>${testData.vectorGroup.w1v2 || '-'} V</td><td>${testData.vectorGroup.w1w2 || '-'} V</td><td>${testData.vectorGroup.un || '-'} V</td></tr>
                         </table>
                     </div>
                     
-                    <!-- Section 4: Winding Resistance -->
+                    <!-- Section 4 -->
                     <div class="section">
                         <div class="section-title">4. Winding Resistance Test</div>
-                        <table>
-                            <tr><th>Tap</th><th>OTI (°C)</th><th>WTI HV (°C)</th><th>WTI LV (°C)</th><th>HV U-N (Ω)</th><th>HV V-N (Ω)</th><th>HV W-N (Ω)</th><th>LV u-n (Ω)</th><th>LV v-n (Ω)</th><th>LV w-n (Ω)</th></tr>
-                            ${testData.wrRows.map(r => `<tr>
-                                <td>${r.tap || '-'} </td
-                                <td>${r.oti || '-'} </td
-                                <td>${r.wti_hv || '-'} </td
-                                <td>${r.wti_lv || '-'} </td
-                                <td>${r.hv_u || '-'} </td
-                                <td>${r.hv_v || '-'} </td
-                                <td>${r.hv_w || '-'} </td
-                                <td>${r.lv_u || '-'} </td
-                                <td>${r.lv_v || '-'} </td
-                                <td>${r.lv_w || '-'} </td
-                            </tr>`).join('')}
+                        <table><th>Tap</th><th>OTI (°C)</th><th>WTI HV (°C)</th><th>WTI LV (°C)</th><th>HV U-N (Ω)</th><th>HV V-N (Ω)</th><th>HV W-N (Ω)</th><th>LV u-n (Ω)</th><th>LV v-n (Ω)</th><th>LV w-n (Ω)</th></tr>
+                        ${testData.wrRows.map(r => `<tr><td>${r.tap || '-'}</td><td>${r.oti || '-'}</td><td>${r.wti_hv || '-'}</td><td>${r.wti_lv || '-'}</td><td>${r.hv_u || '-'}</td><td>${r.hv_v || '-'}</td><td>${r.hv_w || '-'}</td><td>${r.lv_u || '-'}</td><td>${r.lv_v || '-'}</td><td>${r.lv_w || '-'}</td></tr>`).join('')}
                         </table>
                     </div>
                     
-                    <!-- Section 5: Insulation Resistance -->
+                    <!-- Section 5 -->
                     <div class="section">
                         <div class="section-title">5. Insulation Resistance Test (Applied Voltage: 5 kV)</div>
-                        <table>
-                            <tr><th></th><th>60 Sec (GΩ)</th><th>600 Sec (GΩ)</th><th>PI</th></tr>
-                            <tr>
-                                <td>HV-LV</td
-                                <td>${testData.ir.hv_lv_60 || '-'}</td
-                                <td>${testData.ir.hv_lv_600 || '-'}</td
-                                <td>${testData.ir.hv_lv_pi || '-'}</td
-                            </tr>
-                            <tr>
-                                <td>HV-E</td
-                                <td>${testData.ir.hv_e_60 || '-'}</td
-                                <td>${testData.ir.hv_e_600 || '-'}</td
-                                <td>${testData.ir.hv_e_pi || '-'}</td
-                            </tr>
-                            <tr>
-                                <td>LV-E</td
-                                <td>${testData.ir.lv_e_60 || '-'}</td
-                                <td>${testData.ir.lv_e_600 || '-'}</td
-                                <td>${testData.ir.lv_e_pi || '-'}</td
-                            </tr>
+                        <tr><th></th><th>60 Sec (GΩ)</th><th>600 Sec (GΩ)</th><th>PI</th></tr>
+                        <tr><td>HV-LV</td><td>${testData.ir.hv_lv_60 || '-'}</td><td>${testData.ir.hv_lv_600 || '-'}</td><td>${testData.ir.hv_lv_pi || '-'}</td></tr>
+                        <tr><td>HV-E</td><td>${testData.ir.hv_e_60 || '-'}</td><td>${testData.ir.hv_e_600 || '-'}</td><td>${testData.ir.hv_e_pi || '-'}</td></tr>
+                        <tr><td>LV-E</td><td>${testData.ir.lv_e_60 || '-'}</td><td>${testData.ir.lv_e_600 || '-'}</td><td>${testData.ir.lv_e_pi || '-'}</td></tr>
                         </table>
                     </div>
                     
-                    <!-- Section 6: CFT Insulation -->
+                    <!-- Section 6 -->
                     <div class="section">
                         <div class="section-title">6. CFT Insulation Resistance Test (Applied Voltage: 500V)</div>
-                        <table>
-                            <tr><th>Core-Frame (GΩ)</th><th>Frame-Tank (GΩ)</th><th>Core-Tank (GΩ)</th></tr>
-                            <tr>
-                                <td>${testData.cft.core_frame || '-'}</td
-                                <td>${testData.cft.frame_tank || '-'}</td
-                                <td>${testData.cft.core_tank || '-'}</td
-                            </tr>
+                        <tr><th>Core-Frame (GΩ)</th><th>Frame-Tank (GΩ)</th><th>Core-Tank (GΩ)</th></tr>
+                        <tr><td>${testData.cft.core_frame || '-'}</td><td>${testData.cft.frame_tank || '-'}</td><td>${testData.cft.core_tank || '-'}</td></tr>
                         </table>
                     </div>
                     
-                    <!-- Section 7: Turn Ratio -->
+                    <!-- Section 7 -->
                     <div class="section">
                         <div class="section-title">7. Turn Ratio Test</div>
-                        <table>
-                            <tr><th>Tap</th><th>Phase U</th><th>Phase V</th><th>Phase W</th></tr>
-                            ${testData.trRows.map(r => `<tr>
-                                <td>${r.tap || '-'}</td
-                                <td>${r.u || '-'}</td
-                                <td>${r.v || '-'}</td
-                                <td>${r.w || '-'}</td
-                            </tr>`).join('')}
+                        <tr><th>Tap</th><th>Phase U</th><th>Phase V</th><th>Phase W</th></tr>
+                        ${testData.trRows.map(r => `<tr><td>${r.tap || '-'}</td><td>${r.u || '-'}</td><td>${r.v || '-'}</td><td>${r.w || '-'}</td></tr>`).join('')}
                         </table>
                     </div>
                     
-                    <!-- Section 8: DC Voltage Test -->
+                    <!-- Section 8: DC Voltage Test - SEPARATE TABLE -->
                     <div class="section">
                         <div class="section-title">8. DC Voltage Test</div>
-                        <tr>
+                        <table>
                             <tr><th>+VE to -VE (V)</th><th>+VE to Earth (V)</th><th>-VE to Earth (V)</th></tr>
-                            <tr>
-                                <td>${testData.dcVoltage.pn || '-'}</td
-                                <td>${testData.dcVoltage.pe || '-'}</td
-                                <td>${testData.dcVoltage.ne || '-'}</td
-                            </tr>
+                            <tr><td>${testData.dcVoltage.pn || '-'}</td><td>${testData.dcVoltage.pe || '-'}</td><td>${testData.dcVoltage.ne || '-'}</td></tr>
                         </table>
                     </div>
                     
-                    <!-- Section 9: Earthing Resistance Test -->
+                    <!-- Section 9: Earthing Resistance Test - SEPARATE TABLE -->
                     <div class="section">
                         <div class="section-title">9. Earthing Resistance Test</div>
                         <table>
                             <tr><th>HV-E (Ω)</th><th>LV-E (Ω)</th><th>Body (Ω)</th></tr>
-                            <tr>
-                                <td>${testData.earthing.hv_e || '-'}</td
-                                <td>${testData.earthing.lv_e || '-'}</td
-                                <td>${testData.earthing.body || '-'}</td
-                            </tr>
+                            <tr><td>${testData.earthing.hv_e || '-'}</td><td>${testData.earthing.lv_e || '-'}</td><td>${testData.earthing.body || '-'}</td></tr>
                         </table>
                     </div>
                     
-                    <!-- Section 10: Signatories -->
+                    <!-- Section 10 -->
                     <div class="section">
                         <div class="section-title">10. Signatories</div>
                         <table style="border: none;">
@@ -1081,7 +972,7 @@
                         </table>
                     </div>
                     
-                    <!-- Section 11: Remarks -->
+                    <!-- Section 11 -->
                     <div class="section">
                         <div class="section-title">11. Remarks</div>
                         <p style="padding: 8px; border: 1px solid #ccc; min-height: 50px;">${testData.notes || 'No remarks'}</p>
@@ -1093,13 +984,7 @@
                 </body>
                 </html>
             `;
-        }
-
-        function generateFullReport() {
-            if (!currentEquipment) { showStatus('No PTR selected', '#e74c3c'); return; }
-            collectFormData();
             
-            const reportHtml = generateReportHTML();
             const win = window.open('', '_blank');
             win.document.write(reportHtml);
             win.document.close();
@@ -1110,7 +995,125 @@
             if (!currentEquipment) { showStatus('No PTR selected', '#e74c3c'); return; }
             collectFormData();
             
-            const reportHtml = generateReportHTML();
+            const reportHtml = `
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <meta charset="UTF-8">
+                    <title>PTR Test Report - ${currentEquipment.equipmentId}</title>
+                    <style>
+                        body { font-family: 'Times New Roman', Arial, sans-serif; margin: 20mm; font-size: 11px; }
+                        h1 { font-size: 18px; text-align: center; margin-bottom: 5px; }
+                        h2 { font-size: 14px; text-align: center; margin-bottom: 15px; font-weight: normal; }
+                        .equipment-info { margin: 15px 0; padding: 8px; border: 1px solid #000; background: #f9f9f9; }
+                        .equipment-info p { margin: 3px 0; }
+                        table { width: 100%; border-collapse: collapse; margin: 12px 0; }
+                        th, td { border: 1px solid #000; padding: 6px; text-align: center; }
+                        th { background: #f0f0f0; font-weight: bold; }
+                        .section { margin: 20px 0; page-break-inside: avoid; }
+                        .section-title { font-size: 13px; font-weight: bold; margin: 10px 0 5px 0; padding-bottom: 3px; border-bottom: 1px solid #000; }
+                        .footer { margin-top: 25px; text-align: center; font-size: 9px; border-top: 1px solid #ccc; padding-top: 10px; }
+                        @media print { body { margin: 0; padding: 10mm; } }
+                    </style>
+                </head>
+                <body>
+                    <h1>T&C KOSHI - PTR TEST REPORT</h1>
+                    <h2>Power Transformer Routine Test Certificate</h2>
+                    
+                    <div class="equipment-info">
+                        <p><strong>Equipment ID:</strong> ${currentEquipment.equipmentId} &nbsp;|&nbsp; <strong>Rating:</strong> ${currentEquipment.rating || 'N/A'} &nbsp;|&nbsp; <strong>Make:</strong> ${currentEquipment.make || 'N/A'}</p>
+                        <p><strong>Serial Number:</strong> ${currentEquipment.serialNumber || 'N/A'} &nbsp;|&nbsp; <strong>Voltage Ratio:</strong> ${currentEquipment.voltageRatio || 'N/A'} &nbsp;|&nbsp; <strong>Test Date:</strong> ${testData.dateOfTesting}</p>
+                    </div>
+                    
+                    <div class="section">
+                        <div class="section-title">1. Core Balance and Magnetising Current Test</div>
+                        <p>VRY: ${testData.coreBalance.VRY || '-'} V | VYB: ${testData.coreBalance.VYB || '-'} V | VRB: ${testData.coreBalance.VRB || '-'} V</p>
+                        <tr><th>Tap</th><th>VRN (HV)</th><th>VYN (HV)</th><th>VBN (HV)</th><th>Vrn (LV)</th><th>Vyn (LV)</th><th>Vbn (LV)</th></tr>
+                        ${testData.magRows.map(r => `<tr><td>${r.tap || '-'}</td><td>${r.vrn || '-'}</td><td>${r.vyn || '-'}</td><td>${r.vbn || '-'}</td><td>${r.vrn_lv || '-'}</td><td>${r.vyn_lv || '-'}</td><td>${r.vbn_lv || '-'}</td></tr>`).join('')}
+                        </table>
+                    </div>
+                    
+                    <div class="section">
+                        <div class="section-title">2. Short Circuit Test</div>
+                        <tr><th>Tap</th><th>IR</th><th>IY</th><th>IB</th><th>Ir</th><th>Iy</th><th>Ib</th><th>IN</th><th>In</th></tr>
+                        ${testData.scRows.map(r => `<tr><td>${r.tap || '-'}</td><td>${r.ir || '-'}</td><td>${r.iy || '-'}</td><td>${r.ib || '-'}</td><td>${r.ir_lv || '-'}</td><td>${r.iy_lv || '-'}</td><td>${r.ib_lv || '-'}</td><td>${r.in_hv || '-'}</td><td>${r.in_lv || '-'}</td></tr>`).join('')}
+                        </table>
+                    </div>
+                    
+                    <div class="section">
+                        <div class="section-title">3. Vector Group (YNyn0)</div>
+                        <tr><th>1V-2V</th><th>1V-2W</th><th>1W-2V</th><th>1W-2W</th><th>1UN = 2Un + Nn</th></tr>
+                        <tr><td>${testData.vectorGroup.v1v2 || '-'} V</td><td>${testData.vectorGroup.v1w2 || '-'} V</td><td>${testData.vectorGroup.w1v2 || '-'} V</td><td>${testData.vectorGroup.w1w2 || '-'} V</td><td>${testData.vectorGroup.un || '-'} V</td></tr>
+                        </table>
+                    </div>
+                    
+                    <div class="section">
+                        <div class="section-title">4. Winding Resistance Test</div>
+                        <table><th>Tap</th><th>OTI (°C)</th><th>WTI HV (°C)</th><th>WTI LV (°C)</th><th>HV U-N (Ω)</th><th>HV V-N (Ω)</th><th>HV W-N (Ω)</th><th>LV u-n (Ω)</th><th>LV v-n (Ω)</th><th>LV w-n (Ω)</th></tr>
+                        ${testData.wrRows.map(r => `<tr><td>${r.tap || '-'}</td><td>${r.oti || '-'}</td><td>${r.wti_hv || '-'}</td><td>${r.wti_lv || '-'}</td><td>${r.hv_u || '-'}</td><td>${r.hv_v || '-'}</td><td>${r.hv_w || '-'}</td><td>${r.lv_u || '-'}</td><td>${r.lv_v || '-'}</td><td>${r.lv_w || '-'}</td></tr>`).join('')}
+                        </table>
+                    </div>
+                    
+                    <div class="section">
+                        <div class="section-title">5. Insulation Resistance Test (Applied Voltage: 5 kV)</div>
+                        <tr><th></th><th>60 Sec (GΩ)</th><th>600 Sec (GΩ)</th><th>PI</th></tr>
+                        <tr><td>HV-LV</td><td>${testData.ir.hv_lv_60 || '-'}</td><td>${testData.ir.hv_lv_600 || '-'}</td><td>${testData.ir.hv_lv_pi || '-'}</td></tr>
+                        <tr><td>HV-E</td><td>${testData.ir.hv_e_60 || '-'}</td><td>${testData.ir.hv_e_600 || '-'}</td><td>${testData.ir.hv_e_pi || '-'}</td></tr>
+                        <tr><td>LV-E</td><td>${testData.ir.lv_e_60 || '-'}</td><td>${testData.ir.lv_e_600 || '-'}</td><td>${testData.ir.lv_e_pi || '-'}</td></tr>
+                        </table>
+                    </div>
+                    
+                    <div class="section">
+                        <div class="section-title">6. CFT Insulation Resistance Test (Applied Voltage: 500V)</div>
+                        <tr><th>Core-Frame (GΩ)</th><th>Frame-Tank (GΩ)</th><th>Core-Tank (GΩ)</th></tr>
+                        <tr><td>${testData.cft.core_frame || '-'}</td><td>${testData.cft.frame_tank || '-'}</td><td>${testData.cft.core_tank || '-'}</td></tr>
+                        </table>
+                    </div>
+                    
+                    <div class="section">
+                        <div class="section-title">7. Turn Ratio Test</div>
+                        <tr><th>Tap</th><th>Phase U</th><th>Phase V</th><th>Phase W</th></tr>
+                        ${testData.trRows.map(r => `<tr><td>${r.tap || '-'}</td><td>${r.u || '-'}</td><td>${r.v || '-'}</td><td>${r.w || '-'}</td></tr>`).join('')}
+                        </table>
+                    </div>
+                    
+                    <!-- SEPARATE DC VOLTAGE TABLE -->
+                    <div class="section">
+                        <div class="section-title">8. DC Voltage Test</div>
+                        <table>
+                            <tr><th>+VE to -VE (V)</th><th>+VE to Earth (V)</th><th>-VE to Earth (V)</th></tr>
+                            <tr><td>${testData.dcVoltage.pn || '-'}</td><td>${testData.dcVoltage.pe || '-'}</td><td>${testData.dcVoltage.ne || '-'}</td></tr>
+                        </table>
+                    </div>
+                    
+                    <!-- SEPARATE EARTHING RESISTANCE TABLE -->
+                    <div class="section">
+                        <div class="section-title">9. Earthing Resistance Test</div>
+                        <table>
+                            <tr><th>HV-E (Ω)</th><th>LV-E (Ω)</th><th>Body (Ω)</th></tr>
+                            <tr><td>${testData.earthing.hv_e || '-'}</td><td>${testData.earthing.lv_e || '-'}</td><td>${testData.earthing.body || '-'}</td></tr>
+                        </table>
+                    </div>
+                    
+                    <div class="section">
+                        <div class="section-title">10. Signatories</div>
+                        <table style="border: none;">
+                            <tr><td style="border: none; width: 33%;"><strong>CRITL</strong><br><br>${testData.signatories.critl.map(s => `${s.name || '_________________'}<br>(${s.sign || 'Signature'})<br><br>`).join('')}</td>
+                            <td style="border: none; width: 33%;"><strong>T&C Koshi</strong><br><br>${testData.signatories.tc.map(s => `${s.name || '_________________'}<br>(${s.sign || 'Signature'})<br><br>`).join('')}</td>
+                            <td style="border: none; width: 33%;"><strong>Field</strong><br><br>${testData.signatories.field.map(s => `${s.name || '_________________'}<br>(${s.sign || 'Signature'})<br><br>`).join('')}</td></tr>
+                        </table>
+                    </div>
+                    
+                    <div class="section">
+                        <div class="section-title">11. Remarks</div>
+                        <p>${testData.notes || 'No remarks'}</p>
+                    </div>
+                    
+                    <div class="footer">Generated by T&C Koshi Test Management System on ${new Date().toLocaleString()}</div>
+                </body>
+                </html>
+            `;
+            
             const win = window.open('', '_blank');
             win.document.write(reportHtml);
             win.document.close();
