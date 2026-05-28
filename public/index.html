@@ -3,484 +3,348 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>T&C Koshi - PTR Test Report System</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <title>T&C Koshi - PTR Test Report</title>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Segoe UI', 'Times New Roman', Arial, sans-serif; background: #e8e8e8; }
-        
-        .login-container {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            background: #2c3e50;
-        }
-        .login-card {
-            background: white;
-            padding: 40px;
-            width: 400px;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.2);
-        }
-        .login-card h2 { margin-bottom: 10px; color: #2c3e50; text-align: center; }
-        .login-card h3 { text-align: center; margin-bottom: 30px; color: #666; font-size: 14px; }
-        .input-group { margin-bottom: 20px; }
-        .input-group label { display: block; margin-bottom: 5px; font-weight: bold; color: #333; }
-        .input-group input {
-            width: 100%;
-            padding: 10px;
-            border: 1px solid #ddd;
-            font-size: 14px;
-        }
-        .login-btn {
-            width: 100%;
-            padding: 12px;
-            background: #2c3e50;
-            color: white;
-            border: none;
-            cursor: pointer;
-            font-size: 16px;
-            font-weight: bold;
-        }
-        .login-btn:hover { background: #1a2a3a; }
-        .error-msg { color: red; margin-bottom: 15px; display: none; text-align: center; }
-        
-        .app-container { display: none; }
-        .header {
-            background: #2c3e50;
-            color: white;
-            padding: 15px 25px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-        }
-        .btn-logout {
-            background: #c0392b;
-            color: white;
-            padding: 8px 16px;
-            border: none;
-            cursor: pointer;
-        }
-        
-        .version-bar {
-            background: #f0f0f0;
-            padding: 5px 20px;
-            font-size: 11px;
-            text-align: right;
-            border-bottom: 1px solid #ccc;
-            color: #666;
-        }
-        
-        .container { padding: 20px; max-width: 1400px; margin: 0 auto; }
-        
-        .grid-section {
-            background: white;
-            border: 1px solid #ccc;
-            padding: 15px 20px;
-            margin-bottom: 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 15px;
-        }
-        .grid-buttons { display: flex; gap: 10px; flex-wrap: wrap; }
-        .grid-btn {
-            padding: 8px 20px;
-            border: 1px solid #ccc;
-            cursor: pointer;
-            background: #f8f9fa;
-        }
-        .grid-btn.active {
-            background: #2c3e50;
-            color: white;
-            border-color: #2c3e50;
-        }
-        .btn-add {
-            background: #27ae60;
-            color: white;
-            padding: 8px 20px;
-            border: none;
-            cursor: pointer;
-        }
-        
-        .main-layout { display: flex; gap: 20px; }
-        .sidebar {
-            width: 280px;
-            background: white;
-            border: 1px solid #ccc;
-            padding: 20px;
-            height: fit-content;
-        }
-        .content-area {
-            flex: 1;
-            background: white;
-            border: 1px solid #ccc;
-            padding: 20px;
-        }
-        
-        .menu-section { margin-bottom: 25px; }
-        .menu-title {
-            font-size: 14px;
-            font-weight: bold;
-            padding: 10px;
-            background: #2c3e50;
-            color: white;
-            margin-bottom: 10px;
-            text-align: center;
-        }
-        .equipment-list {
-            list-style: none;
-            max-height: 200px;
-            overflow-y: auto;
-        }
-        .equipment-list li {
-            padding: 10px;
-            margin: 5px 0;
-            cursor: pointer;
-            background: #f8f9fa;
-            border: 1px solid #ccc;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        .equipment-list li.active {
-            background: #2c3e50;
-            color: white;
-        }
-        .btn-add-equipment {
-            width: 100%;
-            padding: 8px;
-            background: #27ae60;
-            color: white;
-            border: none;
-            cursor: pointer;
-            margin-top: 10px;
-        }
-        .btn-delete {
-            background: #e74c3c;
-            color: white;
-            border: none;
-            padding: 2px 8px;
-            cursor: pointer;
-        }
-        
-        .current-equipment {
-            background: #f8f9fa;
-            padding: 15px;
-            margin-bottom: 20px;
-            border-left: 4px solid #2c3e50;
-            font-size: 14px;
-        }
-        .test-group {
-            background: #fff;
-            border: 1px solid #ccc;
-            padding: 20px;
-            margin-bottom: 20px;
-        }
-        .test-group h4 {
-            color: #2c3e50;
-            margin-bottom: 15px;
-            padding-bottom: 8px;
-            border-bottom: 2px solid #2c3e50;
-            font-weight: bold;
-        }
-        .test-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin: 15px 0;
-            font-size: 12px;
-        }
-        .test-table th, .test-table td {
-            border: 1px solid #999;
-            padding: 8px;
-            text-align: center;
-        }
-        .test-table th {
-            background: #f0f0f0;
-            font-weight: bold;
-        }
-        .test-table input {
-            width: 80px;
-            padding: 5px;
-            border: 1px solid #ccc;
-            text-align: center;
-            font-family: monospace;
-        }
-        .inline-input {
-            display: inline-block;
-            margin: 0 15px 10px 0;
-        }
-        .inline-input input {
-            width: 100px;
-            padding: 5px;
-            margin-left: 5px;
-            border: 1px solid #ccc;
-        }
-        textarea {
-            width: 100%;
-            padding: 10px;
-            border: 1px solid #ccc;
-            font-family: inherit;
-            resize: vertical;
-        }
-        
-        .action-buttons {
-            display: flex;
-            gap: 15px;
-            margin-top: 20px;
-            justify-content: center;
-        }
-        .btn-save {
-            background: #27ae60;
-            color: white;
-            padding: 10px 25px;
-            border: none;
-            cursor: pointer;
-            font-weight: bold;
-        }
-        .btn-pdf {
-            background: #c0392b;
-            color: white;
-            padding: 10px 25px;
-            border: none;
-            cursor: pointer;
-            font-weight: bold;
-        }
-        .btn-print {
-            background: #2980b9;
-            color: white;
-            padding: 10px 25px;
-            border: none;
-            cursor: pointer;
-            font-weight: bold;
-        }
-        
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.5);
-            justify-content: center;
-            align-items: center;
-            z-index: 1000;
-        }
-        .modal-content {
-            background: white;
-            padding: 30px;
-            width: 450px;
-        }
-        .modal-content input, .modal-content select {
-            width: 100%;
-            padding: 10px;
-            margin: 10px 0;
-            border: 1px solid #ccc;
-        }
-        .modal-buttons {
-            display: flex;
-            gap: 10px;
-            margin-top: 20px;
-        }
-        
-        .status {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            padding: 10px 20px;
-            display: none;
-            z-index: 1000;
-            color: white;
-            font-weight: bold;
-        }
-        
-        @media print {
-            .sidebar, .grid-section, .action-buttons, .header, .btn-add-equipment, .btn-delete, .user-info, .version-bar {
-                display: none;
-            }
-            .content-area {
-                margin: 0;
-                padding: 0;
-            }
-            .test-group {
-                break-inside: avoid;
-                page-break-inside: avoid;
-            }
-        }
+        body { font-family: Arial, sans-serif; margin: 20px; background: #f0f0f0; }
+        .container { max-width: 1200px; margin: 0 auto; background: white; padding: 20px; border-radius: 8px; }
+        h1 { text-align: center; color: #2c3e50; }
+        .login-area, .main-area { display: none; }
+        .login-area { text-align: center; padding: 50px; }
+        input, button { padding: 10px; margin: 5px; }
+        button { background: #2c3e50; color: white; border: none; cursor: pointer; border-radius: 4px; }
+        .grid-btn, .equipment-item { padding: 8px 15px; margin: 5px; background: #e0e0e0; border: none; cursor: pointer; border-radius: 4px; }
+        .active { background: #2c3e50; color: white; }
+        .test-group { border: 1px solid #ccc; padding: 15px; margin: 15px 0; border-radius: 8px; }
+        .test-group h3 { margin-top: 0; background: #2c3e50; color: white; padding: 8px; margin: -15px -15px 15px -15px; border-radius: 8px 8px 0 0; }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { border: 1px solid #ccc; padding: 8px; text-align: center; }
+        input { width: 80px; text-align: center; }
+        .sidebar { float: left; width: 250px; margin-right: 20px; }
+        .content { overflow: hidden; }
+        .status { position: fixed; bottom: 20px; right: 20px; padding: 10px 20px; background: green; color: white; display: none; border-radius: 4px; }
+        @media print { .sidebar, .login-area, .action-buttons, .header-buttons { display: none; } }
     </style>
 </head>
 <body>
-    <div id="loginPage" class="login-container">
-        <div class="login-card">
-            <h2>T&C Koshi</h2>
-            <h3>PTR Test Report Management System</h3>
-            <div id="loginError" class="error-msg"></div>
-            <div class="input-group">
-                <label>Username</label>
-                <input type="text" id="username" placeholder="Enter username">
-            </div>
-            <div class="input-group">
-                <label>Password</label>
-                <input type="password" id="password" placeholder="Enter password">
-            </div>
-            <button class="login-btn" onclick="login()">Login</button>
-            <p style="text-align: center; margin-top: 20px; color: #666;">Demo: admin / admin123</p>
-        </div>
+<div class="container">
+    <h1>T&C Koshi - PTR Test Report System</h1>
+    
+    <!-- Login Area -->
+    <div id="loginArea" class="login-area">
+        <h3>Login</h3>
+        <input type="text" id="username" placeholder="Username" value="admin"><br>
+        <input type="password" id="password" placeholder="Password" value="admin123"><br>
+        <button onclick="login()">Login</button>
+        <p style="margin-top: 20px;">Demo: admin / admin123</p>
     </div>
-
-    <div id="mainApp" class="app-container">
-        <div class="version-bar">
-            <i class="fas fa-code-branch"></i> Version 2.0 | Last Deployed: <span id="deployTime"></span>
+    
+    <!-- Main Area -->
+    <div id="mainArea" class="main-area">
+        <div class="header-buttons" style="text-align: right; margin-bottom: 10px;">
+            <span id="userDisplay"></span>
+            <button onclick="logout()">Logout</button>
         </div>
-        <div class="header">
-            <h2>T&C Koshi - PTR Test Report Management</h2>
-            <div>
-                <span id="userNameDisplay"></span>
-                <button class="btn-logout" onclick="logout()">Logout</button>
-            </div>
-        </div>
-
-        <div class="container">
-            <div class="grid-section">
-                <div class="grid-buttons" id="gridButtons"></div>
-                <button class="btn-add" onclick="showAddGridModal()">+ New Grid</button>
-            </div>
-
-            <div class="main-layout">
-                <div class="sidebar">
-                    <div class="menu-section">
-                        <div class="menu-title">POWER TRANSFORMERS</div>
-                        <ul class="equipment-list" id="transformerList"></ul>
-                        <button class="btn-add-equipment" onclick="showAddEquipmentModal()">+ Add PTR</button>
-                    </div>
-                </div>
-
-                <div class="content-area">
-                    <div id="testArea">
-                        <div class="current-equipment" id="currentEquipmentDisplay">
-                            Select a PTR from the menu to begin testing
-                        </div>
-                        <div id="testForm"></div>
-                        <div class="action-buttons" id="actionButtons" style="display: none;">
-                            <button class="btn-save" onclick="saveTestData()">Save Test Results</button>
-                            <button class="btn-pdf" onclick="generateFullReport()">Download PDF</button>
-                            <button class="btn-print" onclick="printFullReport()">Print Report</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div id="addGridModal" class="modal">
-        <div class="modal-content">
-            <h3>Add New Grid</h3>
-            <input type="text" id="gridName" placeholder="Grid Name">
-            <input type="text" id="gridLocation" placeholder="Location">
-            <div class="modal-buttons">
-                <button class="btn-save" onclick="addGrid()">Add</button>
-                <button class="btn-pdf" onclick="closeModal('addGridModal')">Cancel</button>
-            </div>
-        </div>
-    </div>
-
-    <div id="addEquipmentModal" class="modal">
-        <div class="modal-content">
-            <h3>Add Power Transformer (PTR)</h3>
-            <input type="text" id="eqId" placeholder="Equipment ID (e.g., PTR-01)">
-            <input type="text" id="eqRating" placeholder="Rating (e.g., 20 MVA)">
-            <input type="text" id="eqMake" placeholder="Make (e.g., CGL, BHEL)">
-            <input type="text" id="eqSerial" placeholder="Serial Number">
-            <select id="eqVoltage">
-                <option value="132/33kV">Voltage Ratio: 132/33 kV</option>
-                <option value="220/132kV">Voltage Ratio: 220/132 kV</option>
-            </select>
-            <div class="modal-buttons">
-                <button class="btn-save" onclick="addEquipment()">Add PTR</button>
-                <button class="btn-pdf" onclick="closeModal('addEquipmentModal')">Cancel</button>
-            </div>
-        </div>
-    </div>
-
-    <div id="statusMsg" class="status"></div>
-
-    <script>
-        const API_URL = '/api';
-        let authToken = localStorage.getItem('token');
-        let currentGrid = null;
-        let currentEquipment = null;
-        let currentUser = null;
-
-        // Set deployment timestamp
-        document.getElementById('deployTime').innerHTML = new Date().toLocaleString();
-
-        // [REST OF YOUR JAVASCRIPT CODE - Same as before]
-        // ... (keep all your existing JavaScript functions here)
         
-        // For brevity, I'm showing the key functions, but keep all your existing code
-        // Make sure to keep your existing login(), loadGrids(), loadEquipment(), etc.
-        
-        async function login() {
-            const username = document.getElementById('username').value;
-            const password = document.getElementById('password').value;
+        <div class="sidebar">
+            <h3>Grids</h3>
+            <div id="gridList"></div>
+            <button onclick="addGrid()" style="margin-top: 10px;">+ New Grid</button>
             
-            try {
-                const response = await fetch(`${API_URL}/login`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ username, password })
-                });
-                
-                const data = await response.json();
-                if (response.ok) {
-                    localStorage.setItem('token', data.token);
-                    localStorage.setItem('user', JSON.stringify(data.user));
-                    authToken = data.token;
-                    currentUser = data.user;
-                    document.getElementById('loginPage').style.display = 'none';
-                    document.getElementById('mainApp').style.display = 'block';
-                    document.getElementById('userNameDisplay').innerHTML = data.user.fullName || data.user.username;
-                    await loadGrids();
-                    showStatus('Login successful!', '#27ae60');
-                } else {
-                    showError(data.error);
-                }
-            } catch (error) {
-                showError('Cannot connect to server.');
-            }
-        }
+            <h3 style="margin-top: 20px;">Transformers</h3>
+            <div id="ptrList"></div>
+            <button onclick="addPTR()" style="margin-top: 10px;">+ Add PTR</button>
+        </div>
+        
+        <div class="content">
+            <div id="testArea">
+                <p>Select a PTR from the menu to begin testing</p>
+            </div>
+        </div>
+        <div style="clear: both;"></div>
+    </div>
+</div>
+<div id="statusMsg" class="status"></div>
 
-        // [Keep all your other functions: loadGrids, loadEquipment, loadTestForm, 
-        //  collectFormData, saveTestData, generateFullReport, printFullReport,
-        //  addEquipment, deleteEquipment, addGrid, etc.]
-
-        function showStatus(msg, color) {
-            const div = document.getElementById('statusMsg');
-            div.textContent = msg;
-            div.style.backgroundColor = color;
-            div.style.display = 'block';
-            setTimeout(() => div.style.display = 'none', 3000);
-        }
-
-        function showError(msg) {
-            const div = document.getElementById('loginError');
-            div.textContent = msg;
-            div.style.display = 'block';
-        }
-
-        if (authToken) {
-            const user = JSON.parse(localStorage.getItem('user') || '{}');
+<script>
+    // Load from localStorage
+    let data = JSON.parse(localStorage.getItem('tandc_data')) || {
+        users: [{ username: 'admin', password: 'admin123' }],
+        grids: [{ id: '1', name: 'Grid Alpha' }, { id: '2', name: 'Grid Beta' }],
+        ptrs: [],
+        testData: {}
+    };
+    
+    let currentUser = null;
+    let currentGrid = null;
+    let currentPTR = null;
+    
+    function saveData() { localStorage.setItem('tandc_data', JSON.stringify(data)); }
+    
+    function login() {
+        let user = document.getElementById('username').value;
+        let pass = document.getElementById('password').value;
+        let found = data.users.find(u => u.username === user && u.password === pass);
+        if (found) {
             currentUser = user;
-            document.getElementById('loginPage').style.display = 'none';
-            document.getElementById('mainApp').style.display = 'block';
-            document.getElementById('userNameDisplay').innerHTML = user.fullName || user.username;
+            document.getElementById('loginArea').style.display = 'none';
+            document.getElementById('mainArea').style.display = 'block';
+            document.getElementById('userDisplay').innerHTML = 'Welcome, ' + user;
             loadGrids();
+            showStatus('Login successful!', 'green');
+        } else { showStatus('Invalid credentials', 'red'); }
+    }
+    
+    function logout() { currentUser = null; document.getElementById('loginArea').style.display = 'block'; document.getElementById('mainArea').style.display = 'none'; }
+    
+    function loadGrids() {
+        let html = '';
+        data.grids.forEach(grid => {
+            html += `<button class="grid-btn" onclick="selectGrid('${grid.id}')">${grid.name}</button><br>`;
+        });
+        document.getElementById('gridList').innerHTML = html;
+        if (data.grids.length > 0) selectGrid(data.grids[0].id);
+    }
+    
+    function selectGrid(gridId) {
+        currentGrid = data.grids.find(g => g.id === gridId);
+        loadPTRs();
+    }
+    
+    function addGrid() {
+        let name = prompt('Enter grid name:');
+        if (name) {
+            data.grids.push({ id: Date.now().toString(), name: name });
+            saveData();
+            loadGrids();
+            showStatus('Grid added!', 'green');
         }
-    </script>
+    }
+    
+    function loadPTRs() {
+        if (!currentGrid) return;
+        let ptrs = data.ptrs.filter(p => p.gridId === currentGrid.id);
+        let html = '';
+        ptrs.forEach(ptr => {
+            html += `<button class="grid-btn" onclick="selectPTR('${ptr.id}')">${ptr.id} - ${ptr.rating}</button><br>`;
+        });
+        document.getElementById('ptrList').innerHTML = html || '<p>No PTRs</p>';
+    }
+    
+    function addPTR() {
+        if (!currentGrid) { showStatus('Select a grid first', 'red'); return; }
+        let id = prompt('Enter PTR ID (e.g., PTR-01):');
+        if (!id) return;
+        let rating = prompt('Enter Rating (e.g., 20 MVA):');
+        let make = prompt('Enter Make (e.g., CGL):');
+        let voltage = prompt('Enter Voltage Ratio (132/33kV or 220/132kV):');
+        data.ptrs.push({
+            id: Date.now().toString(),
+            gridId: currentGrid.id,
+            equipmentId: id,
+            rating: rating,
+            make: make,
+            voltageRatio: voltage,
+            testValues: {}
+        });
+        saveData();
+        loadPTRs();
+        showStatus('PTR added!', 'green');
+    }
+    
+    function selectPTR(ptrId) {
+        currentPTR = data.ptrs.find(p => p.id === ptrId);
+        loadTestForm();
+    }
+    
+    function loadTestForm() {
+        if (!currentPTR) return;
+        let saved = data.testData[currentPTR.id] || {};
+        let html = `
+            <div class="test-group">
+                <h3>${currentPTR.equipmentId} | ${currentPTR.rating} | Make: ${currentPTR.make}</h3>
+                <p>Test Date: <input type="date" id="testDate" value="${saved.date || new Date().toISOString().split('T')[0]}"></p>
+            </div>
+            
+            <div class="test-group">
+                <h3>1. Core Balance and Magnetising Current</h3>
+                <p>VRY: <input type="text" id="vry" value="${saved.vry || ''}"> V | 
+                   VYB: <input type="text" id="vyb" value="${saved.vyb || ''}"> V | 
+                   VRB: <input type="text" id="vrb" value="${saved.vrb || ''}"> V</p>
+                <table><tr><th>Tap</th><th>VRN</th><th>VYN</th><th>VBN</th><th>Vrn</th><th>Vyn</th><th>Vbn</th></tr>
+                ${[0,1,2].map(i => `<tr><td><input type="text" id="tap_${i}" placeholder="Tap" style="width:50px"></td>
+                    ${['vrn','vyn','vbn','vrn_lv','vyn_lv','vbn_lv'].map(f => `<td><input type="text" id="mag_${i}_${f}" value="${saved[`mag_${i}_${f}`] || ''}" style="width:70px"></td>`).join('')}</tr>`).join('')}
+                </table>
+            </div>
+            
+            <div class="test-group">
+                <h3>2. Short Circuit Test</h3>
+                <table><tr><th>Tap</th><th>IR</th><th>IY</th><th>IB</th><th>Ir</th><th>Iy</th><th>Ib</th><th>IN</th><th>In</th></tr>
+                ${[0,1,2].map(i => `<tr><td><input type="text" id="sc_tap_${i}" placeholder="Tap" style="width:50px"></td>
+                    ${['ir','iy','ib','ir_lv','iy_lv','ib_lv','in_hv','in_lv'].map(f => `<td><input type="text" id="sc_${i}_${f}" value="${saved[`sc_${i}_${f}`] || ''}" style="width:60px"></td>`).join('')}</tr>`).join('')}
+                </table>
+            </div>
+            
+            <div class="test-group">
+                <h3>3. Vector Group (YNyn0)</h3>
+                <p>1V-2V: <input type="text" id="vg_v1v2" value="${saved.vg_v1v2 || ''}"> V |
+                   1V-2W: <input type="text" id="vg_v1w2" value="${saved.vg_v1w2 || ''}"> V |
+                   1W-2V: <input type="text" id="vg_w1v2" value="${saved.vg_w1v2 || ''}"> V |
+                   1W-2W: <input type="text" id="vg_w1w2" value="${saved.vg_w1w2 || ''}"> V |
+                   1UN=2Un+Nn: <input type="text" id="vg_un" value="${saved.vg_un || ''}"> V</p>
+            </div>
+            
+            <div class="test-group">
+                <h3>4. Winding Resistance Test</h3>
+                <table><tr><th>Tap</th><th>OTI°C</th><th>WTI HV°C</th><th>WTI LV°C</th><th>HV U-N</th><th>HV V-N</th><th>HV W-N</th><th>LV u-n</th><th>LV v-n</th><th>LV w-n</th></tr>
+                ${[0,1,2].map(i => `<tr><td><input type="text" id="wr_tap_${i}" placeholder="Tap" style="width:50px"></td>
+                    ${['oti','wti_hv','wti_lv','hv_u','hv_v','hv_w','lv_u','lv_v','lv_w'].map(f => `<td><input type="text" id="wr_${i}_${f}" value="${saved[`wr_${i}_${f}`] || ''}" style="width:55px"></td>`).join('')}</tr>`).join('')}
+                </table>
+            </div>
+            
+            <div class="test-group">
+                <h3>5. Insulation Resistance Test</h3>
+                <table><tr><th>Test Point</th><th>60 Sec (GΩ)</th><th>600 Sec (GΩ)</th><th>PI</th></tr>
+                <tr><td>HV-LV</td>${[0,1,2].map(i => `<td><input type="text" id="ir_hvlv_${i}" value="${saved[`ir_hvlv_${i}`] || ''}" style="width:70px"></td>`).join('')}</tr>
+                <tr><td>HV-E</td>${[0,1,2].map(i => `<td><input type="text" id="ir_hve_${i}" value="${saved[`ir_hve_${i}`] || ''}" style="width:70px"></td>`).join('')}</tr>
+                <tr><td>LV-E</td>${[0,1,2].map(i => `<td><input type="text" id="ir_lve_${i}" value="${saved[`ir_lve_${i}`] || ''}" style="width:70px"></td>`).join('')}</tr>
+                </table>
+            </div>
+            
+            <div class="test-group">
+                <h3>6. CFT Insulation Resistance</h3>
+                <p>Core-Frame: <input type="text" id="cft_cf" value="${saved.cft_cf || ''}"> GΩ |
+                   Frame-Tank: <input type="text" id="cft_ft" value="${saved.cft_ft || ''}"> GΩ |
+                   Core-Tank: <input type="text" id="cft_ct" value="${saved.cft_ct || ''}"> GΩ</p>
+            </div>
+            
+            <div class="test-group">
+                <h3>7. Turn Ratio Test</h3>
+                <table><tr><th>Tap</th><th>Phase U</th><th>Phase V</th><th>Phase W</th></tr>
+                ${[0,1,2].map(i => `<tr><td><input type="text" id="tr_tap_${i}" placeholder="Tap" style="width:50px"></td>
+                    ${['u','v','w'].map(f => `<td><input type="text" id="tr_${i}_${f}" value="${saved[`tr_${i}_${f}`] || ''}" style="width:70px"></td>`).join('')}</tr>`).join('')}
+                </table>
+            </div>
+            
+            <div class="test-group">
+                <h3>8. DC Voltage Test</h3>
+                <table><tr><th>Source</th><th>+VE to -VE (V)</th><th>+VE to Earth (V)</th><th>-VE to Earth (V)</th></tr>
+                <tr><td>Source I</td>${['pn','pe','ne'].map(f => `<td><input type="text" id="dc1_${f}" value="${saved[`dc1_${f}`] || ''}" style="width:80px"></td>`).join('')}</tr>
+                <tr><td>Source II</td>${['pn','pe','ne'].map(f => `<td><input type="text" id="dc2_${f}" value="${saved[`dc2_${f}`] || ''}" style="width:80px"></td>`).join('')}</tr>
+                </table>
+            </div>
+            
+            <div class="test-group">
+                <h3>9. Earthing Resistance Test</h3>
+                <p>HV-E: <input type="text" id="er_hve" value="${saved.er_hve || ''}"> Ω |
+                   LV-E: <input type="text" id="er_lve" value="${saved.er_lve || ''}"> Ω |
+                   Body: <input type="text" id="er_body" value="${saved.er_body || ''}"> Ω</p>
+            </div>
+            
+            <div class="test-group">
+                <h3>10. Remarks</h3>
+                <textarea id="remarks" rows="3" style="width:100%">${saved.remarks || ''}</textarea>
+            </div>
+            
+            <div class="test-group">
+                <h3>11. Signatories</h3>
+                <table><tr><th>CRITL</th><th>T&C Koshi</th><th>Field</th></tr>
+                <tr><td><input type="text" id="sign_critl" value="${saved.sign_critl || ''}" placeholder="Name & Signature" style="width:150px"></td>
+                    <td><input type="text" id="sign_tc" value="${saved.sign_tc || ''}" placeholder="Name & Signature" style="width:150px"></td>
+                    <td><input type="text" id="sign_field" value="${saved.sign_field || ''}" placeholder="Name & Signature" style="width:150px"></td></tr>
+                </table>
+            </div>
+            
+            <div style="text-align: center; margin-top: 20px;">
+                <button onclick="saveTestData()" style="background: green;">Save Test Results</button>
+                <button onclick="printReport()" style="background: #c0392b;">Print Report</button>
+            </div>
+        `;
+        document.getElementById('testArea').innerHTML = html;
+    }
+    
+    function saveTestData() {
+        if (!currentPTR) return;
+        let saved = {};
+        saved.date = document.getElementById('testDate')?.value || '';
+        saved.vry = document.getElementById('vry')?.value || '';
+        saved.vyb = document.getElementById('vyb')?.value || '';
+        saved.vrb = document.getElementById('vrb')?.value || '';
+        
+        for (let i = 0; i < 3; i++) {
+            saved[`tap_${i}`] = document.getElementById(`tap_${i}`)?.value || '';
+            ['vrn','vyn','vbn','vrn_lv','vyn_lv','vbn_lv'].forEach(f => {
+                saved[`mag_${i}_${f}`] = document.getElementById(`mag_${i}_${f}`)?.value || '';
+            });
+            saved[`sc_tap_${i}`] = document.getElementById(`sc_tap_${i}`)?.value || '';
+            ['ir','iy','ib','ir_lv','iy_lv','ib_lv','in_hv','in_lv'].forEach(f => {
+                saved[`sc_${i}_${f}`] = document.getElementById(`sc_${i}_${f}`)?.value || '';
+            });
+            saved[`wr_tap_${i}`] = document.getElementById(`wr_tap_${i}`)?.value || '';
+            ['oti','wti_hv','wti_lv','hv_u','hv_v','hv_w','lv_u','lv_v','lv_w'].forEach(f => {
+                saved[`wr_${i}_${f}`] = document.getElementById(`wr_${i}_${f}`)?.value || '';
+            });
+            saved[`tr_tap_${i}`] = document.getElementById(`tr_tap_${i}`)?.value || '';
+            ['u','v','w'].forEach(f => {
+                saved[`tr_${i}_${f}`] = document.getElementById(`tr_${i}_${f}`)?.value || '';
+            });
+        }
+        
+        for (let i = 0; i < 3; i++) {
+            saved[`ir_hvlv_${i}`] = document.getElementById(`ir_hvlv_${i}`)?.value || '';
+            saved[`ir_hve_${i}`] = document.getElementById(`ir_hve_${i}`)?.value || '';
+            saved[`ir_lve_${i}`] = document.getElementById(`ir_lve_${i}`)?.value || '';
+        }
+        
+        saved.vg_v1v2 = document.getElementById('vg_v1v2')?.value || '';
+        saved.vg_v1w2 = document.getElementById('vg_v1w2')?.value || '';
+        saved.vg_w1v2 = document.getElementById('vg_w1v2')?.value || '';
+        saved.vg_w1w2 = document.getElementById('vg_w1w2')?.value || '';
+        saved.vg_un = document.getElementById('vg_un')?.value || '';
+        
+        saved.cft_cf = document.getElementById('cft_cf')?.value || '';
+        saved.cft_ft = document.getElementById('cft_ft')?.value || '';
+        saved.cft_ct = document.getElementById('cft_ct')?.value || '';
+        
+        saved.dc1_pn = document.getElementById('dc1_pn')?.value || '';
+        saved.dc1_pe = document.getElementById('dc1_pe')?.value || '';
+        saved.dc1_ne = document.getElementById('dc1_ne')?.value || '';
+        saved.dc2_pn = document.getElementById('dc2_pn')?.value || '';
+        saved.dc2_pe = document.getElementById('dc2_pe')?.value || '';
+        saved.dc2_ne = document.getElementById('dc2_ne')?.value || '';
+        
+        saved.er_hve = document.getElementById('er_hve')?.value || '';
+        saved.er_lve = document.getElementById('er_lve')?.value || '';
+        saved.er_body = document.getElementById('er_body')?.value || '';
+        
+        saved.remarks = document.getElementById('remarks')?.value || '';
+        saved.sign_critl = document.getElementById('sign_critl')?.value || '';
+        saved.sign_tc = document.getElementById('sign_tc')?.value || '';
+        saved.sign_field = document.getElementById('sign_field')?.value || '';
+        
+        data.testData[currentPTR.id] = saved;
+        saveData();
+        showStatus('Test data saved!', 'green');
+    }
+    
+    function printReport() {
+        saveTestData();
+        window.print();
+    }
+    
+    function showStatus(msg, color) {
+        let div = document.getElementById('statusMsg');
+        div.textContent = msg;
+        div.style.backgroundColor = color;
+        div.style.display = 'block';
+        setTimeout(() => div.style.display = 'none', 3000);
+    }
+    
+    // Auto login check
+    if (localStorage.getItem('tandc_logged')) {
+        document.getElementById('loginArea').style.display = 'none';
+        document.getElementById('mainArea').style.display = 'block';
+        loadGrids();
+    }
+</script>
 </body>
 </html>
