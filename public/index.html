@@ -302,10 +302,6 @@
                 break-inside: avoid;
                 page-break-inside: avoid;
             }
-            .test-table input {
-                border: none;
-                background: transparent;
-            }
         }
     </style>
 </head>
@@ -638,21 +634,21 @@
                         <tr><th>Test Point</th><th>60 Sec (GΩ)</th><th>600 Sec (GΩ)</th><th>PI</th></tr>
                         <tr>
                             <td>HV-LV</td
-                            <td><input type="text" id="ir_hv_lv_60" value="${testData.ir.hv_lv_60}" style="width:70px"></td
-                            <td><input type="text" id="ir_hv_lv_600" value="${testData.ir.hv_lv_600}" style="width:70px"></td
-                            <td><input type="text" id="ir_hv_lv_pi" value="${testData.ir.hv_lv_pi}" style="width:70px"></td
+                            <td><input type="text" id="ir_hv_lv_60" value="${testData.ir.hv_lv_60}" style="width:80px"></td
+                            <td><input type="text" id="ir_hv_lv_600" value="${testData.ir.hv_lv_600}" style="width:80px"></td
+                            <td><input type="text" id="ir_hv_lv_pi" value="${testData.ir.hv_lv_pi}" style="width:80px"></td
                         </tr>
                         <tr>
                             <td>HV-E</td
-                            <td><input type="text" id="ir_hv_e_60" value="${testData.ir.hv_e_60}" style="width:70px"></td
-                            <td><input type="text" id="ir_hv_e_600" value="${testData.ir.hv_e_600}" style="width:70px"></td
-                            <td><input type="text" id="ir_hv_e_pi" value="${testData.ir.hv_e_pi}" style="width:70px"></td
+                            <td><input type="text" id="ir_hv_e_60" value="${testData.ir.hv_e_60}" style="width:80px"></td
+                            <td><input type="text" id="ir_hv_e_600" value="${testData.ir.hv_e_600}" style="width:80px"></td
+                            <td><input type="text" id="ir_hv_e_pi" value="${testData.ir.hv_e_pi}" style="width:80px"></td
                         </tr>
                         <tr>
                             <td>LV-E</td
-                            <td><input type="text" id="ir_lv_e_60" value="${testData.ir.lv_e_60}" style="width:70px"></td
-                            <td><input type="text" id="ir_lv_e_600" value="${testData.ir.lv_e_600}" style="width:70px"></td
-                            <td><input type="text" id="ir_lv_e_pi" value="${testData.ir.lv_e_pi}" style="width:70px"></td
+                            <td><input type="text" id="ir_lv_e_60" value="${testData.ir.lv_e_60}" style="width:80px"></td
+                            <td><input type="text" id="ir_lv_e_600" value="${testData.ir.lv_e_600}" style="width:80px"></td
+                            <td><input type="text" id="ir_lv_e_pi" value="${testData.ir.lv_e_pi}" style="width:80px"></td
                         </tr>
                     </table>
                 </div>
@@ -745,7 +741,7 @@
                             <td><input type="text" id="field_name_${i}" value="${testData.signatories.field[i]?.name || ''}" placeholder="Officer Name" style="width:140px"></td>
                             <td><input type="text" id="field_sign_${i}" value="${testData.signatories.field[i]?.sign || ''}" placeholder="Signature" style="width:140px"></td>
                         </tr>`).join('')}
-                    <tr>
+                    </table>
                 </div>
             `;
             document.getElementById('testForm').innerHTML = html;
@@ -942,7 +938,7 @@
                                 <tr><th>Tap</th><th>IR</th><th>IY</th><th>IB</th><th>Ir</th><th>Iy</th><th>Ib</th><th>IN</th><th>In</th></tr>
                             </thead>
                             <tbody>
-                                ${testData.scRows.map(r => `<tr><td>${r.tap || '-'}</td><td>${r.ir || '-'}</td><td>${r.iy || '-'}</td><td>${r.ib || '-'}</td><td>${r.ir_lv || '-'}</td><td>${r.iy_lv || '-'}</td><td>${r.ib_lv || '-'}</td><td>${r.in_hv || '-'}</td><td>${r.in_lv || '-'}</td></tr>`).join('')}
+                                ${testData.scRows.map(r => `<tr><td colspan="9">${r.tap || '-'} | ${r.ir || '-'} | ${r.iy || '-'} | ${r.ib || '-'} | ${r.ir_lv || '-'} | ${r.iy_lv || '-'} | ${r.ib_lv || '-'} | ${r.in_hv || '-'} | ${r.in_lv || '-'}</td></tr>`).join('')}
                             </tbody>
                         </table>
                     </div>
@@ -950,12 +946,12 @@
                     <!-- Section 3 -->
                     <div class="section">
                         <div class="section-title">3. Vector Group (YNyn0)</div>
-                        <table>
+                        <tr>
                             <thead>
                                 <tr><th>1V-2V (V)</th><th>1V-2W (V)</th><th>1W-2V (V)</th><th>1W-2W (V)</th><th>1UN = 2Un + Nn (V)</th></tr>
                             </thead>
                             <tbody>
-                                <tr><td>${testData.vectorGroup.v1v2 || '-'}</td><td>${testData.vectorGroup.v1w2 || '-'}</td><td>${testData.vectorGroup.w1v2 || '-'}</td><td>${testData.vectorGroup.w1w2 || '-'}</td><td>${testData.vectorGroup.un || '-'}</td></tr>
+                                <tr><td colspan="5">${testData.vectorGroup.v1v2 || '-'} | ${testData.vectorGroup.v1w2 || '-'} | ${testData.vectorGroup.w1v2 || '-'} | ${testData.vectorGroup.w1w2 || '-'} | ${testData.vectorGroup.un || '-'}</td></tr>
                             </tbody>
                         </table>
                     </div>
@@ -968,7 +964,7 @@
                                 <tr><th>Tap</th><th>OTI (°C)</th><th>WTI HV (°C)</th><th>WTI LV (°C)</th><th>HV U-N (Ω)</th><th>HV V-N (Ω)</th><th>HV W-N (Ω)</th><th>LV u-n (Ω)</th><th>LV v-n (Ω)</th><th>LV w-n (Ω)</th></tr>
                             </thead>
                             <tbody>
-                                ${testData.wrRows.map(r => `<tr><td>${r.tap || '-'}</td><td>${r.oti || '-'}</td><td>${r.wti_hv || '-'}</td><td>${r.wti_lv || '-'}</td><td>${r.hv_u || '-'}</td><td>${r.hv_v || '-'}</td><td>${r.hv_w || '-'}</td><td>${r.lv_u || '-'}</td><td>${r.lv_v || '-'}</td><td>${r.lv_w || '-'}</td></tr>`).join('')}
+                                ${testData.wrRows.map(r => `<tr><td colspan="10">${r.tap || '-'} | ${r.oti || '-'} | ${r.wti_hv || '-'} | ${r.wti_lv || '-'} | ${r.hv_u || '-'} | ${r.hv_v || '-'} | ${r.hv_w || '-'} | ${r.lv_u || '-'} | ${r.lv_v || '-'} | ${r.lv_w || '-'}</td></tr>`).join('')}
                             </tbody>
                         </table>
                     </div>
@@ -981,9 +977,24 @@
                                 <tr><th>Test Point</th><th>60 Sec (GΩ)</th><th>600 Sec (GΩ)</th><th>PI</th></tr>
                             </thead>
                             <tbody>
-                                <tr><td>HV-LV</td><td>${testData.ir.hv_lv_60 || '-'}</td><td>${testData.ir.hv_lv_600 || '-'}</td><td>${testData.ir.hv_lv_pi || '-'}</td></tr>
-                                <tr><td>HV-E</td><td>${testData.ir.hv_e_60 || '-'}</td><td>${testData.ir.hv_e_600 || '-'}</td><td>${testData.ir.hv_e_pi || '-'}</td></tr>
-                                <tr><td>LV-E</td><td>${testData.ir.lv_e_60 || '-'}</td><td>${testData.ir.lv_e_600 || '-'}</td><td>${testData.ir.lv_e_pi || '-'}</td></tr>
+                                <tr>
+                                    <td>HV-LV</td
+                                    <td>${testData.ir.hv_lv_60 || '-'}</td
+                                    <td>${testData.ir.hv_lv_600 || '-'}</td
+                                    <td>${testData.ir.hv_lv_pi || '-'}</td
+                                </tr>
+                                <tr>
+                                    <td>HV-E</td
+                                    <td>${testData.ir.hv_e_60 || '-'}</td
+                                    <td>${testData.ir.hv_e_600 || '-'}</td
+                                    <td>${testData.ir.hv_e_pi || '-'}</td
+                                </tr>
+                                <tr>
+                                    <td>LV-E</td
+                                    <td>${testData.ir.lv_e_60 || '-'}</td
+                                    <td>${testData.ir.lv_e_600 || '-'}</td
+                                    <td>${testData.ir.lv_e_pi || '-'}</td
+                                </tr>
                             </tbody>
                         </table>
                     </div>
@@ -996,9 +1007,18 @@
                                 <tr><th>Test Point</th><th>Value (GΩ)</th></tr>
                             </thead>
                             <tbody>
-                                <tr><td>Core-Frame</td><td>${testData.cft.core_frame || '-'}</td></tr>
-                                <tr><td>Frame-Tank</td><td>${testData.cft.frame_tank || '-'}</td></tr>
-                                <tr><td>Core-Tank</td><td>${testData.cft.core_tank || '-'}</td></tr>
+                                <tr>
+                                    <td>Core-Frame</td
+                                    <td>${testData.cft.core_frame || '-'}</td
+                                </tr>
+                                <tr>
+                                    <td>Frame-Tank</td
+                                    <td>${testData.cft.frame_tank || '-'}</td
+                                </tr>
+                                <tr>
+                                    <td>Core-Tank</td
+                                    <td>${testData.cft.core_tank || '-'}</td
+                                </tr>
                             </tbody>
                         </table>
                     </div>
@@ -1011,7 +1031,7 @@
                                 <tr><th>Tap</th><th>Phase U</th><th>Phase V</th><th>Phase W</th></tr>
                             </thead>
                             <tbody>
-                                ${testData.trRows.map(r => `<tr><td>${r.tap || '-'}</td><td>${r.u || '-'}</td><td>${r.v || '-'}</td><td>${r.w || '-'}</td></tr>`).join('')}
+                                ${testData.trRows.map(r => `<tr><td colspan="4">${r.tap || '-'} | ${r.u || '-'} | ${r.v || '-'} | ${r.w || '-'}</td></tr>`).join('')}
                             </tbody>
                         </table>
                     </div>
@@ -1024,8 +1044,18 @@
                                 <tr><th>Source</th><th>+VE to -VE (V)</th><th>+VE to Earth (V)</th><th>-VE to Earth (V)</th></tr>
                             </thead>
                             <tbody>
-                                <tr><td>Source I</td><td>${testData.dcVoltage.source1.pn || '-'}</td><td>${testData.dcVoltage.source1.pe || '-'}</td><td>${testData.dcVoltage.source1.ne || '-'}</td></tr>
-                                <tr><td>Source II</td><td>${testData.dcVoltage.source2.pn || '-'}</td><td>${testData.dcVoltage.source2.pe || '-'}</td><td>${testData.dcVoltage.source2.ne || '-'}</td></tr>
+                                <tr>
+                                    <td>Source I</td
+                                    <td>${testData.dcVoltage.source1.pn || '-'}</td
+                                    <td>${testData.dcVoltage.source1.pe || '-'}</td
+                                    <td>${testData.dcVoltage.source1.ne || '-'}</td
+                                </tr>
+                                <tr>
+                                    <td>Source II</td
+                                    <td>${testData.dcVoltage.source2.pn || '-'}</td
+                                    <td>${testData.dcVoltage.source2.pe || '-'}</td
+                                    <td>${testData.dcVoltage.source2.ne || '-'}</td
+                                </tr>
                             </tbody>
                         </table>
                     </div>
@@ -1038,9 +1068,18 @@
                                 <tr><th>Test Point</th><th>Value (Ω)</th></tr>
                             </thead>
                             <tbody>
-                                <tr><td>HV-E</td><td>${testData.earthing.hv_e || '-'}</td></tr>
-                                <tr><td>LV-E</td><td>${testData.earthing.lv_e || '-'}</td></tr>
-                                <tr><td>Body</td><td>${testData.earthing.body || '-'}</td></tr>
+                                <tr>
+                                    <td>HV-E</td
+                                    <td>${testData.earthing.hv_e || '-'}</td
+                                </tr>
+                                <tr>
+                                    <td>LV-E</td
+                                    <td>${testData.earthing.lv_e || '-'}</td
+                                </tr>
+                                <tr>
+                                    <td>Body</td
+                                    <td>${testData.earthing.body || '-'}</td
+                                </tr>
                             </tbody>
                         </table>
                     </div>
@@ -1059,15 +1098,15 @@
                                 <td style="border: none; width: 33%; vertical-align: top;">
                                     <strong>CRITL</strong><br><br>
                                     ${testData.signatories.critl.map(s => `${s.name || '_________________'}<br>(${s.sign || 'Signature'})<br><br>`).join('')}
-                                </td>
+                                </td
                                 <td style="border: none; width: 33%; vertical-align: top;">
                                     <strong>T&C Koshi</strong><br><br>
                                     ${testData.signatories.tc.map(s => `${s.name || '_________________'}<br>(${s.sign || 'Signature'})<br><br>`).join('')}
-                                </td>
+                                </td
                                 <td style="border: none; width: 33%; vertical-align: top;">
                                     <strong>Field</strong><br><br>
                                     ${testData.signatories.field.map(s => `${s.name || '_________________'}<br>(${s.sign || 'Signature'})<br><br>`).join('')}
-                                </td>
+                                </td
                             </tr>
                         </table>
                     </div>
