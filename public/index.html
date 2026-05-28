@@ -3,61 +3,93 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>T&C Koshi - PTR Test Report</title>
+    <title>T&C Koshi - PTR Test Report System</title>
     <style>
-        body { font-family: Arial, sans-serif; margin: 20px; background: #f0f0f0; }
-        .container { max-width: 1200px; margin: 0 auto; background: white; padding: 20px; border-radius: 8px; }
-        h1 { text-align: center; color: #2c3e50; }
-        .login-area, .main-area { display: none; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Arial, sans-serif; background: #e8e8e8; padding: 20px; }
+        .container { max-width: 1400px; margin: 0 auto; background: white; border-radius: 8px; padding: 20px; }
+        h1 { text-align: center; color: #2c3e50; margin-bottom: 20px; }
+        h2 { color: #2c3e50; margin: 15px 0 10px 0; font-size: 18px; border-bottom: 2px solid #2c3e50; padding-bottom: 5px; }
+        
+        /* Login */
         .login-area { text-align: center; padding: 50px; }
-        input, button { padding: 10px; margin: 5px; }
-        button { background: #2c3e50; color: white; border: none; cursor: pointer; border-radius: 4px; }
-        .grid-btn, .equipment-item { padding: 8px 15px; margin: 5px; background: #e0e0e0; border: none; cursor: pointer; border-radius: 4px; }
-        .active { background: #2c3e50; color: white; }
-        .test-group { border: 1px solid #ccc; padding: 15px; margin: 15px 0; border-radius: 8px; }
-        .test-group h3 { margin-top: 0; background: #2c3e50; color: white; padding: 8px; margin: -15px -15px 15px -15px; border-radius: 8px 8px 0 0; }
-        table { width: 100%; border-collapse: collapse; }
-        th, td { border: 1px solid #ccc; padding: 8px; text-align: center; }
-        input { width: 80px; text-align: center; }
-        .sidebar { float: left; width: 250px; margin-right: 20px; }
+        .login-area input, .login-area button { padding: 10px; margin: 5px; width: 200px; }
+        button { background: #2c3e50; color: white; border: none; cursor: pointer; padding: 8px 16px; border-radius: 4px; }
+        button:hover { background: #1a2a3a; }
+        
+        /* Main Area */
+        .main-area { display: none; }
+        .header-bar { background: #2c3e50; color: white; padding: 10px 20px; border-radius: 8px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; }
+        
+        /* Sidebar */
+        .sidebar { float: left; width: 280px; margin-right: 20px; }
+        .sidebar-section { background: #f8f9fa; border: 1px solid #ddd; border-radius: 8px; padding: 15px; margin-bottom: 20px; }
+        .sidebar-section h3 { margin-bottom: 10px; color: #2c3e50; }
+        .grid-btn, .ptr-btn { display: block; width: 100%; text-align: left; padding: 8px 12px; margin: 5px 0; background: #e9ecef; border: 1px solid #ccc; border-radius: 4px; cursor: pointer; }
+        .grid-btn.active, .ptr-btn.active { background: #2c3e50; color: white; }
+        
+        /* Content */
         .content { overflow: hidden; }
-        .status { position: fixed; bottom: 20px; right: 20px; padding: 10px 20px; background: green; color: white; display: none; border-radius: 4px; }
-        @media print { .sidebar, .login-area, .action-buttons, .header-buttons { display: none; } }
+        .test-group { border: 1px solid #ddd; border-radius: 8px; padding: 15px; margin-bottom: 20px; background: #fefefe; }
+        .test-group h3 { background: #2c3e50; color: white; padding: 8px 12px; margin: -15px -15px 15px -15px; border-radius: 8px 8px 0 0; font-size: 14px; }
+        table { width: 100%; border-collapse: collapse; margin: 10px 0; font-size: 12px; }
+        th, td { border: 1px solid #ccc; padding: 6px; text-align: center; }
+        th { background: #f0f0f0; }
+        input { padding: 4px; border: 1px solid #ccc; border-radius: 3px; text-align: center; width: 70px; }
+        .inline-input { display: inline-block; margin: 0 10px 10px 0; }
+        textarea { width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px; font-family: inherit; }
+        
+        .action-buttons { text-align: center; margin-top: 20px; }
+        .action-buttons button { margin: 0 10px; padding: 10px 25px; font-size: 14px; }
+        .btn-save { background: #28a745; }
+        .btn-print { background: #dc3545; }
+        
+        .status { position: fixed; bottom: 20px; right: 20px; padding: 10px 20px; border-radius: 4px; display: none; color: white; z-index: 1000; }
+        
+        @media print {
+            .sidebar, .header-bar, .action-buttons, .status { display: none; }
+            .content { margin: 0; padding: 0; }
+            .test-group { break-inside: avoid; }
+            input { border: none; background: transparent; }
+        }
     </style>
 </head>
 <body>
 <div class="container">
-    <h1>T&C Koshi - PTR Test Report System</h1>
+    <h1>🔧 T&C Koshi - PTR Test Report System</h1>
     
     <!-- Login Area -->
     <div id="loginArea" class="login-area">
-        <h3>Login</h3>
+        <h2>Login</h2>
         <input type="text" id="username" placeholder="Username" value="admin"><br>
         <input type="password" id="password" placeholder="Password" value="admin123"><br>
-        <button onclick="login()">Login</button>
-        <p style="margin-top: 20px;">Demo: admin / admin123</p>
+        <button onclick="doLogin()">Login</button>
+        <p style="margin-top: 20px; color: #666;">Demo: admin / admin123</p>
     </div>
     
     <!-- Main Area -->
     <div id="mainArea" class="main-area">
-        <div class="header-buttons" style="text-align: right; margin-bottom: 10px;">
-            <span id="userDisplay"></span>
-            <button onclick="logout()">Logout</button>
+        <div class="header-bar">
+            <span>⚡ T&C Koshi Test Management</span>
+            <span>Welcome, <span id="userName"></span> <button onclick="doLogout()" style="margin-left: 15px; background: #c0392b;">Logout</button></span>
         </div>
         
         <div class="sidebar">
-            <h3>Grids</h3>
-            <div id="gridList"></div>
-            <button onclick="addGrid()" style="margin-top: 10px;">+ New Grid</button>
-            
-            <h3 style="margin-top: 20px;">Transformers</h3>
-            <div id="ptrList"></div>
-            <button onclick="addPTR()" style="margin-top: 10px;">+ Add PTR</button>
+            <div class="sidebar-section">
+                <h3>📌 Grids / Substations</h3>
+                <div id="gridList"></div>
+                <button onclick="addNewGrid()" style="margin-top: 10px; width: 100%;">+ Add Grid</button>
+            </div>
+            <div class="sidebar-section">
+                <h3>🔧 Power Transformers</h3>
+                <div id="ptrList"></div>
+                <button onclick="addNewPTR()" style="margin-top: 10px; width: 100%;">+ Add PTR</button>
+            </div>
         </div>
         
         <div class="content">
             <div id="testArea">
-                <p>Select a PTR from the menu to begin testing</p>
+                <p style="text-align: center; padding: 40px; color: #999;">Select a PTR from the menu to begin testing</p>
             </div>
         </div>
         <div style="clear: both;"></div>
@@ -66,227 +98,333 @@
 <div id="statusMsg" class="status"></div>
 
 <script>
-    // Load from localStorage
-    let data = JSON.parse(localStorage.getItem('tandc_data')) || {
-        users: [{ username: 'admin', password: 'admin123' }],
-        grids: [{ id: '1', name: 'Grid Alpha' }, { id: '2', name: 'Grid Beta' }],
+    // Load data from localStorage
+    let appData = JSON.parse(localStorage.getItem('tandc_koshi_data')) || {
+        users: [{ username: 'admin', password: 'admin123', name: 'Administrator' }],
+        grids: [
+            { id: '1', name: 'Grid Alpha', location: 'Substation A' },
+            { id: '2', name: 'Grid Beta', location: 'Substation B' }
+        ],
         ptrs: [],
-        testData: {}
+        testResults: {}
     };
     
     let currentUser = null;
     let currentGrid = null;
     let currentPTR = null;
     
-    function saveData() { localStorage.setItem('tandc_data', JSON.stringify(data)); }
-    
-    function login() {
-        let user = document.getElementById('username').value;
-        let pass = document.getElementById('password').value;
-        let found = data.users.find(u => u.username === user && u.password === pass);
-        if (found) {
-            currentUser = user;
-            document.getElementById('loginArea').style.display = 'none';
-            document.getElementById('mainArea').style.display = 'block';
-            document.getElementById('userDisplay').innerHTML = 'Welcome, ' + user;
-            loadGrids();
-            showStatus('Login successful!', 'green');
-        } else { showStatus('Invalid credentials', 'red'); }
+    function saveData() {
+        localStorage.setItem('tandc_koshi_data', JSON.stringify(appData));
     }
     
-    function logout() { currentUser = null; document.getElementById('loginArea').style.display = 'block'; document.getElementById('mainArea').style.display = 'none'; }
+    function showStatus(msg, color) {
+        let div = document.getElementById('statusMsg');
+        div.textContent = msg;
+        div.style.backgroundColor = color;
+        div.style.display = 'block';
+        setTimeout(() => div.style.display = 'none', 3000);
+    }
+    
+    function doLogin() {
+        let user = document.getElementById('username').value;
+        let pass = document.getElementById('password').value;
+        let found = appData.users.find(u => u.username === user && u.password === pass);
+        if (found) {
+            currentUser = found;
+            document.getElementById('loginArea').style.display = 'none';
+            document.getElementById('mainArea').style.display = 'block';
+            document.getElementById('userName').innerHTML = found.name || found.username;
+            loadGrids();
+            showStatus('Login successful!', '#28a745');
+        } else {
+            showStatus('Invalid username or password', '#dc3545');
+        }
+    }
+    
+    function doLogout() {
+        currentUser = null;
+        currentGrid = null;
+        currentPTR = null;
+        document.getElementById('loginArea').style.display = 'block';
+        document.getElementById('mainArea').style.display = 'none';
+    }
     
     function loadGrids() {
         let html = '';
-        data.grids.forEach(grid => {
-            html += `<button class="grid-btn" onclick="selectGrid('${grid.id}')">${grid.name}</button><br>`;
+        appData.grids.forEach(grid => {
+            html += `<div class="grid-btn" onclick="selectGrid('${grid.id}')">📁 ${grid.name}</div>`;
         });
-        document.getElementById('gridList').innerHTML = html;
-        if (data.grids.length > 0) selectGrid(data.grids[0].id);
+        document.getElementById('gridList').innerHTML = html || '<p style="color:#999;">No grids. Click "Add Grid"</p>';
+        if (appData.grids.length > 0 && !currentGrid) {
+            selectGrid(appData.grids[0].id);
+        }
     }
     
     function selectGrid(gridId) {
-        currentGrid = data.grids.find(g => g.id === gridId);
+        currentGrid = appData.grids.find(g => g.id === gridId);
+        document.querySelectorAll('.grid-btn').forEach(btn => btn.classList.remove('active'));
+        event.target.classList.add('active');
         loadPTRs();
     }
     
-    function addGrid() {
-        let name = prompt('Enter grid name:');
+    function addNewGrid() {
+        let name = prompt('Enter Grid/Substation name:', 'New Grid');
         if (name) {
-            data.grids.push({ id: Date.now().toString(), name: name });
+            let newGrid = {
+                id: Date.now().toString(),
+                name: name,
+                location: prompt('Enter location:', '') || ''
+            };
+            appData.grids.push(newGrid);
             saveData();
             loadGrids();
-            showStatus('Grid added!', 'green');
+            showStatus('Grid added successfully!', '#28a745');
         }
     }
     
     function loadPTRs() {
         if (!currentGrid) return;
-        let ptrs = data.ptrs.filter(p => p.gridId === currentGrid.id);
+        let ptrs = appData.ptrs.filter(p => p.gridId === currentGrid.id);
         let html = '';
         ptrs.forEach(ptr => {
-            html += `<button class="grid-btn" onclick="selectPTR('${ptr.id}')">${ptr.id} - ${ptr.rating}</button><br>`;
+            html += `<div class="ptr-btn" onclick="selectPTR('${ptr.id}')">🔹 ${ptr.equipmentId} | ${ptr.rating || ''}</div>`;
         });
-        document.getElementById('ptrList').innerHTML = html || '<p>No PTRs</p>';
+        document.getElementById('ptrList').innerHTML = html || '<p style="color:#999;">No PTRs. Click "Add PTR"</p>';
+        if (ptrs.length > 0 && !currentPTR) {
+            selectPTR(ptrs[0].id);
+        }
     }
     
-    function addPTR() {
-        if (!currentGrid) { showStatus('Select a grid first', 'red'); return; }
-        let id = prompt('Enter PTR ID (e.g., PTR-01):');
-        if (!id) return;
+    function addNewPTR() {
+        if (!currentGrid) {
+            showStatus('Please select a grid first', '#dc3545');
+            return;
+        }
+        let eqId = prompt('Enter PTR ID (e.g., PTR-01):');
+        if (!eqId) return;
         let rating = prompt('Enter Rating (e.g., 20 MVA):');
-        let make = prompt('Enter Make (e.g., CGL):');
+        let make = prompt('Enter Make (e.g., CGL, BHEL):');
         let voltage = prompt('Enter Voltage Ratio (132/33kV or 220/132kV):');
-        data.ptrs.push({
+        
+        let newPTR = {
             id: Date.now().toString(),
             gridId: currentGrid.id,
-            equipmentId: id,
-            rating: rating,
-            make: make,
-            voltageRatio: voltage,
-            testValues: {}
-        });
+            equipmentId: eqId,
+            rating: rating || '',
+            make: make || '',
+            voltageRatio: voltage || '',
+            serialNumber: prompt('Enter Serial Number:', '') || ''
+        };
+        appData.ptrs.push(newPTR);
         saveData();
         loadPTRs();
-        showStatus('PTR added!', 'green');
+        showStatus('PTR added successfully!', '#28a745');
     }
     
     function selectPTR(ptrId) {
-        currentPTR = data.ptrs.find(p => p.id === ptrId);
+        currentPTR = appData.ptrs.find(p => p.id === ptrId);
+        document.querySelectorAll('.ptr-btn').forEach(btn => btn.classList.remove('active'));
+        if (event && event.target) event.target.classList.add('active');
         loadTestForm();
+    }
+    
+    function getSavedData(ptrId) {
+        return appData.testResults[ptrId] || {};
     }
     
     function loadTestForm() {
         if (!currentPTR) return;
-        let saved = data.testData[currentPTR.id] || {};
+        let saved = getSavedData(currentPTR.id);
+        
         let html = `
             <div class="test-group">
-                <h3>${currentPTR.equipmentId} | ${currentPTR.rating} | Make: ${currentPTR.make}</h3>
-                <p>Test Date: <input type="date" id="testDate" value="${saved.date || new Date().toISOString().split('T')[0]}"></p>
-            </div>
-            
-            <div class="test-group">
-                <h3>1. Core Balance and Magnetising Current</h3>
-                <p>VRY: <input type="text" id="vry" value="${saved.vry || ''}"> V | 
-                   VYB: <input type="text" id="vyb" value="${saved.vyb || ''}"> V | 
-                   VRB: <input type="text" id="vrb" value="${saved.vrb || ''}"> V</p>
-                <table><tr><th>Tap</th><th>VRN</th><th>VYN</th><th>VBN</th><th>Vrn</th><th>Vyn</th><th>Vbn</th></tr>
-                ${[0,1,2].map(i => `<tr><td><input type="text" id="tap_${i}" placeholder="Tap" style="width:50px"></td>
-                    ${['vrn','vyn','vbn','vrn_lv','vyn_lv','vbn_lv'].map(f => `<td><input type="text" id="mag_${i}_${f}" value="${saved[`mag_${i}_${f}`] || ''}" style="width:70px"></td>`).join('')}</tr>`).join('')}
-                </table>
-            </div>
-            
-            <div class="test-group">
-                <h3>2. Short Circuit Test</h3>
-                <table><tr><th>Tap</th><th>IR</th><th>IY</th><th>IB</th><th>Ir</th><th>Iy</th><th>Ib</th><th>IN</th><th>In</th></tr>
-                ${[0,1,2].map(i => `<tr><td><input type="text" id="sc_tap_${i}" placeholder="Tap" style="width:50px"></td>
-                    ${['ir','iy','ib','ir_lv','iy_lv','ib_lv','in_hv','in_lv'].map(f => `<td><input type="text" id="sc_${i}_${f}" value="${saved[`sc_${i}_${f}`] || ''}" style="width:60px"></td>`).join('')}</tr>`).join('')}
-                </table>
-            </div>
-            
-            <div class="test-group">
-                <h3>3. Vector Group (YNyn0)</h3>
-                <p>1V-2V: <input type="text" id="vg_v1v2" value="${saved.vg_v1v2 || ''}"> V |
-                   1V-2W: <input type="text" id="vg_v1w2" value="${saved.vg_v1w2 || ''}"> V |
-                   1W-2V: <input type="text" id="vg_w1v2" value="${saved.vg_w1v2 || ''}"> V |
-                   1W-2W: <input type="text" id="vg_w1w2" value="${saved.vg_w1w2 || ''}"> V |
-                   1UN=2Un+Nn: <input type="text" id="vg_un" value="${saved.vg_un || ''}"> V</p>
-            </div>
-            
-            <div class="test-group">
-                <h3>4. Winding Resistance Test</h3>
-                <table><tr><th>Tap</th><th>OTI°C</th><th>WTI HV°C</th><th>WTI LV°C</th><th>HV U-N</th><th>HV V-N</th><th>HV W-N</th><th>LV u-n</th><th>LV v-n</th><th>LV w-n</th></tr>
-                ${[0,1,2].map(i => `<tr><td><input type="text" id="wr_tap_${i}" placeholder="Tap" style="width:50px"></td>
-                    ${['oti','wti_hv','wti_lv','hv_u','hv_v','hv_w','lv_u','lv_v','lv_w'].map(f => `<td><input type="text" id="wr_${i}_${f}" value="${saved[`wr_${i}_${f}`] || ''}" style="width:55px"></td>`).join('')}</tr>`).join('')}
-                </table>
-            </div>
-            
-            <div class="test-group">
-                <h3>5. Insulation Resistance Test</h3>
-                <table><tr><th>Test Point</th><th>60 Sec (GΩ)</th><th>600 Sec (GΩ)</th><th>PI</th></tr>
-                <tr><td>HV-LV</td>${[0,1,2].map(i => `<td><input type="text" id="ir_hvlv_${i}" value="${saved[`ir_hvlv_${i}`] || ''}" style="width:70px"></td>`).join('')}</tr>
-                <tr><td>HV-E</td>${[0,1,2].map(i => `<td><input type="text" id="ir_hve_${i}" value="${saved[`ir_hve_${i}`] || ''}" style="width:70px"></td>`).join('')}</tr>
-                <tr><td>LV-E</td>${[0,1,2].map(i => `<td><input type="text" id="ir_lve_${i}" value="${saved[`ir_lve_${i}`] || ''}" style="width:70px"></td>`).join('')}</tr>
-                </table>
-            </div>
-            
-            <div class="test-group">
-                <h3>6. CFT Insulation Resistance</h3>
-                <p>Core-Frame: <input type="text" id="cft_cf" value="${saved.cft_cf || ''}"> GΩ |
-                   Frame-Tank: <input type="text" id="cft_ft" value="${saved.cft_ft || ''}"> GΩ |
-                   Core-Tank: <input type="text" id="cft_ct" value="${saved.cft_ct || ''}"> GΩ</p>
-            </div>
-            
-            <div class="test-group">
-                <h3>7. Turn Ratio Test</h3>
-                <table><tr><th>Tap</th><th>Phase U</th><th>Phase V</th><th>Phase W</th></tr>
-                ${[0,1,2].map(i => `<tr><td><input type="text" id="tr_tap_${i}" placeholder="Tap" style="width:50px"></td>
-                    ${['u','v','w'].map(f => `<td><input type="text" id="tr_${i}_${f}" value="${saved[`tr_${i}_${f}`] || ''}" style="width:70px"></td>`).join('')}</tr>`).join('')}
-                </table>
-            </div>
-            
-            <div class="test-group">
-                <h3>8. DC Voltage Test</h3>
-                <table><tr><th>Source</th><th>+VE to -VE (V)</th><th>+VE to Earth (V)</th><th>-VE to Earth (V)</th></tr>
-                <tr><td>Source I</td>${['pn','pe','ne'].map(f => `<td><input type="text" id="dc1_${f}" value="${saved[`dc1_${f}`] || ''}" style="width:80px"></td>`).join('')}</tr>
-                <tr><td>Source II</td>${['pn','pe','ne'].map(f => `<td><input type="text" id="dc2_${f}" value="${saved[`dc2_${f}`] || ''}" style="width:80px"></td>`).join('')}</tr>
-                </table>
-            </div>
-            
-            <div class="test-group">
-                <h3>9. Earthing Resistance Test</h3>
-                <p>HV-E: <input type="text" id="er_hve" value="${saved.er_hve || ''}"> Ω |
-                   LV-E: <input type="text" id="er_lve" value="${saved.er_lve || ''}"> Ω |
-                   Body: <input type="text" id="er_body" value="${saved.er_body || ''}"> Ω</p>
-            </div>
-            
-            <div class="test-group">
-                <h3>10. Remarks</h3>
-                <textarea id="remarks" rows="3" style="width:100%">${saved.remarks || ''}</textarea>
-            </div>
-            
-            <div class="test-group">
-                <h3>11. Signatories</h3>
-                <table><tr><th>CRITL</th><th>T&C Koshi</th><th>Field</th></tr>
-                <tr><td><input type="text" id="sign_critl" value="${saved.sign_critl || ''}" placeholder="Name & Signature" style="width:150px"></td>
-                    <td><input type="text" id="sign_tc" value="${saved.sign_tc || ''}" placeholder="Name & Signature" style="width:150px"></td>
-                    <td><input type="text" id="sign_field" value="${saved.sign_field || ''}" placeholder="Name & Signature" style="width:150px"></td></tr>
-                </table>
-            </div>
-            
-            <div style="text-align: center; margin-top: 20px;">
-                <button onclick="saveTestData()" style="background: green;">Save Test Results</button>
-                <button onclick="printReport()" style="background: #c0392b;">Print Report</button>
+                <h3>📋 Equipment Information</h3>
+                <p><strong>ID:</strong> ${currentPTR.equipmentId} | <strong>Rating:</strong> ${currentPTR.rating || 'N/A'} | <strong>Make:</strong> ${currentPTR.make || 'N/A'}</p>
+                <p><strong>Voltage Ratio:</strong> ${currentPTR.voltageRatio || 'N/A'} | <strong>Serial No:</strong> ${currentPTR.serialNumber || 'N/A'}</p>
+                <p>Test Date: <input type="date" id="testDate" value="${saved.testDate || new Date().toISOString().split('T')[0]}"></p>
             </div>
         `;
+        
+        // Section 1: Core Balance
+        html += `<div class="test-group"><h3>1. Core Balance and Magnetising Current Test</h3>
+            <p><span class="inline-input">VRY: <input type="text" id="vry" value="${saved.vry || ''}" style="width:80px"> V</span>
+               <span class="inline-input">VYB: <input type="text" id="vyb" value="${saved.vyb || ''}" style="width:80px"> V</span>
+               <span class="inline-input">VRB: <input type="text" id="vrb" value="${saved.vrb || ''}" style="width:80px"> V</span>
+            </p>
+            <table><tr><th>Tap</th><th>VRN (HV)</th><th>VYN (HV)</th><th>VBN (HV)</th><th>Vrn (LV)</th><th>Vyn (LV)</th><th>Vbn (LV)</th></tr>`;
+        for (let i = 0; i < 3; i++) {
+            html += `<tr>
+                <td><input type="text" id="tap_${i}" value="${saved[`tap_${i}`] || ''}" placeholder="Tap" style="width:50px"></td>
+                <td><input type="text" id="mag_${i}_vrn" value="${saved[`mag_${i}_vrn`] || ''}" style="width:70px"></td>
+                <td><input type="text" id="mag_${i}_vyn" value="${saved[`mag_${i}_vyn`] || ''}" style="width:70px"></td>
+                <td><input type="text" id="mag_${i}_vbn" value="${saved[`mag_${i}_vbn`] || ''}" style="width:70px"></td>
+                <td><input type="text" id="mag_${i}_vrn_lv" value="${saved[`mag_${i}_vrn_lv`] || ''}" style="width:70px"></td>
+                <td><input type="text" id="mag_${i}_vyn_lv" value="${saved[`mag_${i}_vyn_lv`] || ''}" style="width:70px"></td>
+                <td><input type="text" id="mag_${i}_vbn_lv" value="${saved[`mag_${i}_vbn_lv`] || ''}" style="width:70px"></td>
+            </tr>`;
+        }
+        html += `</table></div>`;
+        
+        // Section 2: Short Circuit
+        html += `<div class="test-group"><h3>2. Short Circuit Test</h3>
+            <table><tr><th>Tap</th><th>IR</th><th>IY</th><th>IB</th><th>Ir</th><th>Iy</th><th>Ib</th><th>IN</th><th>In</th></tr>`;
+        for (let i = 0; i < 3; i++) {
+            html += `<tr>
+                <td><input type="text" id="sc_tap_${i}" value="${saved[`sc_tap_${i}`] || ''}" placeholder="Tap" style="width:50px"></td>
+                <td><input type="text" id="sc_${i}_ir" value="${saved[`sc_${i}_ir`] || ''}" style="width:55px"></td>
+                <td><input type="text" id="sc_${i}_iy" value="${saved[`sc_${i}_iy`] || ''}" style="width:55px"></td>
+                <td><input type="text" id="sc_${i}_ib" value="${saved[`sc_${i}_ib`] || ''}" style="width:55px"></td>
+                <td><input type="text" id="sc_${i}_ir_lv" value="${saved[`sc_${i}_ir_lv`] || ''}" style="width:55px"></td>
+                <td><input type="text" id="sc_${i}_iy_lv" value="${saved[`sc_${i}_iy_lv`] || ''}" style="width:55px"></td>
+                <td><input type="text" id="sc_${i}_ib_lv" value="${saved[`sc_${i}_ib_lv`] || ''}" style="width:55px"></td>
+                <td><input type="text" id="sc_${i}_in_hv" value="${saved[`sc_${i}_in_hv`] || ''}" style="width:55px"></td>
+                <td><input type="text" id="sc_${i}_in_lv" value="${saved[`sc_${i}_in_lv`] || ''}" style="width:55px"></td>
+            </tr>`;
+        }
+        html += `</table></div>`;
+        
+        // Section 3: Vector Group
+        html += `<div class="test-group"><h3>3. Vector Group (YNyn0)</h3>
+            <p><span class="inline-input">1V-2V: <input type="text" id="vg_v1v2" value="${saved.vg_v1v2 || ''}" style="width:80px"> V</span>
+               <span class="inline-input">1V-2W: <input type="text" id="vg_v1w2" value="${saved.vg_v1w2 || ''}" style="width:80px"> V</span>
+               <span class="inline-input">1W-2V: <input type="text" id="vg_w1v2" value="${saved.vg_w1v2 || ''}" style="width:80px"> V</span>
+               <span class="inline-input">1W-2W: <input type="text" id="vg_w1w2" value="${saved.vg_w1w2 || ''}" style="width:80px"> V</span>
+               <span class="inline-input">1UN=2Un+Nn: <input type="text" id="vg_un" value="${saved.vg_un || ''}" style="width:80px"> V</span>
+            </p></div>`;
+        
+        // Section 4: Winding Resistance
+        html += `<div class="test-group"><h3>4. Winding Resistance Test</h3>
+            <table><tr><th>Tap</th><th>OTI°C</th><th>WTI HV°C</th><th>WTI LV°C</th><th>HV U-N</th><th>HV V-N</th><th>HV W-N</th><th>LV u-n</th><th>LV v-n</th><th>LV w-n</th></tr>`;
+        for (let i = 0; i < 3; i++) {
+            html += `<tr>
+                <td><input type="text" id="wr_tap_${i}" value="${saved[`wr_tap_${i}`] || ''}" placeholder="Tap" style="width:50px"></td>
+                <td><input type="text" id="wr_oti_${i}" value="${saved[`wr_oti_${i}`] || ''}" style="width:50px"></td>
+                <td><input type="text" id="wr_wti_hv_${i}" value="${saved[`wr_wti_hv_${i}`] || ''}" style="width:55px"></td>
+                <td><input type="text" id="wr_wti_lv_${i}" value="${saved[`wr_wti_lv_${i}`] || ''}" style="width:55px"></td>
+                <td><input type="text" id="wr_hv_u_${i}" value="${saved[`wr_hv_u_${i}`] || ''}" style="width:60px"></td>
+                <td><input type="text" id="wr_hv_v_${i}" value="${saved[`wr_hv_v_${i}`] || ''}" style="width:60px"></td>
+                <td><input type="text" id="wr_hv_w_${i}" value="${saved[`wr_hv_w_${i}`] || ''}" style="width:60px"></td>
+                <td><input type="text" id="wr_lv_u_${i}" value="${saved[`wr_lv_u_${i}`] || ''}" style="width:60px"></td>
+                <td><input type="text" id="wr_lv_v_${i}" value="${saved[`wr_lv_v_${i}`] || ''}" style="width:60px"></td>
+                <td><input type="text" id="wr_lv_w_${i}" value="${saved[`wr_lv_w_${i}`] || ''}" style="width:60px"></td>
+            </tr>`;
+        }
+        html += `</table></div>`;
+        
+        // Section 5: Insulation Resistance
+        html += `<div class="test-group"><h3>5. Insulation Resistance Test (5 kV)</h3>
+            <table><tr><th>Test Point</th><th>60 Sec (GΩ)</th><th>600 Sec (GΩ)</th><th>PI</th></tr>`;
+        ['hvlv', 'hve', 'lve'].forEach(type => {
+            let label = type === 'hvlv' ? 'HV-LV' : (type === 'hve' ? 'HV-E' : 'LV-E');
+            html += `<tr><td>${label}</td>`;
+            for (let i = 0; i < 3; i++) {
+                let val = saved[`ir_${type}_${i}`] || '';
+                html += `<td><input type="text" id="ir_${type}_${i}" value="${val}" style="width:70px"></td>`;
+            }
+            html += `</tr>`;
+        });
+        html += `</table></div>`;
+        
+        // Section 6: CFT
+        html += `<div class="test-group"><h3>6. CFT Insulation Resistance Test (500V)</h3>
+            <p><span class="inline-input">Core-Frame: <input type="text" id="cft_cf" value="${saved.cft_cf || ''}" style="width:80px"> GΩ</span>
+               <span class="inline-input">Frame-Tank: <input type="text" id="cft_ft" value="${saved.cft_ft || ''}" style="width:80px"> GΩ</span>
+               <span class="inline-input">Core-Tank: <input type="text" id="cft_ct" value="${saved.cft_ct || ''}" style="width:80px"> GΩ</span>
+            </p></div>`;
+        
+        // Section 7: Turn Ratio
+        html += `<div class="test-group"><h3>7. Turn Ratio Test</h3>
+            <table><tr><th>Tap</th><th>Phase U</th><th>Phase V</th><th>Phase W</th></tr>`;
+        for (let i = 0; i < 3; i++) {
+            html += `<tr>
+                <td><input type="text" id="tr_tap_${i}" value="${saved[`tr_tap_${i}`] || ''}" placeholder="Tap" style="width:50px"></td>
+                <td><input type="text" id="tr_${i}_u" value="${saved[`tr_${i}_u`] || ''}" style="width:80px"></td>
+                <td><input type="text" id="tr_${i}_v" value="${saved[`tr_${i}_v`] || ''}" style="width:80px"></td>
+                <td><input type="text" id="tr_${i}_w" value="${saved[`tr_${i}_w`] || ''}" style="width:80px"></td>
+            </tr>`;
+        }
+        html += `</table></div>`;
+        
+        // Section 8: DC Voltage
+        html += `<div class="test-group"><h3>8. DC Voltage Test</h3>
+            <table><tr><th>Source</th><th>+VE to -VE (V)</th><th>+VE to Earth (V)</th><th>-VE to Earth (V)</th></tr>
+            <tr><td>Source I</td>${['pn','pe','ne'].map(f => `<td><input type="text" id="dc1_${f}" value="${saved[`dc1_${f}`] || ''}" style="width:80px"></td>`).join('')}</tr>
+            <tr><td>Source II</td>${['pn','pe','ne'].map(f => `<td><input type="text" id="dc2_${f}" value="${saved[`dc2_${f}`] || ''}" style="width:80px"></td>`).join('')}</tr>
+            </table></div>`;
+        
+        // Section 9: Earthing
+        html += `<div class="test-group"><h3>9. Earthing Resistance Test</h3>
+            <p><span class="inline-input">HV-E: <input type="text" id="er_hve" value="${saved.er_hve || ''}" style="width:80px"> Ω</span>
+               <span class="inline-input">LV-E: <input type="text" id="er_lve" value="${saved.er_lve || ''}" style="width:80px"> Ω</span>
+               <span class="inline-input">Body: <input type="text" id="er_body" value="${saved.er_body || ''}" style="width:80px"> Ω</span>
+            </p></div>`;
+        
+        // Section 10: Remarks
+        html += `<div class="test-group"><h3>10. Remarks</h3>
+            <textarea id="remarks" rows="3">${saved.remarks || ''}</textarea></div>`;
+        
+        // Section 11: Signatories
+        html += `<div class="test-group"><h3>11. Signatories</h3>
+            <table><tr><th>CRITL</th><th>T&C Koshi</th><th>Field</th></tr>
+            <tr>
+                <td><input type="text" id="sign_critl" value="${saved.sign_critl || ''}" placeholder="Name & Signature" style="width:180px"></td>
+                <td><input type="text" id="sign_tc" value="${saved.sign_tc || ''}" placeholder="Name & Signature" style="width:180px"></td>
+                <td><input type="text" id="sign_field" value="${saved.sign_field || ''}" placeholder="Name & Signature" style="width:180px"></td>
+            </tr>
+            <tr><td colspan="3"><small>Signature & Stamp</small></td></tr>
+            </table></div>`;
+        
+        html += `<div class="action-buttons">
+            <button class="btn-save" onclick="saveTestData()">💾 Save Test Results</button>
+            <button class="btn-print" onclick="printReport()">📄 Print Report / PDF</button>
+        </div>`;
+        
         document.getElementById('testArea').innerHTML = html;
     }
     
     function saveTestData() {
         if (!currentPTR) return;
         let saved = {};
-        saved.date = document.getElementById('testDate')?.value || '';
+        
+        saved.testDate = document.getElementById('testDate')?.value || '';
         saved.vry = document.getElementById('vry')?.value || '';
         saved.vyb = document.getElementById('vyb')?.value || '';
         saved.vrb = document.getElementById('vrb')?.value || '';
         
         for (let i = 0; i < 3; i++) {
             saved[`tap_${i}`] = document.getElementById(`tap_${i}`)?.value || '';
-            ['vrn','vyn','vbn','vrn_lv','vyn_lv','vbn_lv'].forEach(f => {
-                saved[`mag_${i}_${f}`] = document.getElementById(`mag_${i}_${f}`)?.value || '';
-            });
+            saved[`mag_${i}_vrn`] = document.getElementById(`mag_${i}_vrn`)?.value || '';
+            saved[`mag_${i}_vyn`] = document.getElementById(`mag_${i}_vyn`)?.value || '';
+            saved[`mag_${i}_vbn`] = document.getElementById(`mag_${i}_vbn`)?.value || '';
+            saved[`mag_${i}_vrn_lv`] = document.getElementById(`mag_${i}_vrn_lv`)?.value || '';
+            saved[`mag_${i}_vyn_lv`] = document.getElementById(`mag_${i}_vyn_lv`)?.value || '';
+            saved[`mag_${i}_vbn_lv`] = document.getElementById(`mag_${i}_vbn_lv`)?.value || '';
+            
             saved[`sc_tap_${i}`] = document.getElementById(`sc_tap_${i}`)?.value || '';
-            ['ir','iy','ib','ir_lv','iy_lv','ib_lv','in_hv','in_lv'].forEach(f => {
-                saved[`sc_${i}_${f}`] = document.getElementById(`sc_${i}_${f}`)?.value || '';
-            });
+            saved[`sc_${i}_ir`] = document.getElementById(`sc_${i}_ir`)?.value || '';
+            saved[`sc_${i}_iy`] = document.getElementById(`sc_${i}_iy`)?.value || '';
+            saved[`sc_${i}_ib`] = document.getElementById(`sc_${i}_ib`)?.value || '';
+            saved[`sc_${i}_ir_lv`] = document.getElementById(`sc_${i}_ir_lv`)?.value || '';
+            saved[`sc_${i}_iy_lv`] = document.getElementById(`sc_${i}_iy_lv`)?.value || '';
+            saved[`sc_${i}_ib_lv`] = document.getElementById(`sc_${i}_ib_lv`)?.value || '';
+            saved[`sc_${i}_in_hv`] = document.getElementById(`sc_${i}_in_hv`)?.value || '';
+            saved[`sc_${i}_in_lv`] = document.getElementById(`sc_${i}_in_lv`)?.value || '';
+            
             saved[`wr_tap_${i}`] = document.getElementById(`wr_tap_${i}`)?.value || '';
-            ['oti','wti_hv','wti_lv','hv_u','hv_v','hv_w','lv_u','lv_v','lv_w'].forEach(f => {
-                saved[`wr_${i}_${f}`] = document.getElementById(`wr_${i}_${f}`)?.value || '';
-            });
+            saved[`wr_oti_${i}`] = document.getElementById(`wr_oti_${i}`)?.value || '';
+            saved[`wr_wti_hv_${i}`] = document.getElementById(`wr_wti_hv_${i}`)?.value || '';
+            saved[`wr_wti_lv_${i}`] = document.getElementById(`wr_wti_lv_${i}`)?.value || '';
+            saved[`wr_hv_u_${i}`] = document.getElementById(`wr_hv_u_${i}`)?.value || '';
+            saved[`wr_hv_v_${i}`] = document.getElementById(`wr_hv_v_${i}`)?.value || '';
+            saved[`wr_hv_w_${i}`] = document.getElementById(`wr_hv_w_${i}`)?.value || '';
+            saved[`wr_lv_u_${i}`] = document.getElementById(`wr_lv_u_${i}`)?.value || '';
+            saved[`wr_lv_v_${i}`] = document.getElementById(`wr_lv_v_${i}`)?.value || '';
+            saved[`wr_lv_w_${i}`] = document.getElementById(`wr_lv_w_${i}`)?.value || '';
+            
             saved[`tr_tap_${i}`] = document.getElementById(`tr_tap_${i}`)?.value || '';
-            ['u','v','w'].forEach(f => {
-                saved[`tr_${i}_${f}`] = document.getElementById(`tr_${i}_${f}`)?.value || '';
-            });
+            saved[`tr_${i}_u`] = document.getElementById(`tr_${i}_u`)?.value || '';
+            saved[`tr_${i}_v`] = document.getElementById(`tr_${i}_v`)?.value || '';
+            saved[`tr_${i}_w`] = document.getElementById(`tr_${i}_w`)?.value || '';
         }
         
         for (let i = 0; i < 3; i++) {
@@ -321,9 +459,9 @@
         saved.sign_tc = document.getElementById('sign_tc')?.value || '';
         saved.sign_field = document.getElementById('sign_field')?.value || '';
         
-        data.testData[currentPTR.id] = saved;
+        appData.testResults[currentPTR.id] = saved;
         saveData();
-        showStatus('Test data saved!', 'green');
+        showStatus('Test data saved successfully!', '#28a745');
     }
     
     function printReport() {
@@ -331,18 +469,11 @@
         window.print();
     }
     
-    function showStatus(msg, color) {
-        let div = document.getElementById('statusMsg');
-        div.textContent = msg;
-        div.style.backgroundColor = color;
-        div.style.display = 'block';
-        setTimeout(() => div.style.display = 'none', 3000);
-    }
-    
-    // Auto login check
-    if (localStorage.getItem('tandc_logged')) {
+    // Initialize on page load
+    if (localStorage.getItem('tandc_koshi_logged')) {
         document.getElementById('loginArea').style.display = 'none';
         document.getElementById('mainArea').style.display = 'block';
+        document.getElementById('userName').innerHTML = 'Admin';
         loadGrids();
     }
 </script>
