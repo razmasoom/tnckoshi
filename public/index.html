@@ -4,478 +4,977 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>T&C Koshi - PTR Test Report System</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Segoe UI', Arial, sans-serif; background: #e8e8e8; padding: 20px; }
-        .container { max-width: 1400px; margin: 0 auto; background: white; border-radius: 8px; padding: 20px; }
-        h1 { text-align: center; color: #2c3e50; margin-bottom: 20px; }
-        h2 { color: #2c3e50; margin: 15px 0 10px 0; font-size: 18px; border-bottom: 2px solid #2c3e50; padding-bottom: 5px; }
+        body { font-family: 'Segoe UI', 'Times New Roman', Arial, sans-serif; background: linear-gradient(135deg, #0f2c3b, #1b4f6e); min-height: 100vh; }
         
-        /* Login */
-        .login-area { text-align: center; padding: 50px; }
-        .login-area input, .login-area button { padding: 10px; margin: 5px; width: 200px; }
-        button { background: #2c3e50; color: white; border: none; cursor: pointer; padding: 8px 16px; border-radius: 4px; }
-        button:hover { background: #1a2a3a; }
+        .login-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        .login-card {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            width: 400px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+        .login-card h2 { margin-bottom: 10px; color: #1a4a5f; text-align: center; }
+        .login-card h3 { text-align: center; margin-bottom: 30px; color: #666; font-size: 14px; }
+        .input-group { margin-bottom: 20px; }
+        .input-group label { display: block; margin-bottom: 5px; font-weight: bold; color: #333; }
+        .input-group input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+        .login-btn {
+            width: 100%;
+            padding: 12px;
+            background: #f39c12;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+        }
+        .login-btn:hover { background: #e67e22; }
+        .error-msg { color: red; margin-bottom: 15px; display: none; text-align: center; }
         
-        /* Main Area */
-        .main-area { display: none; }
-        .header-bar { background: #2c3e50; color: white; padding: 10px 20px; border-radius: 8px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; }
+        .app-container { display: none; }
+        .header {
+            background: linear-gradient(135deg, #0b2b3b, #1a4a5f);
+            color: white;
+            padding: 15px 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        .header h2 i { margin-right: 10px; }
+        .user-info { display: flex; align-items: center; gap: 15px; }
+        .btn-logout {
+            background: #e74c3c;
+            color: white;
+            padding: 8px 16px;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+        }
         
-        /* Sidebar */
-        .sidebar { float: left; width: 280px; margin-right: 20px; }
-        .sidebar-section { background: #f8f9fa; border: 1px solid #ddd; border-radius: 8px; padding: 15px; margin-bottom: 20px; }
-        .sidebar-section h3 { margin-bottom: 10px; color: #2c3e50; }
-        .grid-btn, .ptr-btn { display: block; width: 100%; text-align: left; padding: 8px 12px; margin: 5px 0; background: #e9ecef; border: 1px solid #ccc; border-radius: 4px; cursor: pointer; }
-        .grid-btn.active, .ptr-btn.active { background: #2c3e50; color: white; }
+        .container { padding: 20px; max-width: 1400px; margin: 0 auto; }
         
-        /* Content */
-        .content { overflow: hidden; }
-        .test-group { border: 1px solid #ddd; border-radius: 8px; padding: 15px; margin-bottom: 20px; background: #fefefe; }
-        .test-group h3 { background: #2c3e50; color: white; padding: 8px 12px; margin: -15px -15px 15px -15px; border-radius: 8px 8px 0 0; font-size: 14px; }
-        table { width: 100%; border-collapse: collapse; margin: 10px 0; font-size: 12px; }
-        th, td { border: 1px solid #ccc; padding: 6px; text-align: center; }
-        th { background: #f0f0f0; }
-        input { padding: 4px; border: 1px solid #ccc; border-radius: 3px; text-align: center; width: 70px; }
-        .inline-input { display: inline-block; margin: 0 10px 10px 0; }
-        textarea { width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px; font-family: inherit; }
+        .grid-section {
+            background: white;
+            border-radius: 12px;
+            padding: 15px 20px;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        .grid-buttons { display: flex; gap: 10px; flex-wrap: wrap; }
+        .grid-btn {
+            padding: 8px 20px;
+            border: 1px solid #ddd;
+            border-radius: 25px;
+            cursor: pointer;
+            background: #f8f9fa;
+            transition: all 0.3s;
+        }
+        .grid-btn.active {
+            background: #1a4a5f;
+            color: white;
+            border-color: #1a4a5f;
+        }
+        .btn-add {
+            background: #28a745;
+            color: white;
+            padding: 8px 20px;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+        }
         
-        .action-buttons { text-align: center; margin-top: 20px; }
-        .action-buttons button { margin: 0 10px; padding: 10px 25px; font-size: 14px; }
-        .btn-save { background: #28a745; }
-        .btn-print { background: #dc3545; }
+        .main-layout { display: flex; gap: 20px; }
+        .sidebar {
+            width: 280px;
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            height: fit-content;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        .content-area {
+            flex: 1;
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
         
-        .status { position: fixed; bottom: 20px; right: 20px; padding: 10px 20px; border-radius: 4px; display: none; color: white; z-index: 1000; }
+        .menu-section { margin-bottom: 25px; }
+        .menu-title {
+            font-size: 14px;
+            font-weight: bold;
+            padding: 10px;
+            background: #1a4a5f;
+            color: white;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+        .equipment-list {
+            list-style: none;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        .equipment-list li {
+            padding: 10px;
+            margin: 5px 0;
+            cursor: pointer;
+            border-radius: 8px;
+            background: #f8f9fa;
+            border: 1px solid #e0e0e0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .equipment-list li.active {
+            background: #667eea;
+            color: white;
+        }
+        .btn-add-equipment {
+            width: 100%;
+            padding: 8px;
+            background: #28a745;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        .btn-delete {
+            background: #dc3545;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            padding: 2px 8px;
+            cursor: pointer;
+        }
+        
+        .current-equipment {
+            background: linear-gradient(135deg, #667eea15, #764ba215);
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            border-left: 4px solid #f39c12;
+        }
+        .test-group {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border: 1px solid #e0e0e0;
+        }
+        .test-group h4 {
+            color: #1a4a5f;
+            margin-bottom: 15px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid #f39c12;
+        }
+        .test-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+            font-size: 12px;
+        }
+        .test-table th, .test-table td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: center;
+        }
+        .test-table th {
+            background: #e9ecef;
+            font-weight: bold;
+        }
+        .test-table input {
+            width: 80px;
+            padding: 5px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            text-align: center;
+        }
+        .inline-input {
+            display: inline-block;
+            margin: 0 15px 10px 0;
+        }
+        .inline-input input {
+            width: 100px;
+            padding: 5px;
+            margin-left: 5px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-family: inherit;
+            resize: vertical;
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+            justify-content: center;
+        }
+        .btn-save {
+            background: #28a745;
+            color: white;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 30px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        .btn-pdf {
+            background: #dc3545;
+            color: white;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 30px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        .btn-print {
+            background: #17a2b8;
+            color: white;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 30px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        .modal-content {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            width: 450px;
+        }
+        .modal-content input, .modal-content select {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        .modal-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        
+        .status {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            padding: 12px 24px;
+            border-radius: 8px;
+            display: none;
+            z-index: 1000;
+            color: white;
+            font-weight: bold;
+        }
         
         @media print {
-            .sidebar, .header-bar, .action-buttons, .status { display: none; }
-            .content { margin: 0; padding: 0; }
-            .test-group { break-inside: avoid; }
-            input { border: none; background: transparent; }
+            .sidebar, .grid-section, .action-buttons, .header, .btn-add-equipment, .btn-delete, .user-info {
+                display: none;
+            }
+            .content-area {
+                margin: 0;
+                padding: 0;
+            }
+            .test-group {
+                break-inside: avoid;
+                page-break-inside: avoid;
+            }
         }
     </style>
 </head>
 <body>
-<div class="container">
-    <h1>🔧 T&C Koshi - PTR Test Report System</h1>
-    
-    <!-- Login Area -->
-    <div id="loginArea" class="login-area">
-        <h2>Login</h2>
-        <input type="text" id="username" placeholder="Username" value="admin"><br>
-        <input type="password" id="password" placeholder="Password" value="admin123"><br>
-        <button onclick="doLogin()">Login</button>
-        <p style="margin-top: 20px; color: #666;">Demo: admin / admin123</p>
+    <div id="loginPage" class="login-container">
+        <div class="login-card">
+            <h2><i class="fas fa-bolt"></i> T&C Koshi</h2>
+            <h3>PTR Test Report Management System</h3>
+            <div id="loginError" class="error-msg"></div>
+            <div class="input-group">
+                <label>Username</label>
+                <input type="text" id="username" placeholder="Enter username">
+            </div>
+            <div class="input-group">
+                <label>Password</label>
+                <input type="password" id="password" placeholder="Enter password">
+            </div>
+            <button class="login-btn" onclick="login()"><i class="fas fa-sign-in-alt"></i> Login</button>
+            <p style="text-align: center; margin-top: 20px; color: #666;">Demo: admin / admin123</p>
+        </div>
     </div>
-    
-    <!-- Main Area -->
-    <div id="mainArea" class="main-area">
-        <div class="header-bar">
-            <span>⚡ T&C Koshi Test Management</span>
-            <span>Welcome, <span id="userName"></span> <button onclick="doLogout()" style="margin-left: 15px; background: #c0392b;">Logout</button></span>
-        </div>
-        
-        <div class="sidebar">
-            <div class="sidebar-section">
-                <h3>📌 Grids / Substations</h3>
-                <div id="gridList"></div>
-                <button onclick="addNewGrid()" style="margin-top: 10px; width: 100%;">+ Add Grid</button>
-            </div>
-            <div class="sidebar-section">
-                <h3>🔧 Power Transformers</h3>
-                <div id="ptrList"></div>
-                <button onclick="addNewPTR()" style="margin-top: 10px; width: 100%;">+ Add PTR</button>
-            </div>
-        </div>
-        
-        <div class="content">
-            <div id="testArea">
-                <p style="text-align: center; padding: 40px; color: #999;">Select a PTR from the menu to begin testing</p>
-            </div>
-        </div>
-        <div style="clear: both;"></div>
-    </div>
-</div>
-<div id="statusMsg" class="status"></div>
 
-<script>
-    // Load data from localStorage
-    let appData = JSON.parse(localStorage.getItem('tandc_koshi_data')) || {
-        users: [{ username: 'admin', password: 'admin123', name: 'Administrator' }],
-        grids: [
-            { id: '1', name: 'Grid Alpha', location: 'Substation A' },
-            { id: '2', name: 'Grid Beta', location: 'Substation B' }
-        ],
-        ptrs: [],
-        testResults: {}
-    };
-    
-    let currentUser = null;
-    let currentGrid = null;
-    let currentPTR = null;
-    
-    function saveData() {
-        localStorage.setItem('tandc_koshi_data', JSON.stringify(appData));
-    }
-    
-    function showStatus(msg, color) {
-        let div = document.getElementById('statusMsg');
-        div.textContent = msg;
-        div.style.backgroundColor = color;
-        div.style.display = 'block';
-        setTimeout(() => div.style.display = 'none', 3000);
-    }
-    
-    function doLogin() {
-        let user = document.getElementById('username').value;
-        let pass = document.getElementById('password').value;
-        let found = appData.users.find(u => u.username === user && u.password === pass);
-        if (found) {
-            currentUser = found;
-            document.getElementById('loginArea').style.display = 'none';
-            document.getElementById('mainArea').style.display = 'block';
-            document.getElementById('userName').innerHTML = found.name || found.username;
-            loadGrids();
-            showStatus('Login successful!', '#28a745');
-        } else {
-            showStatus('Invalid username or password', '#dc3545');
-        }
-    }
-    
-    function doLogout() {
-        currentUser = null;
-        currentGrid = null;
-        currentPTR = null;
-        document.getElementById('loginArea').style.display = 'block';
-        document.getElementById('mainArea').style.display = 'none';
-    }
-    
-    function loadGrids() {
-        let html = '';
-        appData.grids.forEach(grid => {
-            html += `<div class="grid-btn" onclick="selectGrid('${grid.id}')">📁 ${grid.name}</div>`;
-        });
-        document.getElementById('gridList').innerHTML = html || '<p style="color:#999;">No grids. Click "Add Grid"</p>';
-        if (appData.grids.length > 0 && !currentGrid) {
-            selectGrid(appData.grids[0].id);
-        }
-    }
-    
-    function selectGrid(gridId) {
-        currentGrid = appData.grids.find(g => g.id === gridId);
-        document.querySelectorAll('.grid-btn').forEach(btn => btn.classList.remove('active'));
-        event.target.classList.add('active');
-        loadPTRs();
-    }
-    
-    function addNewGrid() {
-        let name = prompt('Enter Grid/Substation name:', 'New Grid');
-        if (name) {
-            let newGrid = {
-                id: Date.now().toString(),
-                name: name,
-                location: prompt('Enter location:', '') || ''
-            };
-            appData.grids.push(newGrid);
-            saveData();
-            loadGrids();
-            showStatus('Grid added successfully!', '#28a745');
-        }
-    }
-    
-    function loadPTRs() {
-        if (!currentGrid) return;
-        let ptrs = appData.ptrs.filter(p => p.gridId === currentGrid.id);
-        let html = '';
-        ptrs.forEach(ptr => {
-            html += `<div class="ptr-btn" onclick="selectPTR('${ptr.id}')">🔹 ${ptr.equipmentId} | ${ptr.rating || ''}</div>`;
-        });
-        document.getElementById('ptrList').innerHTML = html || '<p style="color:#999;">No PTRs. Click "Add PTR"</p>';
-        if (ptrs.length > 0 && !currentPTR) {
-            selectPTR(ptrs[0].id);
-        }
-    }
-    
-    function addNewPTR() {
-        if (!currentGrid) {
-            showStatus('Please select a grid first', '#dc3545');
-            return;
-        }
-        let eqId = prompt('Enter PTR ID (e.g., PTR-01):');
-        if (!eqId) return;
-        let rating = prompt('Enter Rating (e.g., 20 MVA):');
-        let make = prompt('Enter Make (e.g., CGL, BHEL):');
-        let voltage = prompt('Enter Voltage Ratio (132/33kV or 220/132kV):');
-        
-        let newPTR = {
-            id: Date.now().toString(),
-            gridId: currentGrid.id,
-            equipmentId: eqId,
-            rating: rating || '',
-            make: make || '',
-            voltageRatio: voltage || '',
-            serialNumber: prompt('Enter Serial Number:', '') || ''
-        };
-        appData.ptrs.push(newPTR);
-        saveData();
-        loadPTRs();
-        showStatus('PTR added successfully!', '#28a745');
-    }
-    
-    function selectPTR(ptrId) {
-        currentPTR = appData.ptrs.find(p => p.id === ptrId);
-        document.querySelectorAll('.ptr-btn').forEach(btn => btn.classList.remove('active'));
-        if (event && event.target) event.target.classList.add('active');
-        loadTestForm();
-    }
-    
-    function getSavedData(ptrId) {
-        return appData.testResults[ptrId] || {};
-    }
-    
-    function loadTestForm() {
-        if (!currentPTR) return;
-        let saved = getSavedData(currentPTR.id);
-        
-        let html = `
-            <div class="test-group">
-                <h3>📋 Equipment Information</h3>
-                <p><strong>ID:</strong> ${currentPTR.equipmentId} | <strong>Rating:</strong> ${currentPTR.rating || 'N/A'} | <strong>Make:</strong> ${currentPTR.make || 'N/A'}</p>
-                <p><strong>Voltage Ratio:</strong> ${currentPTR.voltageRatio || 'N/A'} | <strong>Serial No:</strong> ${currentPTR.serialNumber || 'N/A'}</p>
-                <p>Test Date: <input type="date" id="testDate" value="${saved.testDate || new Date().toISOString().split('T')[0]}"></p>
+    <div id="mainApp" class="app-container">
+        <div class="header">
+            <h2><i class="fas fa-microchip"></i> T&C Koshi - PTR Test Report Management</h2>
+            <div class="user-info">
+                <span><i class="fas fa-user"></i> <span id="userNameDisplay"></span></span>
+                <button class="btn-logout" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Logout</button>
             </div>
-        `;
-        
-        // Section 1: Core Balance
-        html += `<div class="test-group"><h3>1. Core Balance and Magnetising Current Test</h3>
-            <p><span class="inline-input">VRY: <input type="text" id="vry" value="${saved.vry || ''}" style="width:80px"> V</span>
-               <span class="inline-input">VYB: <input type="text" id="vyb" value="${saved.vyb || ''}" style="width:80px"> V</span>
-               <span class="inline-input">VRB: <input type="text" id="vrb" value="${saved.vrb || ''}" style="width:80px"> V</span>
-            </p>
-            <table><tr><th>Tap</th><th>VRN (HV)</th><th>VYN (HV)</th><th>VBN (HV)</th><th>Vrn (LV)</th><th>Vyn (LV)</th><th>Vbn (LV)</th></tr>`;
-        for (let i = 0; i < 3; i++) {
-            html += `<tr>
-                <td><input type="text" id="tap_${i}" value="${saved[`tap_${i}`] || ''}" placeholder="Tap" style="width:50px"></td>
-                <td><input type="text" id="mag_${i}_vrn" value="${saved[`mag_${i}_vrn`] || ''}" style="width:70px"></td>
-                <td><input type="text" id="mag_${i}_vyn" value="${saved[`mag_${i}_vyn`] || ''}" style="width:70px"></td>
-                <td><input type="text" id="mag_${i}_vbn" value="${saved[`mag_${i}_vbn`] || ''}" style="width:70px"></td>
-                <td><input type="text" id="mag_${i}_vrn_lv" value="${saved[`mag_${i}_vrn_lv`] || ''}" style="width:70px"></td>
-                <td><input type="text" id="mag_${i}_vyn_lv" value="${saved[`mag_${i}_vyn_lv`] || ''}" style="width:70px"></td>
-                <td><input type="text" id="mag_${i}_vbn_lv" value="${saved[`mag_${i}_vbn_lv`] || ''}" style="width:70px"></td>
-            </tr>`;
-        }
-        html += `</table></div>`;
-        
-        // Section 2: Short Circuit
-        html += `<div class="test-group"><h3>2. Short Circuit Test</h3>
-            <table><tr><th>Tap</th><th>IR</th><th>IY</th><th>IB</th><th>Ir</th><th>Iy</th><th>Ib</th><th>IN</th><th>In</th></tr>`;
-        for (let i = 0; i < 3; i++) {
-            html += `<tr>
-                <td><input type="text" id="sc_tap_${i}" value="${saved[`sc_tap_${i}`] || ''}" placeholder="Tap" style="width:50px"></td>
-                <td><input type="text" id="sc_${i}_ir" value="${saved[`sc_${i}_ir`] || ''}" style="width:55px"></td>
-                <td><input type="text" id="sc_${i}_iy" value="${saved[`sc_${i}_iy`] || ''}" style="width:55px"></td>
-                <td><input type="text" id="sc_${i}_ib" value="${saved[`sc_${i}_ib`] || ''}" style="width:55px"></td>
-                <td><input type="text" id="sc_${i}_ir_lv" value="${saved[`sc_${i}_ir_lv`] || ''}" style="width:55px"></td>
-                <td><input type="text" id="sc_${i}_iy_lv" value="${saved[`sc_${i}_iy_lv`] || ''}" style="width:55px"></td>
-                <td><input type="text" id="sc_${i}_ib_lv" value="${saved[`sc_${i}_ib_lv`] || ''}" style="width:55px"></td>
-                <td><input type="text" id="sc_${i}_in_hv" value="${saved[`sc_${i}_in_hv`] || ''}" style="width:55px"></td>
-                <td><input type="text" id="sc_${i}_in_lv" value="${saved[`sc_${i}_in_lv`] || ''}" style="width:55px"></td>
-            </tr>`;
-        }
-        html += `</table></div>`;
-        
-        // Section 3: Vector Group
-        html += `<div class="test-group"><h3>3. Vector Group (YNyn0)</h3>
-            <p><span class="inline-input">1V-2V: <input type="text" id="vg_v1v2" value="${saved.vg_v1v2 || ''}" style="width:80px"> V</span>
-               <span class="inline-input">1V-2W: <input type="text" id="vg_v1w2" value="${saved.vg_v1w2 || ''}" style="width:80px"> V</span>
-               <span class="inline-input">1W-2V: <input type="text" id="vg_w1v2" value="${saved.vg_w1v2 || ''}" style="width:80px"> V</span>
-               <span class="inline-input">1W-2W: <input type="text" id="vg_w1w2" value="${saved.vg_w1w2 || ''}" style="width:80px"> V</span>
-               <span class="inline-input">1UN=2Un+Nn: <input type="text" id="vg_un" value="${saved.vg_un || ''}" style="width:80px"> V</span>
-            </p></div>`;
-        
-        // Section 4: Winding Resistance
-        html += `<div class="test-group"><h3>4. Winding Resistance Test</h3>
-            <table><tr><th>Tap</th><th>OTI°C</th><th>WTI HV°C</th><th>WTI LV°C</th><th>HV U-N</th><th>HV V-N</th><th>HV W-N</th><th>LV u-n</th><th>LV v-n</th><th>LV w-n</th></tr>`;
-        for (let i = 0; i < 3; i++) {
-            html += `<tr>
-                <td><input type="text" id="wr_tap_${i}" value="${saved[`wr_tap_${i}`] || ''}" placeholder="Tap" style="width:50px"></td>
-                <td><input type="text" id="wr_oti_${i}" value="${saved[`wr_oti_${i}`] || ''}" style="width:50px"></td>
-                <td><input type="text" id="wr_wti_hv_${i}" value="${saved[`wr_wti_hv_${i}`] || ''}" style="width:55px"></td>
-                <td><input type="text" id="wr_wti_lv_${i}" value="${saved[`wr_wti_lv_${i}`] || ''}" style="width:55px"></td>
-                <td><input type="text" id="wr_hv_u_${i}" value="${saved[`wr_hv_u_${i}`] || ''}" style="width:60px"></td>
-                <td><input type="text" id="wr_hv_v_${i}" value="${saved[`wr_hv_v_${i}`] || ''}" style="width:60px"></td>
-                <td><input type="text" id="wr_hv_w_${i}" value="${saved[`wr_hv_w_${i}`] || ''}" style="width:60px"></td>
-                <td><input type="text" id="wr_lv_u_${i}" value="${saved[`wr_lv_u_${i}`] || ''}" style="width:60px"></td>
-                <td><input type="text" id="wr_lv_v_${i}" value="${saved[`wr_lv_v_${i}`] || ''}" style="width:60px"></td>
-                <td><input type="text" id="wr_lv_w_${i}" value="${saved[`wr_lv_w_${i}`] || ''}" style="width:60px"></td>
-            </tr>`;
-        }
-        html += `</table></div>`;
-        
-        // Section 5: Insulation Resistance
-        html += `<div class="test-group"><h3>5. Insulation Resistance Test (5 kV)</h3>
-            <table><tr><th>Test Point</th><th>60 Sec (GΩ)</th><th>600 Sec (GΩ)</th><th>PI</th></tr>`;
-        ['hvlv', 'hve', 'lve'].forEach(type => {
-            let label = type === 'hvlv' ? 'HV-LV' : (type === 'hve' ? 'HV-E' : 'LV-E');
-            html += `<tr><td>${label}</td>`;
-            for (let i = 0; i < 3; i++) {
-                let val = saved[`ir_${type}_${i}`] || '';
-                html += `<td><input type="text" id="ir_${type}_${i}" value="${val}" style="width:70px"></td>`;
+        </div>
+
+        <div class="container">
+            <div class="grid-section">
+                <div class="grid-buttons" id="gridButtons"></div>
+                <button class="btn-add" onclick="showAddGridModal()"><i class="fas fa-plus"></i> New Grid</button>
+            </div>
+
+            <div class="main-layout">
+                <div class="sidebar">
+                    <div class="menu-section">
+                        <div class="menu-title"><i class="fas fa-tachometer-alt"></i> POWER TRANSFORMERS</div>
+                        <ul class="equipment-list" id="transformerList"></ul>
+                        <button class="btn-add-equipment" onclick="showAddEquipmentModal()"><i class="fas fa-plus"></i> Add PTR</button>
+                    </div>
+                </div>
+
+                <div class="content-area">
+                    <div id="testArea">
+                        <div class="current-equipment" id="currentEquipmentDisplay">
+                            <i class="fas fa-info-circle"></i> Select a PTR from the menu to begin testing
+                        </div>
+                        <div id="testForm"></div>
+                        <div class="action-buttons" id="actionButtons" style="display: none;">
+                            <button class="btn-save" onclick="saveTestData()"><i class="fas fa-save"></i> Save Test Results</button>
+                            <button class="btn-pdf" onclick="generateFullReport()"><i class="fas fa-file-pdf"></i> Download PDF</button>
+                            <button class="btn-print" onclick="printFullReport()"><i class="fas fa-print"></i> Print Report</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="addGridModal" class="modal">
+        <div class="modal-content">
+            <h3>Add New Grid</h3>
+            <input type="text" id="gridName" placeholder="Grid Name">
+            <input type="text" id="gridLocation" placeholder="Location">
+            <div class="modal-buttons">
+                <button class="btn-save" onclick="addGrid()">Add</button>
+                <button class="btn-pdf" onclick="closeModal('addGridModal')">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="addEquipmentModal" class="modal">
+        <div class="modal-content">
+            <h3>Add Power Transformer (PTR)</h3>
+            <input type="text" id="eqId" placeholder="Equipment ID (e.g., PTR-01)">
+            <input type="text" id="eqRating" placeholder="Rating (e.g., 20 MVA)">
+            <input type="text" id="eqMake" placeholder="Make (e.g., CGL, BHEL)">
+            <input type="text" id="eqSerial" placeholder="Serial Number">
+            <select id="eqVoltage">
+                <option value="132/33kV">Voltage Ratio: 132/33 kV</option>
+                <option value="220/132kV">Voltage Ratio: 220/132 kV</option>
+            </select>
+            <div class="modal-buttons">
+                <button class="btn-save" onclick="addEquipment()">Add PTR</button>
+                <button class="btn-pdf" onclick="closeModal('addEquipmentModal')">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="statusMsg" class="status"></div>
+
+    <script>
+        const API_URL = '/api';
+        let authToken = localStorage.getItem('token');
+        let currentGrid = null;
+        let currentEquipment = null;
+        let currentUser = null;
+
+        // Sample test data structure
+        let testData = {
+            dateOfTesting: new Date().toISOString().split('T')[0],
+            coreBalance: { VRY: '', VYB: '', VRB: '' },
+            magRows: [
+                { tap: '', vrn: '', vyn: '', vbn: '', vrn_lv: '', vyn_lv: '', vbn_lv: '' },
+                { tap: '', vrn: '', vyn: '', vbn: '', vrn_lv: '', vyn_lv: '', vbn_lv: '' },
+                { tap: '', vrn: '', vyn: '', vbn: '', vrn_lv: '', vyn_lv: '', vbn_lv: '' }
+            ],
+            scRows: [
+                { tap: '', ir: '', iy: '', ib: '', ir_lv: '', iy_lv: '', ib_lv: '', in_hv: '', in_lv: '' },
+                { tap: '', ir: '', iy: '', ib: '', ir_lv: '', iy_lv: '', ib_lv: '', in_hv: '', in_lv: '' },
+                { tap: '', ir: '', iy: '', ib: '', ir_lv: '', iy_lv: '', ib_lv: '', in_hv: '', in_lv: '' }
+            ],
+            vectorGroup: { v1v2: '', v1w2: '', w1v2: '', w1w2: '', un: '' },
+            wrRows: [
+                { tap: '', oti: '', wti_hv: '', wti_lv: '', hv_u: '', hv_v: '', hv_w: '', lv_u: '', lv_v: '', lv_w: '' },
+                { tap: '', oti: '', wti_hv: '', wti_lv: '', hv_u: '', hv_v: '', hv_w: '', lv_u: '', lv_v: '', lv_w: '' },
+                { tap: '', oti: '', wti_hv: '', wti_lv: '', hv_u: '', hv_v: '', hv_w: '', lv_u: '', lv_v: '', lv_w: '' }
+            ],
+            ir: {
+                hv_lv_60: '', hv_lv_600: '', hv_lv_pi: '',
+                hv_e_60: '', hv_e_600: '', hv_e_pi: '',
+                lv_e_60: '', lv_e_600: '', lv_e_pi: ''
+            },
+            cft: { core_frame: '', frame_tank: '', core_tank: '' },
+            trRows: [
+                { tap: '', u: '', v: '', w: '' },
+                { tap: '', u: '', v: '', w: '' },
+                { tap: '', u: '', v: '', w: '' }
+            ],
+            dcVoltage: {
+                source1: { pn: '', pe: '', ne: '' },
+                source2: { pn: '', pe: '', ne: '' }
+            },
+            earthing: { hv_e: '', lv_e: '', body: '' },
+            signatories: {
+                critl: [{ name: '', sign: '' }, { name: '', sign: '' }, { name: '', sign: '' }],
+                tc: [{ name: '', sign: '' }, { name: '', sign: '' }, { name: '', sign: '' }],
+                field: [{ name: '', sign: '' }, { name: '', sign: '' }, { name: '', sign: '' }]
+            },
+            notes: ''
+        };
+
+        async function login() {
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            
+            // Simple demo login
+            if (username === 'admin' && password === 'admin123') {
+                localStorage.setItem('token', 'demo-token');
+                localStorage.setItem('user', JSON.stringify({ username: 'admin', fullName: 'Administrator' }));
+                authToken = 'demo-token';
+                document.getElementById('loginPage').style.display = 'none';
+                document.getElementById('mainApp').style.display = 'block';
+                document.getElementById('userNameDisplay').innerHTML = 'Administrator';
+                
+                // Load demo data
+                loadGrids();
+                showStatus('Login successful!', '#27ae60');
+            } else {
+                showError('Invalid credentials');
             }
-            html += `</tr>`;
-        });
-        html += `</table></div>`;
-        
-        // Section 6: CFT
-        html += `<div class="test-group"><h3>6. CFT Insulation Resistance Test (500V)</h3>
-            <p><span class="inline-input">Core-Frame: <input type="text" id="cft_cf" value="${saved.cft_cf || ''}" style="width:80px"> GΩ</span>
-               <span class="inline-input">Frame-Tank: <input type="text" id="cft_ft" value="${saved.cft_ft || ''}" style="width:80px"> GΩ</span>
-               <span class="inline-input">Core-Tank: <input type="text" id="cft_ct" value="${saved.cft_ct || ''}" style="width:80px"> GΩ</span>
-            </p></div>`;
-        
-        // Section 7: Turn Ratio
-        html += `<div class="test-group"><h3>7. Turn Ratio Test</h3>
-            <table><tr><th>Tap</th><th>Phase U</th><th>Phase V</th><th>Phase W</th></tr>`;
-        for (let i = 0; i < 3; i++) {
-            html += `<tr>
-                <td><input type="text" id="tr_tap_${i}" value="${saved[`tr_tap_${i}`] || ''}" placeholder="Tap" style="width:50px"></td>
-                <td><input type="text" id="tr_${i}_u" value="${saved[`tr_${i}_u`] || ''}" style="width:80px"></td>
-                <td><input type="text" id="tr_${i}_v" value="${saved[`tr_${i}_v`] || ''}" style="width:80px"></td>
-                <td><input type="text" id="tr_${i}_w" value="${saved[`tr_${i}_w`] || ''}" style="width:80px"></td>
-            </tr>`;
         }
-        html += `</table></div>`;
-        
-        // Section 8: DC Voltage
-        html += `<div class="test-group"><h3>8. DC Voltage Test</h3>
-            <table><tr><th>Source</th><th>+VE to -VE (V)</th><th>+VE to Earth (V)</th><th>-VE to Earth (V)</th></tr>
-            <tr><td>Source I</td>${['pn','pe','ne'].map(f => `<td><input type="text" id="dc1_${f}" value="${saved[`dc1_${f}`] || ''}" style="width:80px"></td>`).join('')}</tr>
-            <tr><td>Source II</td>${['pn','pe','ne'].map(f => `<td><input type="text" id="dc2_${f}" value="${saved[`dc2_${f}`] || ''}" style="width:80px"></td>`).join('')}</tr>
-            </table></div>`;
-        
-        // Section 9: Earthing
-        html += `<div class="test-group"><h3>9. Earthing Resistance Test</h3>
-            <p><span class="inline-input">HV-E: <input type="text" id="er_hve" value="${saved.er_hve || ''}" style="width:80px"> Ω</span>
-               <span class="inline-input">LV-E: <input type="text" id="er_lve" value="${saved.er_lve || ''}" style="width:80px"> Ω</span>
-               <span class="inline-input">Body: <input type="text" id="er_body" value="${saved.er_body || ''}" style="width:80px"> Ω</span>
-            </p></div>`;
-        
-        // Section 10: Remarks
-        html += `<div class="test-group"><h3>10. Remarks</h3>
-            <textarea id="remarks" rows="3">${saved.remarks || ''}</textarea></div>`;
-        
-        // Section 11: Signatories
-        html += `<div class="test-group"><h3>11. Signatories</h3>
-            <table><tr><th>CRITL</th><th>T&C Koshi</th><th>Field</th></tr>
-            <tr>
-                <td><input type="text" id="sign_critl" value="${saved.sign_critl || ''}" placeholder="Name & Signature" style="width:180px"></td>
-                <td><input type="text" id="sign_tc" value="${saved.sign_tc || ''}" placeholder="Name & Signature" style="width:180px"></td>
-                <td><input type="text" id="sign_field" value="${saved.sign_field || ''}" placeholder="Name & Signature" style="width:180px"></td>
-            </tr>
-            <tr><td colspan="3"><small>Signature & Stamp</small></td></tr>
-            </table></div>`;
-        
-        html += `<div class="action-buttons">
-            <button class="btn-save" onclick="saveTestData()">💾 Save Test Results</button>
-            <button class="btn-print" onclick="printReport()">📄 Print Report / PDF</button>
-        </div>`;
-        
-        document.getElementById('testArea').innerHTML = html;
-    }
-    
-    function saveTestData() {
-        if (!currentPTR) return;
-        let saved = {};
-        
-        saved.testDate = document.getElementById('testDate')?.value || '';
-        saved.vry = document.getElementById('vry')?.value || '';
-        saved.vyb = document.getElementById('vyb')?.value || '';
-        saved.vrb = document.getElementById('vrb')?.value || '';
-        
-        for (let i = 0; i < 3; i++) {
-            saved[`tap_${i}`] = document.getElementById(`tap_${i}`)?.value || '';
-            saved[`mag_${i}_vrn`] = document.getElementById(`mag_${i}_vrn`)?.value || '';
-            saved[`mag_${i}_vyn`] = document.getElementById(`mag_${i}_vyn`)?.value || '';
-            saved[`mag_${i}_vbn`] = document.getElementById(`mag_${i}_vbn`)?.value || '';
-            saved[`mag_${i}_vrn_lv`] = document.getElementById(`mag_${i}_vrn_lv`)?.value || '';
-            saved[`mag_${i}_vyn_lv`] = document.getElementById(`mag_${i}_vyn_lv`)?.value || '';
-            saved[`mag_${i}_vbn_lv`] = document.getElementById(`mag_${i}_vbn_lv`)?.value || '';
+
+        async function loadGrids() {
+            // Demo grids
+            let grids = JSON.parse(localStorage.getItem('grids')) || [
+                { _id: '1', name: 'Grid Alpha', location: 'Substation A' },
+                { _id: '2', name: 'Grid Beta', location: 'Substation B' }
+            ];
             
-            saved[`sc_tap_${i}`] = document.getElementById(`sc_tap_${i}`)?.value || '';
-            saved[`sc_${i}_ir`] = document.getElementById(`sc_${i}_ir`)?.value || '';
-            saved[`sc_${i}_iy`] = document.getElementById(`sc_${i}_iy`)?.value || '';
-            saved[`sc_${i}_ib`] = document.getElementById(`sc_${i}_ib`)?.value || '';
-            saved[`sc_${i}_ir_lv`] = document.getElementById(`sc_${i}_ir_lv`)?.value || '';
-            saved[`sc_${i}_iy_lv`] = document.getElementById(`sc_${i}_iy_lv`)?.value || '';
-            saved[`sc_${i}_ib_lv`] = document.getElementById(`sc_${i}_ib_lv`)?.value || '';
-            saved[`sc_${i}_in_hv`] = document.getElementById(`sc_${i}_in_hv`)?.value || '';
-            saved[`sc_${i}_in_lv`] = document.getElementById(`sc_${i}_in_lv`)?.value || '';
+            const container = document.getElementById('gridButtons');
+            container.innerHTML = '';
             
-            saved[`wr_tap_${i}`] = document.getElementById(`wr_tap_${i}`)?.value || '';
-            saved[`wr_oti_${i}`] = document.getElementById(`wr_oti_${i}`)?.value || '';
-            saved[`wr_wti_hv_${i}`] = document.getElementById(`wr_wti_hv_${i}`)?.value || '';
-            saved[`wr_wti_lv_${i}`] = document.getElementById(`wr_wti_lv_${i}`)?.value || '';
-            saved[`wr_hv_u_${i}`] = document.getElementById(`wr_hv_u_${i}`)?.value || '';
-            saved[`wr_hv_v_${i}`] = document.getElementById(`wr_hv_v_${i}`)?.value || '';
-            saved[`wr_hv_w_${i}`] = document.getElementById(`wr_hv_w_${i}`)?.value || '';
-            saved[`wr_lv_u_${i}`] = document.getElementById(`wr_lv_u_${i}`)?.value || '';
-            saved[`wr_lv_v_${i}`] = document.getElementById(`wr_lv_v_${i}`)?.value || '';
-            saved[`wr_lv_w_${i}`] = document.getElementById(`wr_lv_w_${i}`)?.value || '';
+            grids.forEach(grid => {
+                const btn = document.createElement('button');
+                btn.className = 'grid-btn';
+                btn.textContent = grid.name;
+                btn.onclick = () => {
+                    document.querySelectorAll('.grid-btn').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    currentGrid = grid;
+                    loadEquipment();
+                };
+                container.appendChild(btn);
+            });
             
-            saved[`tr_tap_${i}`] = document.getElementById(`tr_tap_${i}`)?.value || '';
-            saved[`tr_${i}_u`] = document.getElementById(`tr_${i}_u`)?.value || '';
-            saved[`tr_${i}_v`] = document.getElementById(`tr_${i}_v`)?.value || '';
-            saved[`tr_${i}_w`] = document.getElementById(`tr_${i}_w`)?.value || '';
+            if (grids.length > 0 && !currentGrid) {
+                document.querySelector('.grid-btn').click();
+            }
+        }
+
+        async function loadEquipment() {
+            if (!currentGrid) return;
+            
+            let equipment = JSON.parse(localStorage.getItem('equipment')) || [];
+            let ptrs = equipment.filter(e => e.gridId === currentGrid._id && e.equipmentType === 'transformer');
+            
+            const container = document.getElementById('transformerList');
+            container.innerHTML = '';
+            
+            if (ptrs.length === 0) {
+                container.innerHTML = '<li style="text-align: center; color: #999;">No PTRs. Click "Add PTR"</li>';
+                return;
+            }
+            
+            ptrs.forEach(eq => {
+                const li = document.createElement('li');
+                li.innerHTML = `
+                    <div style="flex:1">
+                        <strong>${eq.equipmentId}</strong>
+                        <div style="font-size: 11px;">${eq.rating || ''} | ${eq.make || ''}</div>
+                    </div>
+                    <button class="btn-delete" onclick="event.stopPropagation(); deleteEquipment('${eq._id}')">✖</button>
+                `;
+                li.onclick = () => {
+                    document.querySelectorAll('.equipment-list li').forEach(l => l.classList.remove('active'));
+                    li.classList.add('active');
+                    currentEquipment = eq;
+                    if (eq.testValues && eq.testValues[0]) {
+                        try {
+                            Object.assign(testData, JSON.parse(eq.testValues[0]));
+                        } catch(e) {}
+                    }
+                    loadTestForm();
+                    document.getElementById('actionButtons').style.display = 'flex';
+                };
+                container.appendChild(li);
+            });
+        }
+
+        function loadTestForm() {
+            const html = `
+                <div class="current-equipment">
+                    <strong>${currentEquipment.rating || ''} ${currentEquipment.equipmentId}</strong> | Make: ${currentEquipment.make || 'N/A'} | SN: ${currentEquipment.serialNumber || 'N/A'}<br>
+                    Voltage Ratio: ${currentEquipment.voltageRatio || 'N/A'} | Test Date: <input type="date" id="testDate" value="${testData.dateOfTesting}">
+                </div>
+
+                <div class="test-group">
+                    <h4>1. Core Balance and Magnetising Current Test</h4>
+                    <div><span class="inline-input">VRY: <input type="text" id="cb_vry" value="${testData.coreBalance.VRY}" style="width:80px"> V</span>
+                         <span class="inline-input">VYB: <input type="text" id="cb_vyb" value="${testData.coreBalance.VYB}" style="width:80px"> V</span>
+                         <span class="inline-input">VRB: <input type="text" id="cb_vrb" value="${testData.coreBalance.VRB}" style="width:80px"> V</span>
+                    </div>
+                    <table class="test-table">
+                        <tr><th>Tap</th><th>VRN (HV)</th><th>VYN (HV)</th><th>VBN (HV)</th><th>Vrn (LV)</th><th>Vyn (LV)</th><th>Vbn (LV)</th></tr>
+                        ${[0,1,2].map(i => `<tr>
+                            <td><input type="text" id="mag_tap_${i}" value="${testData.magRows[i].tap}" placeholder="Tap" style="width:60px"></td>
+                            <td><input type="text" id="mag_${i}_vrn" value="${testData.magRows[i].vrn}" style="width:70px"></td>
+                            <td><input type="text" id="mag_${i}_vyn" value="${testData.magRows[i].vyn}" style="width:70px"></td>
+                            <td><input type="text" id="mag_${i}_vbn" value="${testData.magRows[i].vbn}" style="width:70px"></td>
+                            <td><input type="text" id="mag_${i}_vrn_lv" value="${testData.magRows[i].vrn_lv}" style="width:70px"></td>
+                            <td><input type="text" id="mag_${i}_vyn_lv" value="${testData.magRows[i].vyn_lv}" style="width:70px"></td>
+                            <td><input type="text" id="mag_${i}_vbn_lv" value="${testData.magRows[i].vbn_lv}" style="width:70px"></td>
+                        </tr>`).join('')}
+                    </table>
+                </div>
+
+                <div class="test-group">
+                    <h4>2. Short Circuit Test</h4>
+                    <table class="test-table">
+                        <tr><th>Tap</th><th>IR</th><th>IY</th><th>IB</th><th>Ir</th><th>Iy</th><th>Ib</th><th>IN</th><th>In</th></tr>
+                        ${[0,1,2].map(i => `<tr>
+                            <td><input type="text" id="sc_tap_${i}" value="${testData.scRows[i].tap}" placeholder="Tap" style="width:60px"></td>
+                            <td><input type="text" id="sc_${i}_ir" value="${testData.scRows[i].ir}" style="width:60px"></td>
+                            <td><input type="text" id="sc_${i}_iy" value="${testData.scRows[i].iy}" style="width:60px"></td>
+                            <td><input type="text" id="sc_${i}_ib" value="${testData.scRows[i].ib}" style="width:60px"></td>
+                            <td><input type="text" id="sc_${i}_ir_lv" value="${testData.scRows[i].ir_lv}" style="width:60px"></td>
+                            <td><input type="text" id="sc_${i}_iy_lv" value="${testData.scRows[i].iy_lv}" style="width:60px"></td>
+                            <td><input type="text" id="sc_${i}_ib_lv" value="${testData.scRows[i].ib_lv}" style="width:60px"></td>
+                            <td><input type="text" id="sc_${i}_in_hv" value="${testData.scRows[i].in_hv}" style="width:60px"></td>
+                            <td><input type="text" id="sc_${i}_in_lv" value="${testData.scRows[i].in_lv}" style="width:60px"></td>
+                        </tr>`).join('')}
+                    </table>
+                </div>
+
+                <div class="test-group">
+                    <h4>3. Vector Group (YNyn0)</h4>
+                    <table class="test-table">
+                        <tr><th>1V-2V (V)</th><th>1V-2W (V)</th><th>1W-2V (V)</th><th>1W-2W (V)</th><th>1UN = 2Un + Nn (V)</th></tr>
+                        <tr>
+                            <td><input type="text" id="vg_v1v2" value="${testData.vectorGroup.v1v2}" style="width:90px"></td>
+                            <td><input type="text" id="vg_v1w2" value="${testData.vectorGroup.v1w2}" style="width:90px"></td>
+                            <td><input type="text" id="vg_w1v2" value="${testData.vectorGroup.w1v2}" style="width:90px"></td>
+                            <td><input type="text" id="vg_w1w2" value="${testData.vectorGroup.w1w2}" style="width:90px"></td>
+                            <td><input type="text" id="vg_un" value="${testData.vectorGroup.un}" style="width:90px"></td>
+                        </tr>
+                    </table>
+                </div>
+
+                <div class="test-group">
+                    <h4>4. Winding Resistance Test</h4>
+                    <table class="test-table">
+                        <tr><th>Tap</th><th>OTI (°C)</th><th>WTI HV (°C)</th><th>WTI LV (°C)</th><th>HV U-N (Ω)</th><th>HV V-N (Ω)</th><th>HV W-N (Ω)</th><th>LV u-n (Ω)</th><th>LV v-n (Ω)</th><th>LV w-n (Ω)</th></tr>
+                        ${[0,1,2].map(i => `<tr>
+                            <td><input type="text" id="wr_tap_${i}" value="${testData.wrRows[i].tap}" placeholder="Tap" style="width:55px"></td>
+                            <td><input type="text" id="wr_oti_${i}" value="${testData.wrRows[i].oti}" style="width:50px"></td>
+                            <td><input type="text" id="wr_wti_hv_${i}" value="${testData.wrRows[i].wti_hv}" style="width:55px"></td>
+                            <td><input type="text" id="wr_wti_lv_${i}" value="${testData.wrRows[i].wti_lv}" style="width:55px"></td>
+                            <td><input type="text" id="wr_hv_u_${i}" value="${testData.wrRows[i].hv_u}" style="width:60px"></td>
+                            <td><input type="text" id="wr_hv_v_${i}" value="${testData.wrRows[i].hv_v}" style="width:60px"></td>
+                            <td><input type="text" id="wr_hv_w_${i}" value="${testData.wrRows[i].hv_w}" style="width:60px"></td>
+                            <td><input type="text" id="wr_lv_u_${i}" value="${testData.wrRows[i].lv_u}" style="width:60px"></td>
+                            <td><input type="text" id="wr_lv_v_${i}" value="${testData.wrRows[i].lv_v}" style="width:60px"></td>
+                            <td><input type="text" id="wr_lv_w_${i}" value="${testData.wrRows[i].lv_w}" style="width:60px"></td>
+                        </tr>`).join('')}
+                    </table>
+                </div>
+
+                <div class="test-group">
+                    <h4>5. Insulation Resistance Test (Applied Voltage: 5 kV)</h4>
+                    <table class="test-table">
+                        <tr><th>Test Point</th><th>60 Sec (GΩ)</th><th>600 Sec (GΩ)</th><th>PI</th></tr>
+                        <tr><td>HV-LV</td>
+                            <td><input type="text" id="ir_hv_lv_60" value="${testData.ir.hv_lv_60}" style="width:80px"></td>
+                            <td><input type="text" id="ir_hv_lv_600" value="${testData.ir.hv_lv_600}" style="width:80px"></td>
+                            <td><input type="text" id="ir_hv_lv_pi" value="${testData.ir.hv_lv_pi}" style="width:80px"></td>
+                        </tr>
+                        <tr><td>HV-E</td>
+                            <td><input type="text" id="ir_hv_e_60" value="${testData.ir.hv_e_60}" style="width:80px"></td>
+                            <td><input type="text" id="ir_hv_e_600" value="${testData.ir.hv_e_600}" style="width:80px"></td>
+                            <td><input type="text" id="ir_hv_e_pi" value="${testData.ir.hv_e_pi}" style="width:80px"></td>
+                        </tr>
+                        <tr><td>LV-E</td>
+                            <td><input type="text" id="ir_lv_e_60" value="${testData.ir.lv_e_60}" style="width:80px"></td>
+                            <td><input type="text" id="ir_lv_e_600" value="${testData.ir.lv_e_600}" style="width:80px"></td>
+                            <td><input type="text" id="ir_lv_e_pi" value="${testData.ir.lv_e_pi}" style="width:80px"></td>
+                        </tr>
+                    </table>
+                </div>
+
+                <div class="test-group">
+                    <h4>6. CFT Insulation Resistance Test (Applied Voltage: 500V)</h4>
+                    <table class="test-table">
+                        <tr><th>Test Point</th><th>Value (GΩ)</th></tr>
+                        <tr><td>Core-Frame</td><td><input type="text" id="cft_cf" value="${testData.cft.core_frame}" style="width:100px"></td></tr>
+                        <tr><td>Frame-Tank</td><td><input type="text" id="cft_ft" value="${testData.cft.frame_tank}" style="width:100px"></td></tr>
+                        <tr><td>Core-Tank</td><td><input type="text" id="cft_ct" value="${testData.cft.core_tank}" style="width:100px"></td></tr>
+                    </table>
+                </div>
+
+                <div class="test-group">
+                    <h4>7. Turn Ratio Test</h4>
+                    <table class="test-table">
+                        <tr><th>Tap</th><th>Phase U</th><th>Phase V</th><th>Phase W</th></tr>
+                        ${[0,1,2].map(i => `<tr>
+                            <td><input type="text" id="tr_tap_${i}" value="${testData.trRows[i].tap}" placeholder="Tap" style="width:60px"></td>
+                            <td><input type="text" id="tr_${i}_u" value="${testData.trRows[i].u}" style="width:80px"></td>
+                            <td><input type="text" id="tr_${i}_v" value="${testData.trRows[i].v}" style="width:80px"></td>
+                            <td><input type="text" id="tr_${i}_w" value="${testData.trRows[i].w}" style="width:80px"></td>
+                        </tr>`).join('')}
+                    </table>
+                </div>
+
+                <div class="test-group">
+                    <h4>8. DC Voltage Test</h4>
+                    <table class="test-table">
+                        <tr><th>Source</th><th>+VE to -VE (V)</th><th>+VE to Earth (V)</th><th>-VE to Earth (V)</th></tr>
+                        <tr><td>Source I</td>
+                            <td><input type="text" id="dc1_pn" value="${testData.dcVoltage.source1.pn}" style="width:90px"></td>
+                            <td><input type="text" id="dc1_pe" value="${testData.dcVoltage.source1.pe}" style="width:90px"></td>
+                            <td><input type="text" id="dc1_ne" value="${testData.dcVoltage.source1.ne}" style="width:90px"></td>
+                        </tr>
+                        <tr><td>Source II</td
+                            <td><input type="text" id="dc2_pn" value="${testData.dcVoltage.source2.pn}" style="width:90px"></td
+                            <td><input type="text" id="dc2_pe" value="${testData.dcVoltage.source2.pe}" style="width:90px"></td
+                            <td><input type="text" id="dc2_ne" value="${testData.dcVoltage.source2.ne}" style="width:90px"></td
+                        </tr>
+                    </table>
+                </div>
+
+                <div class="test-group">
+                    <h4>9. Earthing Resistance Test</h4>
+                    <table class="test-table">
+                        <tr><th>Test Point</th><th>Value (Ω)</th></tr>
+                        <tr><td>HV-E</td
+                            <td><input type="text" id="er_hve" value="${testData.earthing.hv_e}" style="width:100px"></td
+                        </tr>
+                        <tr>
+                            <td>LV-E</td
+                            <td><input type="text" id="er_lve" value="${testData.earthing.lv_e}" style="width:100px"></td
+                        </tr>
+                        <tr>
+                            <td>Body</td
+                            <td><input type="text" id="er_body" value="${testData.earthing.body}" style="width:100px"></td
+                        </tr>
+                    </table>
+                </div>
+
+                <div class="test-group">
+                    <h4>10. Remarks / Notes</h4>
+                    <textarea id="notes" rows="3">${testData.notes}</textarea>
+                </div>
+
+                <div class="test-group">
+                    <h4>11. Signatories</h4>
+                    <table class="test-table">
+                        <tr><th colspan="2">CRITL</th><th colspan="2">T&C Koshi</th><th colspan="2">Field</th></tr>
+                        <tr><th>Name</th><th>Signature</th><th>Name</th><th>Signature</th><th>Name</th><th>Signature</th></tr>
+                        ${[0,1,2].map(i => `<tr>
+                            <td><input type="text" id="critl_name_${i}" value="${testData.signatories.critl[i]?.name || ''}" placeholder="Officer Name" style="width:140px"></td>
+                            <td><input type="text" id="critl_sign_${i}" value="${testData.signatories.critl[i]?.sign || ''}" placeholder="Signature" style="width:140px"></td>
+                            <td><input type="text" id="tc_name_${i}" value="${testData.signatories.tc[i]?.name || ''}" placeholder="Officer Name" style="width:140px"></td>
+                            <td><input type="text" id="tc_sign_${i}" value="${testData.signatories.tc[i]?.sign || ''}" placeholder="Signature" style="width:140px"></td>
+                            <td><input type="text" id="field_name_${i}" value="${testData.signatories.field[i]?.name || ''}" placeholder="Officer Name" style="width:140px"></td>
+                            <td><input type="text" id="field_sign_${i}" value="${testData.signatories.field[i]?.sign || ''}" placeholder="Signature" style="width:140px"></td>
+                        </tr>`).join('')}
+                    </table>
+                </div>
+            `;
+            document.getElementById('testForm').innerHTML = html;
+        }
+
+        function collectFormData() {
+            testData.dateOfTesting = document.getElementById('testDate')?.value || new Date().toISOString().split('T')[0];
+            testData.coreBalance = {
+                VRY: document.getElementById('cb_vry')?.value || '',
+                VYB: document.getElementById('cb_vyb')?.value || '',
+                VRB: document.getElementById('cb_vrb')?.value || ''
+            };
+            
+            for (let i = 0; i < 3; i++) {
+                testData.magRows[i] = {
+                    tap: document.getElementById(`mag_tap_${i}`)?.value || '',
+                    vrn: document.getElementById(`mag_${i}_vrn`)?.value || '',
+                    vyn: document.getElementById(`mag_${i}_vyn`)?.value || '',
+                    vbn: document.getElementById(`mag_${i}_vbn`)?.value || '',
+                    vrn_lv: document.getElementById(`mag_${i}_vrn_lv`)?.value || '',
+                    vyn_lv: document.getElementById(`mag_${i}_vyn_lv`)?.value || '',
+                    vbn_lv: document.getElementById(`mag_${i}_vbn_lv`)?.value || ''
+                };
+                
+                testData.scRows[i] = {
+                    tap: document.getElementById(`sc_tap_${i}`)?.value || '',
+                    ir: document.getElementById(`sc_${i}_ir`)?.value || '',
+                    iy: document.getElementById(`sc_${i}_iy`)?.value || '',
+                    ib: document.getElementById(`sc_${i}_ib`)?.value || '',
+                    ir_lv: document.getElementById(`sc_${i}_ir_lv`)?.value || '',
+                    iy_lv: document.getElementById(`sc_${i}_iy_lv`)?.value || '',
+                    ib_lv: document.getElementById(`sc_${i}_ib_lv`)?.value || '',
+                    in_hv: document.getElementById(`sc_${i}_in_hv`)?.value || '',
+                    in_lv: document.getElementById(`sc_${i}_in_lv`)?.value || ''
+                };
+                
+                testData.wrRows[i] = {
+                    tap: document.getElementById(`wr_tap_${i}`)?.value || '',
+                    oti: document.getElementById(`wr_oti_${i}`)?.value || '',
+                    wti_hv: document.getElementById(`wr_wti_hv_${i}`)?.value || '',
+                    wti_lv: document.getElementById(`wr_wti_lv_${i}`)?.value || '',
+                    hv_u: document.getElementById(`wr_hv_u_${i}`)?.value || '',
+                    hv_v: document.getElementById(`wr_hv_v_${i}`)?.value || '',
+                    hv_w: document.getElementById(`wr_hv_w_${i}`)?.value || '',
+                    lv_u: document.getElementById(`wr_lv_u_${i}`)?.value || '',
+                    lv_v: document.getElementById(`wr_lv_v_${i}`)?.value || '',
+                    lv_w: document.getElementById(`wr_lv_w_${i}`)?.value || ''
+                };
+                
+                testData.trRows[i] = {
+                    tap: document.getElementById(`tr_tap_${i}`)?.value || '',
+                    u: document.getElementById(`tr_${i}_u`)?.value || '',
+                    v: document.getElementById(`tr_${i}_v`)?.value || '',
+                    w: document.getElementById(`tr_${i}_w`)?.value || ''
+                };
+            }
+            
+            testData.vectorGroup = {
+                v1v2: document.getElementById('vg_v1v2')?.value || '',
+                v1w2: document.getElementById('vg_v1w2')?.value || '',
+                w1v2: document.getElementById('vg_w1v2')?.value || '',
+                w1w2: document.getElementById('vg_w1w2')?.value || '',
+                un: document.getElementById('vg_un')?.value || ''
+            };
+            
+            testData.ir = {
+                hv_lv_60: document.getElementById('ir_hv_lv_60')?.value || '',
+                hv_lv_600: document.getElementById('ir_hv_lv_600')?.value || '',
+                hv_lv_pi: document.getElementById('ir_hv_lv_pi')?.value || '',
+                hv_e_60: document.getElementById('ir_hv_e_60')?.value || '',
+                hv_e_600: document.getElementById('ir_hv_e_600')?.value || '',
+                hv_e_pi: document.getElementById('ir_hv_e_pi')?.value || '',
+                lv_e_60: document.getElementById('ir_lv_e_60')?.value || '',
+                lv_e_600: document.getElementById('ir_lv_e_600')?.value || '',
+                lv_e_pi: document.getElementById('ir_lv_e_pi')?.value || ''
+            };
+            
+            testData.cft = {
+                core_frame: document.getElementById('cft_cf')?.value || '',
+                frame_tank: document.getElementById('cft_ft')?.value || '',
+                core_tank: document.getElementById('cft_ct')?.value || ''
+            };
+            
+            testData.dcVoltage = {
+                source1: {
+                    pn: document.getElementById('dc1_pn')?.value || '',
+                    pe: document.getElementById('dc1_pe')?.value || '',
+                    ne: document.getElementById('dc1_ne')?.value || ''
+                },
+                source2: {
+                    pn: document.getElementById('dc2_pn')?.value || '',
+                    pe: document.getElementById('dc2_pe')?.value || '',
+                    ne: document.getElementById('dc2_ne')?.value || ''
+                }
+            };
+            
+            testData.earthing = {
+                hv_e: document.getElementById('er_hve')?.value || '',
+                lv_e: document.getElementById('er_lve')?.value || '',
+                body: document.getElementById('er_body')?.value || ''
+            };
+            
+            for (let i = 0; i < 3; i++) {
+                testData.signatories.critl[i] = {
+                    name: document.getElementById(`critl_name_${i}`)?.value || '',
+                    sign: document.getElementById(`critl_sign_${i}`)?.value || ''
+                };
+                testData.signatories.tc[i] = {
+                    name: document.getElementById(`tc_name_${i}`)?.value || '',
+                    sign: document.getElementById(`tc_sign_${i}`)?.value || ''
+                };
+                testData.signatories.field[i] = {
+                    name: document.getElementById(`field_name_${i}`)?.value || '',
+                    sign: document.getElementById(`field_sign_${i}`)?.value || ''
+                };
+            }
+            
+            testData.notes = document.getElementById('notes')?.value || '';
+        }
+
+        async function saveTestData() {
+            if (!currentEquipment) { showStatus('No PTR selected', '#e74c3c'); return; }
+            collectFormData();
+            
+            let equipment = JSON.parse(localStorage.getItem('equipment')) || [];
+            let index = equipment.findIndex(e => e._id === currentEquipment._id);
+            if (index !== -1) {
+                equipment[index].testValues = [JSON.stringify(testData)];
+                equipment[index].remarks = testData.notes;
+                localStorage.setItem('equipment', JSON.stringify(equipment));
+                showStatus('Test data saved successfully!', '#27ae60');
+            }
+        }
+
+        async function addEquipment() {
+            if (!currentGrid) { showStatus('Please select a grid first', '#e74c3c'); return; }
+            
+            const equipmentId = document.getElementById('eqId').value.trim();
+            if (!equipmentId) { showStatus('Equipment ID required', '#e74c3c'); return; }
+            
+            const equipmentData = {
+                _id: Date.now().toString(),
+                gridId: currentGrid._id,
+                equipmentType: 'transformer',
+                equipmentId: equipmentId,
+                name: equipmentId,
+                rating: document.getElementById('eqRating').value,
+                make: document.getElementById('eqMake').value,
+                serialNumber: document.getElementById('eqSerial').value,
+                voltageRatio: document.getElementById('eqVoltage').value,
+                testValues: []
+            };
+            
+            let equipment = JSON.parse(localStorage.getItem('equipment')) || [];
+            equipment.push(equipmentData);
+            localStorage.setItem('equipment', JSON.stringify(equipment));
+            
+            closeModal('addEquipmentModal');
+            showStatus('PTR added successfully!', '#27ae60');
+            loadEquipment();
+            
+            document.getElementById('eqId').value = '';
+            document.getElementById('eqMake').value = '';
+            document.getElementById('eqSerial').value = '';
+        }
+
+        async function deleteEquipment(id) {
+            if (confirm('Delete this PTR? All test data will be lost!')) {
+                let equipment = JSON.parse(localStorage.getItem('equipment')) || [];
+                equipment = equipment.filter(e => e._id !== id);
+                localStorage.setItem('equipment', JSON.stringify(equipment));
+                loadEquipment();
+                if (currentEquipment && currentEquipment._id === id) {
+                    currentEquipment = null;
+                    document.getElementById('testForm').innerHTML = '';
+                    document.getElementById('actionButtons').style.display = 'none';
+                }
+                showStatus('PTR deleted', '#27ae60');
+            }
+        }
+
+        function showAddGridModal() { document.getElementById('addGridModal').style.display = 'flex'; }
+        
+        async function addGrid() {
+            const name = document.getElementById('gridName').value.trim();
+            if (!name) { showStatus('Grid name required', '#e74c3c'); return; }
+            
+            let grids = JSON.parse(localStorage.getItem('grids')) || [];
+            let newGrid = { _id: Date.now().toString(), name: name, location: document.getElementById('gridLocation').value };
+            grids.push(newGrid);
+            localStorage.setItem('grids', JSON.stringify(grids));
+            
+            closeModal('addGridModal');
+            showStatus('Grid added!', '#27ae60');
+            loadGrids();
+        }
+
+        function showAddEquipmentModal() {
+            if (!currentGrid) { showStatus('Please select a grid first', '#e74c3c'); return; }
+            document.getElementById('addEquipmentModal').style.display = 'flex';
+        }
+
+        function generateFullReport() {
+            if (!currentEquipment) { showStatus('No PTR selected', '#e74c3c'); return; }
+            collectFormData();
+            window.print();
+        }
+
+        function printFullReport() {
+            if (!currentEquipment) { showStatus('No PTR selected', '#e74c3c'); return; }
+            collectFormData();
+            window.print();
+        }
+
+        function closeModal(modalId) { document.getElementById(modalId).style.display = 'none'; }
+        function logout() { localStorage.clear(); location.reload(); }
+        
+        function showStatus(msg, color) {
+            const div = document.getElementById('statusMsg');
+            div.textContent = msg;
+            div.style.backgroundColor = color;
+            div.style.display = 'block';
+            setTimeout(() => div.style.display = 'none', 3000);
         }
         
-        for (let i = 0; i < 3; i++) {
-            saved[`ir_hvlv_${i}`] = document.getElementById(`ir_hvlv_${i}`)?.value || '';
-            saved[`ir_hve_${i}`] = document.getElementById(`ir_hve_${i}`)?.value || '';
-            saved[`ir_lve_${i}`] = document.getElementById(`ir_lve_${i}`)?.value || '';
+        function showError(msg) {
+            const div = document.getElementById('loginError');
+            div.textContent = msg;
+            div.style.display = 'block';
         }
-        
-        saved.vg_v1v2 = document.getElementById('vg_v1v2')?.value || '';
-        saved.vg_v1w2 = document.getElementById('vg_v1w2')?.value || '';
-        saved.vg_w1v2 = document.getElementById('vg_w1v2')?.value || '';
-        saved.vg_w1w2 = document.getElementById('vg_w1w2')?.value || '';
-        saved.vg_un = document.getElementById('vg_un')?.value || '';
-        
-        saved.cft_cf = document.getElementById('cft_cf')?.value || '';
-        saved.cft_ft = document.getElementById('cft_ft')?.value || '';
-        saved.cft_ct = document.getElementById('cft_ct')?.value || '';
-        
-        saved.dc1_pn = document.getElementById('dc1_pn')?.value || '';
-        saved.dc1_pe = document.getElementById('dc1_pe')?.value || '';
-        saved.dc1_ne = document.getElementById('dc1_ne')?.value || '';
-        saved.dc2_pn = document.getElementById('dc2_pn')?.value || '';
-        saved.dc2_pe = document.getElementById('dc2_pe')?.value || '';
-        saved.dc2_ne = document.getElementById('dc2_ne')?.value || '';
-        
-        saved.er_hve = document.getElementById('er_hve')?.value || '';
-        saved.er_lve = document.getElementById('er_lve')?.value || '';
-        saved.er_body = document.getElementById('er_body')?.value || '';
-        
-        saved.remarks = document.getElementById('remarks')?.value || '';
-        saved.sign_critl = document.getElementById('sign_critl')?.value || '';
-        saved.sign_tc = document.getElementById('sign_tc')?.value || '';
-        saved.sign_field = document.getElementById('sign_field')?.value || '';
-        
-        appData.testResults[currentPTR.id] = saved;
-        saveData();
-        showStatus('Test data saved successfully!', '#28a745');
-    }
-    
-    function printReport() {
-        saveTestData();
-        window.print();
-    }
-    
-    // Initialize on page load
-    if (localStorage.getItem('tandc_koshi_logged')) {
-        document.getElementById('loginArea').style.display = 'none';
-        document.getElementById('mainArea').style.display = 'block';
-        document.getElementById('userName').innerHTML = 'Admin';
-        loadGrids();
-    }
-</script>
+
+        // Auto login check
+        if (localStorage.getItem('token')) {
+            document.getElementById('loginPage').style.display = 'none';
+            document.getElementById('mainApp').style.display = 'block';
+            document.getElementById('userNameDisplay').innerHTML = 'Administrator';
+            loadGrids();
+        }
+    </script>
 </body>
 </html>
