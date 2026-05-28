@@ -428,7 +428,6 @@
         let currentEquipment = null;
         let currentUser = null;
 
-        // Sample test data structure
         let testData = {
             dateOfTesting: new Date().toISOString().split('T')[0],
             coreBalance: { VRY: '', VYB: '', VRB: '' },
@@ -476,7 +475,6 @@
             const username = document.getElementById('username').value;
             const password = document.getElementById('password').value;
             
-            // Simple demo login
             if (username === 'admin' && password === 'admin123') {
                 localStorage.setItem('token', 'demo-token');
                 localStorage.setItem('user', JSON.stringify({ username: 'admin', fullName: 'Administrator' }));
@@ -484,8 +482,6 @@
                 document.getElementById('loginPage').style.display = 'none';
                 document.getElementById('mainApp').style.display = 'block';
                 document.getElementById('userNameDisplay').innerHTML = 'Administrator';
-                
-                // Load demo data
                 loadGrids();
                 showStatus('Login successful!', '#27ae60');
             } else {
@@ -494,7 +490,6 @@
         }
 
         async function loadGrids() {
-            // Demo grids
             let grids = JSON.parse(localStorage.getItem('grids')) || [
                 { _id: '1', name: 'Grid Alpha', location: 'Substation A' },
                 { _id: '2', name: 'Grid Beta', location: 'Substation B' }
@@ -567,6 +562,7 @@
                     Voltage Ratio: ${currentEquipment.voltageRatio || 'N/A'} | Test Date: <input type="date" id="testDate" value="${testData.dateOfTesting}">
                 </div>
 
+                <!-- 1. Core Balance -->
                 <div class="test-group">
                     <h4>1. Core Balance and Magnetising Current Test</h4>
                     <div><span class="inline-input">VRY: <input type="text" id="cb_vry" value="${testData.coreBalance.VRY}" style="width:80px"> V</span>
@@ -587,6 +583,7 @@
                     </table>
                 </div>
 
+                <!-- 2. Short Circuit -->
                 <div class="test-group">
                     <h4>2. Short Circuit Test</h4>
                     <table class="test-table">
@@ -605,6 +602,7 @@
                     </table>
                 </div>
 
+                <!-- 3. Vector Group -->
                 <div class="test-group">
                     <h4>3. Vector Group (YNyn0)</h4>
                     <table class="test-table">
@@ -616,9 +614,10 @@
                             <td><input type="text" id="vg_w1w2" value="${testData.vectorGroup.w1w2}" style="width:90px"></td>
                             <td><input type="text" id="vg_un" value="${testData.vectorGroup.un}" style="width:90px"></td>
                         </tr>
-                    </tr>
+                    </table>
                 </div>
 
+                <!-- 4. Winding Resistance -->
                 <div class="test-group">
                     <h4>4. Winding Resistance Test</h4>
                     <table class="test-table">
@@ -638,6 +637,7 @@
                     </table>
                 </div>
 
+                <!-- 5. Insulation Resistance -->
                 <div class="test-group">
                     <h4>5. Insulation Resistance Test (Applied Voltage: 5 kV)</h4>
                     <table class="test-table">
@@ -653,7 +653,7 @@
                             <td><input type="text" id="ir_hv_e_60" value="${testData.ir.hv_e_60}" style="width:80px"></td
                             <td><input type="text" id="ir_hv_e_600" value="${testData.ir.hv_e_600}" style="width:80px"></td
                             <td><input type="text" id="ir_hv_e_pi" value="${testData.ir.hv_e_pi}" style="width:80px"></td
-                        <tr>
+                        </tr>
                         <tr>
                             <td>LV-E</td
                             <td><input type="text" id="ir_lv_e_60" value="${testData.ir.lv_e_60}" style="width:80px"></td
@@ -663,6 +663,7 @@
                     </table>
                 </div>
 
+                <!-- 6. CFT Insulation -->
                 <div class="test-group">
                     <h4>6. CFT Insulation Resistance Test (Applied Voltage: 500V)</h4>
                     <table class="test-table">
@@ -682,6 +683,7 @@
                     </table>
                 </div>
 
+                <!-- 7. Turn Ratio -->
                 <div class="test-group">
                     <h4>7. Turn Ratio Test</h4>
                     <table class="test-table">
@@ -695,7 +697,7 @@
                     </table>
                 </div>
 
-                <!-- 8. DC Voltage Test - FIXED TABLE -->
+                <!-- 8. DC Voltage Test -->
                 <div class="test-group">
                     <h4>8. DC Voltage Test</h4>
                     <table class="test-table">
@@ -706,21 +708,21 @@
                             <th>-VE to Earth (V)</th>
                         </tr>
                         <tr>
-                            <td>Source I</td>
-                            <td><input type="text" id="dc1_pn" value="${testData.dcVoltage.source1.pn}" style="width:90px"></td>
-                            <td><input type="text" id="dc1_pe" value="${testData.dcVoltage.source1.pe}" style="width:90px"></td>
-                            <td><input type="text" id="dc1_ne" value="${testData.dcVoltage.source1.ne}" style="width:90px"></td>
+                            <td>Source I</td
+                            <td><input type="text" id="dc1_pn" value="${testData.dcVoltage.source1.pn}" style="width:90px"></td
+                            <td><input type="text" id="dc1_pe" value="${testData.dcVoltage.source1.pe}" style="width:90px"></td
+                            <td><input type="text" id="dc1_ne" value="${testData.dcVoltage.source1.ne}" style="width:90px"></td
                         </tr>
                         <tr>
                             <td>Source II</td
-                            <td><input type="text" id="dc2_pn" value="${testData.dcVoltage.source2.pn}" style="width:90px"></td>
-                            <td><input type="text" id="dc2_pe" value="${testData.dcVoltage.source2.pe}" style="width:90px"></td>
-                            <td><input type="text" id="dc2_ne" value="${testData.dcVoltage.source2.ne}" style="width:90px"></td>
+                            <td><input type="text" id="dc2_pn" value="${testData.dcVoltage.source2.pn}" style="width:90px"></td
+                            <td><input type="text" id="dc2_pe" value="${testData.dcVoltage.source2.pe}" style="width:90px"></td
+                            <td><input type="text" id="dc2_ne" value="${testData.dcVoltage.source2.ne}" style="width:90px"></td
                         </tr>
                     </table>
                 </div>
 
-                <!-- 9. Earthing Resistance Test - FIXED TABLE -->
+                <!-- 9. Earthing Resistance Test -->
                 <div class="test-group">
                     <h4>9. Earthing Resistance Test</h4>
                     <table class="test-table">
@@ -730,29 +732,39 @@
                         </tr>
                         <tr>
                             <td>HV-E</td
-                            <td><input type="text" id="er_hve" value="${testData.earthing.hv_e}" style="width:100px"></td>
+                            <td><input type="text" id="er_hve" value="${testData.earthing.hv_e}" style="width:100px"></td
                         </tr>
                         <tr>
                             <td>LV-E</td
-                            <td><input type="text" id="er_lve" value="${testData.earthing.lv_e}" style="width:100px"></td>
+                            <td><input type="text" id="er_lve" value="${testData.earthing.lv_e}" style="width:100px"></td
                         </tr>
                         <tr>
                             <td>Body</td
-                            <td><input type="text" id="er_body" value="${testData.earthing.body}" style="width:100px"></td>
+                            <td><input type="text" id="er_body" value="${testData.earthing.body}" style="width:100px"></td
                         </tr>
                     </table>
                 </div>
 
+                <!-- 10. Remarks -->
                 <div class="test-group">
                     <h4>10. Remarks / Notes</h4>
                     <textarea id="notes" rows="3">${testData.notes}</textarea>
                 </div>
 
+                <!-- 11. Signatories -->
                 <div class="test-group">
                     <h4>11. Signatories</h4>
                     <table class="test-table">
-                        <tr><th colspan="2">CRITL</th><th colspan="2">T&C Koshi</th><th colspan="2">Field</th></tr>
-                        <tr><th>Name</th><th>Signature</th><th>Name</th><th>Signature</th><th>Name</th><th>Signature</th></tr>
+                        <tr>
+                            <th colspan="2">CRITL</th>
+                            <th colspan="2">T&C Koshi</th>
+                            <th colspan="2">Field</th>
+                        </tr>
+                        <tr>
+                            <th>Name</th><th>Signature</th>
+                            <th>Name</th><th>Signature</th>
+                            <th>Name</th><th>Signature</th>
+                        </tr>
                         ${[0,1,2].map(i => `<tr>
                             <td><input type="text" id="critl_name_${i}" value="${testData.signatories.critl[i]?.name || ''}" placeholder="Officer Name" style="width:140px"></td>
                             <td><input type="text" id="critl_sign_${i}" value="${testData.signatories.critl[i]?.sign || ''}" placeholder="Signature" style="width:140px"></td>
@@ -993,7 +1005,6 @@
             div.style.display = 'block';
         }
 
-        // Auto login check
         if (localStorage.getItem('token')) {
             document.getElementById('loginPage').style.display = 'none';
             document.getElementById('mainApp').style.display = 'block';
