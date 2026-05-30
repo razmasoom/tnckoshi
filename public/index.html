@@ -380,8 +380,8 @@
                         <div id="testForm"></div>
                         <div class="action-buttons" id="actionButtons" style="display: none;">
                             <button class="btn-save" onclick="saveTestData()"><i class="fas fa-save"></i> Save Test Results</button>
-                            <button class="btn-pdf" onclick="generateFullReport()"><i class="fas fa-file-pdf"></i> Download PDF</button>
-                            <button class="btn-print" onclick="printFullReport()"><i class="fas fa-print"></i> Print Report</button>
+                            <button class="btn-pdf" onclick="generatePDFReport()"><i class="fas fa-file-pdf"></i> Download PDF</button>
+                            <button class="btn-print" onclick="printReport()"><i class="fas fa-print"></i> Print Report</button>
                         </div>
                     </div>
                 </div>
@@ -408,6 +408,9 @@
             <input type="text" id="eqRating" placeholder="Rating (e.g., 20 MVA)">
             <input type="text" id="eqMake" placeholder="Make (e.g., CGL, BHEL)">
             <input type="text" id="eqSerial" placeholder="Serial Number">
+            <input type="text" id="eqOtiTemp" placeholder="OTI Temperature (°C)">
+            <input type="text" id="eqWtiHvTemp" placeholder="WTI HV Temperature (°C)">
+            <input type="text" id="eqWtiLvTemp" placeholder="WTI LV Temperature (°C)">
             <select id="eqVoltage">
                 <option value="132/33kV">Voltage Ratio: 132/33 kV</option>
                 <option value="220/132kV">Voltage Ratio: 220/132 kV</option>
@@ -422,14 +425,15 @@
     <div id="statusMsg" class="status"></div>
 
     <script>
-        const API_URL = '/api';
         let authToken = localStorage.getItem('token');
         let currentGrid = null;
         let currentEquipment = null;
-        let currentUser = null;
 
         let testData = {
             dateOfTesting: new Date().toISOString().split('T')[0],
+            otiTemp: '',
+            wtiHvTemp: '',
+            wtiLvTemp: '',
             coreBalance: { VRY: '', VYB: '', VRB: '' },
             magRows: [
                 { tap: '', vrn: '', vyn: '', vbn: '', vrn_lv: '', vyn_lv: '', vbn_lv: '' },
@@ -443,9 +447,9 @@
             ],
             vectorGroup: { v1v2: '', v1w2: '', w1v2: '', w1w2: '', un: '' },
             wrRows: [
-                { tap: '', oti: '', wti_hv: '', wti_lv: '', hv_u: '', hv_v: '', hv_w: '', lv_u: '', lv_v: '', lv_w: '' },
-                { tap: '', oti: '', wti_hv: '', wti_lv: '', hv_u: '', hv_v: '', hv_w: '', lv_u: '', lv_v: '', lv_w: '' },
-                { tap: '', oti: '', wti_hv: '', wti_lv: '', hv_u: '', hv_v: '', hv_w: '', lv_u: '', lv_v: '', lv_w: '' }
+                { tap: '', hv_u: '', hv_v: '', hv_w: '', lv_u: '', lv_v: '', lv_w: '' },
+                { tap: '', hv_u: '', hv_v: '', hv_w: '', lv_u: '', lv_v: '', lv_w: '' },
+                { tap: '', hv_u: '', hv_v: '', hv_w: '', lv_u: '', lv_v: '', lv_w: '' }
             ],
             ir: {
                 hv_lv_60: '', hv_lv_600: '', hv_lv_pi: '',
@@ -478,7 +482,6 @@
             if (username === 'admin' && password === 'admin123') {
                 localStorage.setItem('token', 'demo-token');
                 localStorage.setItem('user', JSON.stringify({ username: 'admin', fullName: 'Administrator' }));
-                authToken = 'demo-token';
                 document.getElementById('loginPage').style.display = 'none';
                 document.getElementById('mainApp').style.display = 'block';
                 document.getElementById('userNameDisplay').innerHTML = 'Administrator';
@@ -548,6 +551,9 @@
                             Object.assign(testData, JSON.parse(eq.testValues[0]));
                         } catch(e) {}
                     }
+                    if (eq.otiTemp) testData.otiTemp = eq.otiTemp;
+                    if (eq.wtiHvTemp) testData.wtiHvTemp = eq.wtiHvTemp;
+                    if (eq.wtiLvTemp) testData.wtiLvTemp = eq.wtiLvTemp;
                     loadTestForm();
                     document.getElementById('actionButtons').style.display = 'flex';
                 };
@@ -562,17 +568,25 @@
                     Voltage Ratio: ${currentEquipment.voltageRatio || 'N/A'} | Test Date: <input type="date" id="testDate" value="${testData.dateOfTesting}">
                 </div>
 
+                <!-- Temperature Information -->
+                <div class="test-group">
+                    <h4>Temperature Readings During Test</h4>
+                    <div class="inline-input">OTI Temperature: <input type="text" id="otiTemp" value="${testData.otiTemp}" style="width:80px"> °C</div>
+                    <div class="inline-input">WTI HV Temperature: <input type="text" id="wtiHvTemp" value="${testData.wtiHvTemp}" style="width:80px"> °C</div>
+                    <div class="inline-input">WTI LV Temperature: <input type="text" id="wtiLvTemp" value="${testData.wtiLvTemp}" style="width:80px"> °C</div>
+                </div>
+
                 <!-- 1. Core Balance -->
                 <div class="test-group">
                     <h4>1. Core Balance and Magnetising Current Test</h4>
-                    <div><span class="inline-input">VRY: <input type="text" id="cb_vry" value="${testData.coreBalance.VRY}" style="width:80px"> V</span>
-                         <span class="inline-input">VYB: <input type="text" id="cb_vyb" value="${testData.coreBalance.VYB}" style="width:80px"> V</span>
-                         <span class="inline-input">VRB: <input type="text" id="cb_vrb" value="${testData.coreBalance.VRB}" style="width:80px"> V</span>
+                    <div>VRY: <input type="text" id="cb_vry" value="${testData.coreBalance.VRY}" style="width:80px"> V | 
+                         VYB: <input type="text" id="cb_vyb" value="${testData.coreBalance.VYB}" style="width:80px"> V | 
+                         VRB: <input type="text" id="cb_vrb" value="${testData.coreBalance.VRB}" style="width:80px"> V
                     </div>
                     <table class="test-table">
                         <tr><th>Tap</th><th>VRN (HV)</th><th>VYN (HV)</th><th>VBN (HV)</th><th>Vrn (LV)</th><th>Vyn (LV)</th><th>Vbn (LV)</th></tr>
                         ${[0,1,2].map(i => `<tr>
-                            <td><input type="text" id="mag_tap_${i}" value="${testData.magRows[i].tap}" placeholder="Tap" style="width:60px"></td>
+                            <td><input type="text" id="mag_tap_${i}" value="${testData.magRows[i].tap}" style="width:60px"></td>
                             <td><input type="text" id="mag_${i}_vrn" value="${testData.magRows[i].vrn}" style="width:70px"></td>
                             <td><input type="text" id="mag_${i}_vyn" value="${testData.magRows[i].vyn}" style="width:70px"></td>
                             <td><input type="text" id="mag_${i}_vbn" value="${testData.magRows[i].vbn}" style="width:70px"></td>
@@ -589,7 +603,7 @@
                     <table class="test-table">
                         <tr><th>Tap</th><th>IR</th><th>IY</th><th>IB</th><th>Ir</th><th>Iy</th><th>Ib</th><th>IN</th><th>In</th></tr>
                         ${[0,1,2].map(i => `<tr>
-                            <td><input type="text" id="sc_tap_${i}" value="${testData.scRows[i].tap}" placeholder="Tap" style="width:60px"></td>
+                            <td><input type="text" id="sc_tap_${i}" value="${testData.scRows[i].tap}" style="width:60px"></td>
                             <td><input type="text" id="sc_${i}_ir" value="${testData.scRows[i].ir}" style="width:60px"></td>
                             <td><input type="text" id="sc_${i}_iy" value="${testData.scRows[i].iy}" style="width:60px"></td>
                             <td><input type="text" id="sc_${i}_ib" value="${testData.scRows[i].ib}" style="width:60px"></td>
@@ -614,25 +628,23 @@
                             <td><input type="text" id="vg_w1w2" value="${testData.vectorGroup.w1w2}" style="width:90px"></td>
                             <td><input type="text" id="vg_un" value="${testData.vectorGroup.un}" style="width:90px"></td>
                         </tr>
-                    </table>
+                    </tr>
                 </div>
 
-                <!-- 4. Winding Resistance -->
+                <!-- 4. Winding Resistance - WITHOUT temperature columns -->
                 <div class="test-group">
                     <h4>4. Winding Resistance Test</h4>
+                    <div><small>Note: All winding resistance values measured at the temperatures specified above</small></div>
                     <table class="test-table">
-                        <tr><th>Tap</th><th>OTI (°C)</th><th>WTI HV (°C)</th><th>WTI LV (°C)</th><th>HV U-N (Ω)</th><th>HV V-N (Ω)</th><th>HV W-N (Ω)</th><th>LV u-n (Ω)</th><th>LV v-n (Ω)</th><th>LV w-n (Ω)</th></tr>
+                        <tr><th>Tap</th><th>HV U-N (Ω)</th><th>HV V-N (Ω)</th><th>HV W-N (Ω)</th><th>LV u-n (Ω)</th><th>LV v-n (Ω)</th><th>LV w-n (Ω)</th></tr>
                         ${[0,1,2].map(i => `<tr>
-                            <td><input type="text" id="wr_tap_${i}" value="${testData.wrRows[i].tap}" placeholder="Tap" style="width:55px"></td>
-                            <td><input type="text" id="wr_oti_${i}" value="${testData.wrRows[i].oti}" style="width:50px"></td>
-                            <td><input type="text" id="wr_wti_hv_${i}" value="${testData.wrRows[i].wti_hv}" style="width:55px"></td>
-                            <td><input type="text" id="wr_wti_lv_${i}" value="${testData.wrRows[i].wti_lv}" style="width:55px"></td>
-                            <td><input type="text" id="wr_hv_u_${i}" value="${testData.wrRows[i].hv_u}" style="width:60px"></td>
-                            <td><input type="text" id="wr_hv_v_${i}" value="${testData.wrRows[i].hv_v}" style="width:60px"></td>
-                            <td><input type="text" id="wr_hv_w_${i}" value="${testData.wrRows[i].hv_w}" style="width:60px"></td>
-                            <td><input type="text" id="wr_lv_u_${i}" value="${testData.wrRows[i].lv_u}" style="width:60px"></td>
-                            <td><input type="text" id="wr_lv_v_${i}" value="${testData.wrRows[i].lv_v}" style="width:60px"></td>
-                            <td><input type="text" id="wr_lv_w_${i}" value="${testData.wrRows[i].lv_w}" style="width:60px"></td>
+                            <td><input type="text" id="wr_tap_${i}" value="${testData.wrRows[i].tap}" style="width:60px"></td>
+                            <td><input type="text" id="wr_hv_u_${i}" value="${testData.wrRows[i].hv_u}" style="width:70px"></td>
+                            <td><input type="text" id="wr_hv_v_${i}" value="${testData.wrRows[i].hv_v}" style="width:70px"></td>
+                            <td><input type="text" id="wr_hv_w_${i}" value="${testData.wrRows[i].hv_w}" style="width:70px"></td>
+                            <td><input type="text" id="wr_lv_u_${i}" value="${testData.wrRows[i].lv_u}" style="width:70px"></td>
+                            <td><input type="text" id="wr_lv_v_${i}" value="${testData.wrRows[i].lv_v}" style="width:70px"></td>
+                            <td><input type="text" id="wr_lv_w_${i}" value="${testData.wrRows[i].lv_w}" style="width:70px"></td>
                         </tr>`).join('')}
                     </table>
                 </div>
@@ -663,7 +675,7 @@
                     </table>
                 </div>
 
-                <!-- 6. CFT Insulation -->
+                <!-- 6. CFT -->
                 <div class="test-group">
                     <h4>6. CFT Insulation Resistance Test (Applied Voltage: 500V)</h4>
                     <table class="test-table">
@@ -689,24 +701,19 @@
                     <table class="test-table">
                         <tr><th>Tap</th><th>Phase U</th><th>Phase V</th><th>Phase W</th></tr>
                         ${[0,1,2].map(i => `<tr>
-                            <td><input type="text" id="tr_tap_${i}" value="${testData.trRows[i].tap}" placeholder="Tap" style="width:60px"></td>
+                            <td><input type="text" id="tr_tap_${i}" value="${testData.trRows[i].tap}" style="width:60px"></td>
                             <td><input type="text" id="tr_${i}_u" value="${testData.trRows[i].u}" style="width:80px"></td>
                             <td><input type="text" id="tr_${i}_v" value="${testData.trRows[i].v}" style="width:80px"></td>
                             <td><input type="text" id="tr_${i}_w" value="${testData.trRows[i].w}" style="width:80px"></td>
                         </tr>`).join('')}
-                    </table>
+                    </tr>
                 </div>
 
-                <!-- 8. DC Voltage Test -->
+                <!-- 8. DC Voltage -->
                 <div class="test-group">
                     <h4>8. DC Voltage Test</h4>
                     <table class="test-table">
-                        <tr>
-                            <th>Source</th>
-                            <th>+VE to -VE (V)</th>
-                            <th>+VE to Earth (V)</th>
-                            <th>-VE to Earth (V)</th>
-                        </tr>
+                        <tr><th>Source</th><th>+VE to -VE (V)</th><th>+VE to Earth (V)</th><th>-VE to Earth (V)</th></tr>
                         <tr>
                             <td>Source I</td
                             <td><input type="text" id="dc1_pn" value="${testData.dcVoltage.source1.pn}" style="width:90px"></td
@@ -722,14 +729,11 @@
                     </table>
                 </div>
 
-                <!-- 9. Earthing Resistance Test -->
+                <!-- 9. Earthing Resistance -->
                 <div class="test-group">
                     <h4>9. Earthing Resistance Test</h4>
                     <table class="test-table">
-                        <tr>
-                            <th>Test Point</th>
-                            <th>Value (Ω)</th>
-                        </tr>
+                        <tr><th>Test Point</th><th>Value (Ω)</th></tr>
                         <tr>
                             <td>HV-E</td
                             <td><input type="text" id="er_hve" value="${testData.earthing.hv_e}" style="width:100px"></td
@@ -755,16 +759,8 @@
                 <div class="test-group">
                     <h4>11. Signatories</h4>
                     <table class="test-table">
-                        <tr>
-                            <th colspan="2">CRITL</th>
-                            <th colspan="2">T&C Koshi</th>
-                            <th colspan="2">Field</th>
-                        </tr>
-                        <tr>
-                            <th>Name</th><th>Signature</th>
-                            <th>Name</th><th>Signature</th>
-                            <th>Name</th><th>Signature</th>
-                        </tr>
+                        <tr><th colspan="2">CRITL</th><th colspan="2">T&C Koshi</th><th colspan="2">Field</th></tr>
+                        <tr><th>Name</th><th>Signature</th><th>Name</th><th>Signature</th><th>Name</th><th>Signature</th></tr>
                         ${[0,1,2].map(i => `<tr>
                             <td><input type="text" id="critl_name_${i}" value="${testData.signatories.critl[i]?.name || ''}" placeholder="Officer Name" style="width:140px"></td>
                             <td><input type="text" id="critl_sign_${i}" value="${testData.signatories.critl[i]?.sign || ''}" placeholder="Signature" style="width:140px"></td>
@@ -781,6 +777,10 @@
 
         function collectFormData() {
             testData.dateOfTesting = document.getElementById('testDate')?.value || new Date().toISOString().split('T')[0];
+            testData.otiTemp = document.getElementById('otiTemp')?.value || '';
+            testData.wtiHvTemp = document.getElementById('wtiHvTemp')?.value || '';
+            testData.wtiLvTemp = document.getElementById('wtiLvTemp')?.value || '';
+            
             testData.coreBalance = {
                 VRY: document.getElementById('cb_vry')?.value || '',
                 VYB: document.getElementById('cb_vyb')?.value || '',
@@ -812,9 +812,6 @@
                 
                 testData.wrRows[i] = {
                     tap: document.getElementById(`wr_tap_${i}`)?.value || '',
-                    oti: document.getElementById(`wr_oti_${i}`)?.value || '',
-                    wti_hv: document.getElementById(`wr_wti_hv_${i}`)?.value || '',
-                    wti_lv: document.getElementById(`wr_wti_lv_${i}`)?.value || '',
                     hv_u: document.getElementById(`wr_hv_u_${i}`)?.value || '',
                     hv_v: document.getElementById(`wr_hv_v_${i}`)?.value || '',
                     hv_w: document.getElementById(`wr_hv_w_${i}`)?.value || '',
@@ -903,6 +900,9 @@
             if (index !== -1) {
                 equipment[index].testValues = [JSON.stringify(testData)];
                 equipment[index].remarks = testData.notes;
+                equipment[index].otiTemp = testData.otiTemp;
+                equipment[index].wtiHvTemp = testData.wtiHvTemp;
+                equipment[index].wtiLvTemp = testData.wtiLvTemp;
                 localStorage.setItem('equipment', JSON.stringify(equipment));
                 showStatus('Test data saved successfully!', '#27ae60');
             }
@@ -923,6 +923,9 @@
                 rating: document.getElementById('eqRating').value,
                 make: document.getElementById('eqMake').value,
                 serialNumber: document.getElementById('eqSerial').value,
+                otiTemp: document.getElementById('eqOtiTemp').value,
+                wtiHvTemp: document.getElementById('eqWtiHvTemp').value,
+                wtiLvTemp: document.getElementById('eqWtiLvTemp').value,
                 voltageRatio: document.getElementById('eqVoltage').value,
                 testValues: []
             };
@@ -976,13 +979,13 @@
             document.getElementById('addEquipmentModal').style.display = 'flex';
         }
 
-        function generateFullReport() {
+        function generatePDFReport() {
             if (!currentEquipment) { showStatus('No PTR selected', '#e74c3c'); return; }
             collectFormData();
             window.print();
         }
 
-        function printFullReport() {
+        function printReport() {
             if (!currentEquipment) { showStatus('No PTR selected', '#e74c3c'); return; }
             collectFormData();
             window.print();
