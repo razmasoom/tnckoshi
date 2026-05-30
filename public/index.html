@@ -314,41 +314,17 @@
             font-weight: bold;
         }
         
-        /* Print Styles - Clean Report Format */
         @media print {
-            .sidebar, .grid-section, .action-buttons, .header, .btn-add-equipment, .btn-delete, .user-info, .modal, .status, .no-print {
-                display: none !important;
+            .sidebar, .grid-section, .action-buttons, .header, .btn-add-equipment, .btn-delete, .user-info {
+                display: none;
             }
             .content-area {
                 margin: 0;
                 padding: 0;
-                width: 100%;
             }
             .test-group {
                 break-inside: avoid;
                 page-break-inside: avoid;
-                margin-bottom: 20px;
-            }
-            .test-table {
-                border-collapse: collapse;
-                width: 100%;
-                margin: 10px 0;
-            }
-            .test-table th, .test-table td {
-                border: 1px solid #000;
-                padding: 6px;
-                text-align: center;
-            }
-            .test-table input {
-                border: none;
-                background: transparent;
-                text-align: center;
-                width: auto;
-            }
-            .current-equipment {
-                background: #f0f0f0;
-                padding: 10px;
-                margin-bottom: 15px;
             }
         }
     </style>
@@ -404,7 +380,8 @@
                         <div id="testForm"></div>
                         <div class="action-buttons" id="actionButtons" style="display: none;">
                             <button class="btn-save" onclick="saveTestData()"><i class="fas fa-save"></i> Save Test Results</button>
-                            <button class="btn-pdf" onclick="printReport()"><i class="fas fa-file-pdf"></i> Print / PDF</button>
+                            <button class="btn-pdf" onclick="generatePDF()"><i class="fas fa-file-pdf"></i> Download PDF</button>
+                            <button class="btn-print" onclick="printReport()"><i class="fas fa-print"></i> Print Report</button>
                         </div>
                     </div>
                 </div>
@@ -590,16 +567,20 @@
                          VRB: <input type="text" id="cb_vrb" value="${testData.coreBalance.VRB}" style="width:80px"> V
                     </div>
                     <table class="test-table">
-                        <tr><th>Tap</th><th>VRN (HV)</th><th>VYN (HV)</th><th>VBN (HV)</th><th>Vrn (LV)</th><th>Vyn (LV)</th><th>Vbn (LV)</th></tr>
-                        ${[0,1,2].map(i => `<tr>
-                            <td><input type="text" id="mag_tap_${i}" value="${testData.magRows[i].tap}" style="width:60px"></td>
-                            <td><input type="text" id="mag_${i}_vrn" value="${testData.magRows[i].vrn}" style="width:70px"></td>
-                            <td><input type="text" id="mag_${i}_vyn" value="${testData.magRows[i].vyn}" style="width:70px"></td>
-                            <td><input type="text" id="mag_${i}_vbn" value="${testData.magRows[i].vbn}" style="width:70px"></td>
-                            <td><input type="text" id="mag_${i}_vrn_lv" value="${testData.magRows[i].vrn_lv}" style="width:70px"></td>
-                            <td><input type="text" id="mag_${i}_vyn_lv" value="${testData.magRows[i].vyn_lv}" style="width:70px"></td>
-                            <td><input type="text" id="mag_${i}_vbn_lv" value="${testData.magRows[i].vbn_lv}" style="width:70px"></td>
-                        </tr>`).join('')}
+                        <thead>
+                            <tr><th>Tap</th><th>VRN (HV)</th><th>VYN (HV)</th><th>VBN (HV)</th><th>Vrn (LV)</th><th>Vyn (LV)</th><th>Vbn (LV)</th></tr>
+                        </thead>
+                        <tbody>
+                            ${[0,1,2].map(i => `<tr>
+                                <td><input type="text" id="mag_tap_${i}" value="${testData.magRows[i].tap}" style="width:60px"></td>
+                                <td><input type="text" id="mag_${i}_vrn" value="${testData.magRows[i].vrn}" style="width:70px"></td>
+                                <td><input type="text" id="mag_${i}_vyn" value="${testData.magRows[i].vyn}" style="width:70px"></td>
+                                <td><input type="text" id="mag_${i}_vbn" value="${testData.magRows[i].vbn}" style="width:70px"></td>
+                                <td><input type="text" id="mag_${i}_vrn_lv" value="${testData.magRows[i].vrn_lv}" style="width:70px"></td>
+                                <td><input type="text" id="mag_${i}_vyn_lv" value="${testData.magRows[i].vyn_lv}" style="width:70px"></td>
+                                <td><input type="text" id="mag_${i}_vbn_lv" value="${testData.magRows[i].vbn_lv}" style="width:70px"></td>
+                            </tr>`).join('')}
+                        </tbody>
                     </table>
                 </div>
 
@@ -607,18 +588,22 @@
                 <div class="test-group">
                     <h4>2. Short Circuit Test</h4>
                     <table class="test-table">
-                        <tr><th>Tap</th><th>IR</th><th>IY</th><th>IB</th><th>Ir</th><th>Iy</th><th>Ib</th><th>IN</th><th>In</th></tr>
-                        ${[0,1,2].map(i => `<tr>
-                            <td><input type="text" id="sc_tap_${i}" value="${testData.scRows[i].tap}" style="width:60px"></td>
-                            <td><input type="text" id="sc_${i}_ir" value="${testData.scRows[i].ir}" style="width:60px"></td>
-                            <td><input type="text" id="sc_${i}_iy" value="${testData.scRows[i].iy}" style="width:60px"></td>
-                            <td><input type="text" id="sc_${i}_ib" value="${testData.scRows[i].ib}" style="width:60px"></td>
-                            <td><input type="text" id="sc_${i}_ir_lv" value="${testData.scRows[i].ir_lv}" style="width:60px"></td>
-                            <td><input type="text" id="sc_${i}_iy_lv" value="${testData.scRows[i].iy_lv}" style="width:60px"></td>
-                            <td><input type="text" id="sc_${i}_ib_lv" value="${testData.scRows[i].ib_lv}" style="width:60px"></td>
-                            <td><input type="text" id="sc_${i}_in_hv" value="${testData.scRows[i].in_hv}" style="width:60px"></td>
-                            <td><input type="text" id="sc_${i}_in_lv" value="${testData.scRows[i].in_lv}" style="width:60px"><td>
-                        </tr>`).join('')}
+                        <thead>
+                            <tr><th>Tap</th><th>IR</th><th>IY</th><th>IB</th><th>Ir</th><th>Iy</th><th>Ib</th><th>IN</th><th>In</th></tr>
+                        </thead>
+                        <tbody>
+                            ${[0,1,2].map(i => `<tr>
+                                <td><input type="text" id="sc_tap_${i}" value="${testData.scRows[i].tap}" style="width:60px"></td>
+                                <td><input type="text" id="sc_${i}_ir" value="${testData.scRows[i].ir}" style="width:60px"></td>
+                                <td><input type="text" id="sc_${i}_iy" value="${testData.scRows[i].iy}" style="width:60px"></td>
+                                <td><input type="text" id="sc_${i}_ib" value="${testData.scRows[i].ib}" style="width:60px"></td>
+                                <td><input type="text" id="sc_${i}_ir_lv" value="${testData.scRows[i].ir_lv}" style="width:60px"></td>
+                                <td><input type="text" id="sc_${i}_iy_lv" value="${testData.scRows[i].iy_lv}" style="width:60px"></td>
+                                <td><input type="text" id="sc_${i}_ib_lv" value="${testData.scRows[i].ib_lv}" style="width:60px"></td>
+                                <td><input type="text" id="sc_${i}_in_hv" value="${testData.scRows[i].in_hv}" style="width:60px"></td>
+                                <td><input type="text" id="sc_${i}_in_lv" value="${testData.scRows[i].in_lv}" style="width:60px"></td>
+                            </tr>`).join('')}
+                        </tbody>
                     </table>
                 </div>
 
@@ -626,80 +611,96 @@
                 <div class="test-group">
                     <h4>3. Vector Group (YNyn0)</h4>
                     <table class="test-table">
-                        <tr><th>1V-2V (V)</th><th>1V-2W (V)</th><th>1W-2V (V)</th><th>1W-2W (V)</th><th>1UN = 2Un + Nn (V)</th></tr>
-                        <tr>
-                            <td><input type="text" id="vg_v1v2" value="${testData.vectorGroup.v1v2}" style="width:90px"></td>
-                            <td><input type="text" id="vg_v1w2" value="${testData.vectorGroup.v1w2}" style="width:90px"></td>
-                            <td><input type="text" id="vg_w1v2" value="${testData.vectorGroup.w1v2}" style="width:90px"></td>
-                            <td><input type="text" id="vg_w1w2" value="${testData.vectorGroup.w1w2}" style="width:90px"></td>
-                            <td><input type="text" id="vg_un" value="${testData.vectorGroup.un}" style="width:90px"></td>
-                        </tr>
+                        <thead>
+                            <tr><th>1V-2V (V)</th><th>1V-2W (V)</th><th>1W-2V (V)</th><th>1W-2W (V)</th><th>1UN = 2Un + Nn (V)</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><input type="text" id="vg_v1v2" value="${testData.vectorGroup.v1v2}" style="width:90px"></td>
+                                <td><input type="text" id="vg_v1w2" value="${testData.vectorGroup.v1w2}" style="width:90px"></td>
+                                <td><input type="text" id="vg_w1v2" value="${testData.vectorGroup.w1v2}" style="width:90px"></td>
+                                <td><input type="text" id="vg_w1w2" value="${testData.vectorGroup.w1w2}" style="width:90px"></td>
+                                <td><input type="text" id="vg_un" value="${testData.vectorGroup.un}" style="width:90px"></td>
+                            </tr>
+                        </tbody>
                     </table>
                 </div>
 
-                <!-- 4. Winding Resistance with Temperature Note -->
+                <!-- 4. Winding Resistance -->
                 <div class="test-group">
                     <h4>4. Winding Resistance Test</h4>
                     <div class="inline-input">OTI Temp: <input type="text" id="otiTemp" value="${testData.otiTemp || ''}" style="width:60px"> °C</div>
                     <div class="inline-input">WTI HV Temp: <input type="text" id="wtiHvTemp" value="${testData.wtiHvTemp || ''}" style="width:60px"> °C</div>
                     <div class="inline-input">WTI LV Temp: <input type="text" id="wtiLvTemp" value="${testData.wtiLvTemp || ''}" style="width:60px"> °C</div>
                     <table class="test-table">
-                        <tr><th>Tap</th><th>HV U-N (Ω)</th><th>HV V-N (Ω)</th><th>HV W-N (Ω)</th><th>LV u-n (Ω)</th><th>LV v-n (Ω)</th><th>LV w-n (Ω)</th></tr>
-                        ${[0,1,2].map(i => `<tr>
-                            <td><input type="text" id="wr_tap_${i}" value="${testData.wrRows[i].tap}" style="width:60px"></td>
-                            <td><input type="text" id="wr_hv_u_${i}" value="${testData.wrRows[i].hv_u}" style="width:70px"></td>
-                            <td><input type="text" id="wr_hv_v_${i}" value="${testData.wrRows[i].hv_v}" style="width:70px"></td>
-                            <td><input type="text" id="wr_hv_w_${i}" value="${testData.wrRows[i].hv_w}" style="width:70px"></td>
-                            <td><input type="text" id="wr_lv_u_${i}" value="${testData.wrRows[i].lv_u}" style="width:70px"></td>
-                            <td><input type="text" id="wr_lv_v_${i}" value="${testData.wrRows[i].lv_v}" style="width:70px"></td>
-                            <td><input type="text" id="wr_lv_w_${i}" value="${testData.wrRows[i].lv_w}" style="width:70px"></td>
-                        </tr>`).join('')}
+                        <thead>
+                            <tr><th>Tap</th><th>HV U-N (Ω)</th><th>HV V-N (Ω)</th><th>HV W-N (Ω)</th><th>LV u-n (Ω)</th><th>LV v-n (Ω)</th><th>LV w-n (Ω)</th></tr>
+                        </thead>
+                        <tbody>
+                            ${[0,1,2].map(i => `<tr>
+                                <td><input type="text" id="wr_tap_${i}" value="${testData.wrRows[i].tap}" style="width:60px"></td>
+                                <td><input type="text" id="wr_hv_u_${i}" value="${testData.wrRows[i].hv_u}" style="width:70px"></td>
+                                <td><input type="text" id="wr_hv_v_${i}" value="${testData.wrRows[i].hv_v}" style="width:70px"></td>
+                                <td><input type="text" id="wr_hv_w_${i}" value="${testData.wrRows[i].hv_w}" style="width:70px"></td>
+                                <td><input type="text" id="wr_lv_u_${i}" value="${testData.wrRows[i].lv_u}" style="width:70px"></td>
+                                <td><input type="text" id="wr_lv_v_${i}" value="${testData.wrRows[i].lv_v}" style="width:70px"></td>
+                                <td><input type="text" id="wr_lv_w_${i}" value="${testData.wrRows[i].lv_w}" style="width:70px"></td>
+                            </tr>`).join('')}
+                        </tbody>
                     </table>
                 </div>
 
-                <!-- 5. Insulation Resistance -->
+                <!-- 5. Insulation Resistance - FIXED -->
                 <div class="test-group">
                     <h4>5. Insulation Resistance Test (Applied Voltage: 5 kV)</h4>
                     <table class="test-table">
-                        <tr><th>Test Point</th><th>60 Sec (GΩ)</th><th>600 Sec (GΩ)</th><th>PI</th></tr>
-                        <tr>
-                            <td>HV-LV</td
-                            <td><input type="text" id="ir_hv_lv_60" value="${testData.ir.hv_lv_60}" style="width:80px"></td
-                            <td><input type="text" id="ir_hv_lv_600" value="${testData.ir.hv_lv_600}" style="width:80px"></td
-                            <td><input type="text" id="ir_hv_lv_pi" value="${testData.ir.hv_lv_pi}" style="width:80px"></td
-                        </tr>
-                        <tr>
-                            <td>HV-E</td
-                            <td><input type="text" id="ir_hv_e_60" value="${testData.ir.hv_e_60}" style="width:80px"></td
-                            <td><input type="text" id="ir_hv_e_600" value="${testData.ir.hv_e_600}" style="width:80px"></td
-                            <td><input type="text" id="ir_hv_e_pi" value="${testData.ir.hv_e_pi}" style="width:80px"></td
-                        </tr>
-                        <tr>
-                            <td>LV-E</td
-                            <td><input type="text" id="ir_lv_e_60" value="${testData.ir.lv_e_60}" style="width:80px"></td
-                            <td><input type="text" id="ir_lv_e_600" value="${testData.ir.lv_e_600}" style="width:80px"></td
-                            <td><input type="text" id="ir_lv_e_pi" value="${testData.ir.lv_e_pi}" style="width:80px"></td
-                        </tr>
+                        <thead>
+                            <tr><th>Test Point</th><th>60 Sec (GΩ)</th><th>600 Sec (GΩ)</th><th>PI</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>HV-LV</td
+                                <td><input type="text" id="ir_hv_lv_60" value="${testData.ir.hv_lv_60}" style="width:80px"></td
+                                <td><input type="text" id="ir_hv_lv_600" value="${testData.ir.hv_lv_600}" style="width:80px"></td
+                                <td><input type="text" id="ir_hv_lv_pi" value="${testData.ir.hv_lv_pi}" style="width:80px"></td
+                            </tr>
+                            <tr>
+                                <td>HV-E</td
+                                <td><input type="text" id="ir_hv_e_60" value="${testData.ir.hv_e_60}" style="width:80px"></td
+                                <td><input type="text" id="ir_hv_e_600" value="${testData.ir.hv_e_600}" style="width:80px"></td
+                                <td><input type="text" id="ir_hv_e_pi" value="${testData.ir.hv_e_pi}" style="width:80px"></td
+                            </tr>
+                            <tr>
+                                <td>LV-E</td
+                                <td><input type="text" id="ir_lv_e_60" value="${testData.ir.lv_e_60}" style="width:80px"></td
+                                <td><input type="text" id="ir_lv_e_600" value="${testData.ir.lv_e_600}" style="width:80px"></td
+                                <td><input type="text" id="ir_lv_e_pi" value="${testData.ir.lv_e_pi}" style="width:80px"></td
+                            </tr>
+                        </tbody>
                     </table>
                 </div>
 
-                <!-- 6. CFT -->
+                <!-- 6. CFT - FIXED -->
                 <div class="test-group">
                     <h4>6. CFT Insulation Resistance Test (Applied Voltage: 500V)</h4>
                     <table class="test-table">
-                        <tr><th>Test Point</th><th>Value (GΩ)</th></tr>
-                        <tr>
-                            <td>Core-Frame</td
-                            <td><input type="text" id="cft_cf" value="${testData.cft.core_frame}" style="width:100px"></td
-                        </tr>
-                        <tr>
-                            <td>Frame-Tank</td
-                            <td><input type="text" id="cft_ft" value="${testData.cft.frame_tank}" style="width:100px"></td
-                        </tr>
-                        <tr>
-                            <td>Core-Tank</td
-                            <td><input type="text" id="cft_ct" value="${testData.cft.core_tank}" style="width:100px"></td
-                        </tr>
+                        <thead>
+                            <tr><th>Test Point</th><th>Value (GΩ)</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Core-Frame</td
+                                <td><input type="text" id="cft_cf" value="${testData.cft.core_frame}" style="width:100px"></td
+                            </tr>
+                            <tr>
+                                <td>Frame-Tank</td
+                                <td><input type="text" id="cft_ft" value="${testData.cft.frame_tank}" style="width:100px"></td
+                            </tr>
+                            <tr>
+                                <td>Core-Tank</td
+                                <td><input type="text" id="cft_ct" value="${testData.cft.core_tank}" style="width:100px"></td
+                            </tr>
+                        </tbody>
                     </table>
                 </div>
 
@@ -707,53 +708,65 @@
                 <div class="test-group">
                     <h4>7. Turn Ratio Test</h4>
                     <table class="test-table">
-                        <tr><th>Tap</th><th>Phase U</th><th>Phase V</th><th>Phase W</th></tr>
-                        ${[0,1,2].map(i => `<tr>
-                            <td><input type="text" id="tr_tap_${i}" value="${testData.trRows[i].tap}" style="width:60px"></td>
-                            <td><input type="text" id="tr_${i}_u" value="${testData.trRows[i].u}" style="width:80px"></td>
-                            <td><input type="text" id="tr_${i}_v" value="${testData.trRows[i].v}" style="width:80px"></td>
-                            <td><input type="text" id="tr_${i}_w" value="${testData.trRows[i].w}" style="width:80px"></td>
-                        </tr>`).join('')}
+                        <thead>
+                            <tr><th>Tap</th><th>Phase U</th><th>Phase V</th><th>Phase W</th></tr>
+                        </thead>
+                        <tbody>
+                            ${[0,1,2].map(i => `<tr>
+                                <td><input type="text" id="tr_tap_${i}" value="${testData.trRows[i].tap}" style="width:60px"></td>
+                                <td><input type="text" id="tr_${i}_u" value="${testData.trRows[i].u}" style="width:80px"></td>
+                                <td><input type="text" id="tr_${i}_v" value="${testData.trRows[i].v}" style="width:80px"></td>
+                                <td><input type="text" id="tr_${i}_w" value="${testData.trRows[i].w}" style="width:80px"></td>
+                            </tr>`).join('')}
+                        </tbody>
                     </table>
                 </div>
 
-                <!-- 8. DC Voltage -->
+                <!-- 8. DC Voltage - FIXED -->
                 <div class="test-group">
                     <h4>8. DC Voltage Test</h4>
                     <table class="test-table">
-                        <tr><th>Source</th><th>+VE to -VE (V)</th><th>+VE to Earth (V)</th><th>-VE to Earth (V)</th></tr>
-                        <tr>
-                            <td>Source I</td
-                            <td><input type="text" id="dc1_pn" value="${testData.dcVoltage.source1.pn}" style="width:90px"></td
-                            <td><input type="text" id="dc1_pe" value="${testData.dcVoltage.source1.pe}" style="width:90px"></td
-                            <td><input type="text" id="dc1_ne" value="${testData.dcVoltage.source1.ne}" style="width:90px"></td
-                        </tr>
-                        <tr>
-                            <td>Source II</td
-                            <td><input type="text" id="dc2_pn" value="${testData.dcVoltage.source2.pn}" style="width:90px"></td
-                            <td><input type="text" id="dc2_pe" value="${testData.dcVoltage.source2.pe}" style="width:90px"></td
-                            <td><input type="text" id="dc2_ne" value="${testData.dcVoltage.source2.ne}" style="width:90px"></td
-                        </tr>
+                        <thead>
+                            <tr><th>Source</th><th>+VE to -VE (V)</th><th>+VE to Earth (V)</th><th>-VE to Earth (V)</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Source I</td
+                                <td><input type="text" id="dc1_pn" value="${testData.dcVoltage.source1.pn}" style="width:90px"></td
+                                <td><input type="text" id="dc1_pe" value="${testData.dcVoltage.source1.pe}" style="width:90px"></td
+                                <td><input type="text" id="dc1_ne" value="${testData.dcVoltage.source1.ne}" style="width:90px"></td
+                            </tr>
+                            <tr>
+                                <td>Source II</td
+                                <td><input type="text" id="dc2_pn" value="${testData.dcVoltage.source2.pn}" style="width:90px"></td
+                                <td><input type="text" id="dc2_pe" value="${testData.dcVoltage.source2.pe}" style="width:90px"></td
+                                <td><input type="text" id="dc2_ne" value="${testData.dcVoltage.source2.ne}" style="width:90px"></td
+                            </tr>
+                        </tbody>
                     </table>
                 </div>
 
-                <!-- 9. Earthing Resistance -->
+                <!-- 9. Earthing Resistance - FIXED -->
                 <div class="test-group">
                     <h4>9. Earthing Resistance Test</h4>
                     <table class="test-table">
-                        <tr><th>Test Point</th><th>Value (Ω)</th></tr>
-                        <tr>
-                            <td>HV-E</td
-                            <td><input type="text" id="er_hve" value="${testData.earthing.hv_e}" style="width:100px"></td
-                        </tr>
-                        <tr>
-                            <td>LV-E</td
-                            <td><input type="text" id="er_lve" value="${testData.earthing.lv_e}" style="width:100px"></td
-                        </tr>
-                        <tr>
-                            <td>Body</td
-                            <td><input type="text" id="er_body" value="${testData.earthing.body}" style="width:100px"></td
-                        </tr>
+                        <thead>
+                            <tr><th>Test Point</th><th>Value (Ω)</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>HV-E</td
+                                <td><input type="text" id="er_hve" value="${testData.earthing.hv_e}" style="width:100px"></td
+                            </tr>
+                            <tr>
+                                <td>LV-E</td
+                                <td><input type="text" id="er_lve" value="${testData.earthing.lv_e}" style="width:100px"></td
+                            </tr>
+                            <tr>
+                                <td>Body</td
+                                <td><input type="text" id="er_body" value="${testData.earthing.body}" style="width:100px"></td
+                            </tr>
+                        </tbody>
                     </table>
                 </div>
 
@@ -767,16 +780,20 @@
                 <div class="test-group">
                     <h4>11. Signatories</h4>
                     <table class="test-table">
-                        <tr><th colspan="2">CRITL</th><th colspan="2">T&C Koshi</th><th colspan="2">Field</th></tr>
-                        <tr><th>Name</th><th>Signature</th><th>Name</th><th>Signature</th><th>Name</th><th>Signature</th></tr>
-                        ${[0,1,2].map(i => `<tr>
-                            <td><input type="text" id="critl_name_${i}" value="${testData.signatories.critl[i]?.name || ''}" placeholder="Officer Name" style="width:140px"></td>
-                            <td><input type="text" id="critl_sign_${i}" value="${testData.signatories.critl[i]?.sign || ''}" placeholder="Signature" style="width:140px"></td>
-                            <td><input type="text" id="tc_name_${i}" value="${testData.signatories.tc[i]?.name || ''}" placeholder="Officer Name" style="width:140px"></td>
-                            <td><input type="text" id="tc_sign_${i}" value="${testData.signatories.tc[i]?.sign || ''}" placeholder="Signature" style="width:140px"></td>
-                            <td><input type="text" id="field_name_${i}" value="${testData.signatories.field[i]?.name || ''}" placeholder="Officer Name" style="width:140px"></td>
-                            <td><input type="text" id="field_sign_${i}" value="${testData.signatories.field[i]?.sign || ''}" placeholder="Signature" style="width:140px"></td>
-                        </td>`).join('')}
+                        <thead>
+                            <tr><th colspan="2">CRITL</th><th colspan="2">T&C Koshi</th><th colspan="2">Field</th></tr>
+                            <tr><th>Name</th><th>Signature</th><th>Name</th><th>Signature</th><th>Name</th><th>Signature</th></tr>
+                        </thead>
+                        <tbody>
+                            ${[0,1,2].map(i => `<tr>
+                                <td><input type="text" id="critl_name_${i}" value="${testData.signatories.critl[i]?.name || ''}" placeholder="Officer Name" style="width:140px"></td>
+                                <td><input type="text" id="critl_sign_${i}" value="${testData.signatories.critl[i]?.sign || ''}" placeholder="Signature" style="width:140px"></td>
+                                <td><input type="text" id="tc_name_${i}" value="${testData.signatories.tc[i]?.name || ''}" placeholder="Officer Name" style="width:140px"></td>
+                                <td><input type="text" id="tc_sign_${i}" value="${testData.signatories.tc[i]?.sign || ''}" placeholder="Signature" style="width:140px"></td>
+                                <td><input type="text" id="field_name_${i}" value="${testData.signatories.field[i]?.name || ''}" placeholder="Officer Name" style="width:140px"></td>
+                                <td><input type="text" id="field_sign_${i}" value="${testData.signatories.field[i]?.sign || ''}" placeholder="Signature" style="width:140px"></td>
+                            </tr>`).join('')}
+                        </tbody>
                     </table>
                 </div>
             `;
@@ -979,6 +996,12 @@
         function showAddEquipmentModal() {
             if (!currentGrid) { showStatus('Please select a grid first', '#e74c3c'); return; }
             document.getElementById('addEquipmentModal').style.display = 'flex';
+        }
+
+        function generatePDF() {
+            if (!currentEquipment) { showStatus('No PTR selected', '#e74c3c'); return; }
+            collectFormData();
+            window.print();
         }
 
         function printReport() {
