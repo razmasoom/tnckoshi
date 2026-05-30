@@ -600,7 +600,7 @@
                                 <td><input type="text" id="vg_un" value="${testData.vectorGroup.un}" style="width:90px"></td>
                             </tr>
                         </tbody>
-                    </table>
+                    </tr>
                 </div>
 
                 <div class="test-group">
@@ -629,9 +629,24 @@
                     <table class="test-table">
                         <thead><tr><th>Test Point</th><th>60 Sec (GΩ)</th><th>600 Sec (GΩ)</th><th>PI</th></tr></thead>
                         <tbody>
-                            <tr><td>HV-LV</td><td><input type="text" id="ir_hv_lv_60" value="${testData.ir.hv_lv_60}" style="width:80px"></td><td><input type="text" id="ir_hv_lv_600" value="${testData.ir.hv_lv_600}" style="width:80px"></td><td><input type="text" id="ir_hv_lv_pi" value="${testData.ir.hv_lv_pi}" style="width:80px"></td></tr>
-                            <tr><td>HV-E</td><td><input type="text" id="ir_hv_e_60" value="${testData.ir.hv_e_60}" style="width:80px"></td><td><input type="text" id="ir_hv_e_600" value="${testData.ir.hv_e_600}" style="width:80px"></td><td><input type="text" id="ir_hv_e_pi" value="${testData.ir.hv_e_pi}" style="width:80px"></td></tr>
-                            <tr><td>LV-E</td><td><input type="text" id="ir_lv_e_60" value="${testData.ir.lv_e_60}" style="width:80px"></td><td><input type="text" id="ir_lv_e_600" value="${testData.ir.lv_e_600}" style="width:80px"></td><td><input type="text" id="ir_lv_e_pi" value="${testData.ir.lv_e_pi}" style="width:80px"></td></tr>
+                            <tr>
+                                <td>HV-LV</td
+                                <td><input type="text" id="ir_hv_lv_60" value="${testData.ir.hv_lv_60}" style="width:80px"></td
+                                <td><input type="text" id="ir_hv_lv_600" value="${testData.ir.hv_lv_600}" style="width:80px"></td
+                                <td><input type="text" id="ir_hv_lv_pi" value="${testData.ir.hv_lv_pi}" style="width:80px"></td
+                            </tr>
+                            <tr>
+                                <td>HV-E</td
+                                <td><input type="text" id="ir_hv_e_60" value="${testData.ir.hv_e_60}" style="width:80px"></td
+                                <td><input type="text" id="ir_hv_e_600" value="${testData.ir.hv_e_600}" style="width:80px"></td
+                                <td><input type="text" id="ir_hv_e_pi" value="${testData.ir.hv_e_pi}" style="width:80px"></td
+                            </tr>
+                            <tr>
+                                <td>LV-E</td
+                                <td><input type="text" id="ir_lv_e_60" value="${testData.ir.lv_e_60}" style="width:80px"></td
+                                <td><input type="text" id="ir_lv_e_600" value="${testData.ir.lv_e_600}" style="width:80px"></td
+                                <td><input type="text" id="ir_lv_e_pi" value="${testData.ir.lv_e_pi}" style="width:80px"></td
+                            </tr>
                         </tbody>
                     </table>
                 </div>
@@ -641,9 +656,18 @@
                     <table class="test-table">
                         <thead><tr><th>Test Point</th><th>Value (GΩ)</th></tr></thead>
                         <tbody>
-                            <tr><td>Core-Frame</td><td><input type="text" id="cft_cf" value="${testData.cft.core_frame}" style="width:100px"></td></tr>
-                            <tr><td>Frame-Tank</td><td><input type="text" id="cft_ft" value="${testData.cft.frame_tank}" style="width:100px"></td></tr>
-                            <tr><td>Core-Tank</td><td><input type="text" id="cft_ct" value="${testData.cft.core_tank}" style="width:100px"></td></tr>
+                            <tr>
+                                <td>Core-Frame</td
+                                <td><input type="text" id="cft_cf" value="${testData.cft.core_frame}" style="width:100px"></td
+                            </tr>
+                            <tr>
+                                <td>Frame-Tank</td
+                                <td><input type="text" id="cft_ft" value="${testData.cft.frame_tank}" style="width:100px"></td
+                            </tr>
+                            <tr>
+                                <td>Core-Tank</td
+                                <td><input type="text" id="cft_ct" value="${testData.cft.core_tank}" style="width:100px"></td
+                            </tr>
                         </tbody>
                     </table>
                 </div>
@@ -663,36 +687,57 @@
                     </table>
                 </div>
 
+                <!-- 8. DC Voltage Test - FIXED WEB DISPLAY -->
                 <div class="test-group">
                     <h4>8. DC Voltage Test</h4>
                     <table class="test-table">
-                        <thead><tr><th>Source</th><th>+VE to -VE (V)</th><th>+VE to Earth (V)</th><th>-VE to Earth (V)</th></tr></thead>
+                        <thead>
+                            <tr>
+                                <th>Source</th>
+                                <th>+VE to -VE (V)</th>
+                                <th>+VE to Earth (V)</th>
+                                <th>-VE to Earth (V)</th>
+                            </tr>
+                        </thead>
                         <tbody>
-                            <tr><td>Source I</td><td><input type="text" id="dc1_pn" value="${testData.dcVoltage.source1.pn}" style="width:90px"></td><td><input type="text" id="dc1_pe" value="${testData.dcVoltage.source1.pe}" style="width:90px"></td><td><input type="text" id="dc1_ne" value="${testData.dcVoltage.source1.ne}" style="width:90px"></td></tr>
-                            <tr><td>Source II</td
-                                <td><input type="text" id="dc2_pn" value="${testData.dcVoltage.source2.pn}" style="width:90px"></td>
-                                <td><input type="text" id="dc2_pe" value="${testData.dcVoltage.source2.pe}" style="width:90px"></td>
-                                <td><input type="text" id="dc2_ne" value="${testData.dcVoltage.source2.ne}" style="width:90px"></td>
+                            <tr>
+                                <td>Source I</td
+                                <td><input type="text" id="dc1_pn" value="${testData.dcVoltage.source1.pn}" style="width:90px"></td
+                                <td><input type="text" id="dc1_pe" value="${testData.dcVoltage.source1.pe}" style="width:90px"></td
+                                <td><input type="text" id="dc1_ne" value="${testData.dcVoltage.source1.ne}" style="width:90px"></td
+                            </tr>
+                            <tr>
+                                <td>Source II</td
+                                <td><input type="text" id="dc2_pn" value="${testData.dcVoltage.source2.pn}" style="width:90px"></td
+                                <td><input type="text" id="dc2_pe" value="${testData.dcVoltage.source2.pe}" style="width:90px"></td
+                                <td><input type="text" id="dc2_ne" value="${testData.dcVoltage.source2.ne}" style="width:90px"></td
                             </tr>
                         </tbody>
                     </table>
                 </div>
 
+                <!-- 9. Earthing Resistance Test - FIXED WEB DISPLAY -->
                 <div class="test-group">
                     <h4>9. Earthing Resistance Test</h4>
                     <table class="test-table">
-                        <thead><tr><th>Test Point</th><th>Value (Ω)</th></tr></thead>
+                        <thead>
+                            <tr>
+                                <th>Test Point</th>
+                                <th>Value (Ω)</th>
+                            </tr>
+                        </thead>
                         <tbody>
-                            <tr><td>HV-E</td
-                                <td><input type="text" id="er_hve" value="${testData.earthing.hv_e}" style="width:100px"></td>
+                            <tr>
+                                <td>HV-E</td
+                                <td><input type="text" id="er_hve" value="${testData.earthing.hv_e}" style="width:100px"></td
                             </tr>
                             <tr>
                                 <td>LV-E</td
-                                <td><input type="text" id="er_lve" value="${testData.earthing.lv_e}" style="width:100px"></td>
+                                <td><input type="text" id="er_lve" value="${testData.earthing.lv_e}" style="width:100px"></td
                             </tr>
                             <tr>
                                 <td>Body</td
-                                <td><input type="text" id="er_body" value="${testData.earthing.body}" style="width:100px"></td>
+                                <td><input type="text" id="er_body" value="${testData.earthing.body}" style="width:100px"></td
                             </tr>
                         </tbody>
                     </table>
@@ -711,7 +756,7 @@
                             <tr><th>Name</th><th>Signature</th><th>Name</th><th>Signature</th><th>Name</th><th>Signature</th></tr>
                         </thead>
                         <tbody>
-                            ${[0,1,2].map(i => `<tr>
+                            ${[0,1,2].map(i => `</tr>
                                 <td><input type="text" id="critl_name_${i}" value="${testData.signatories.critl[i]?.name || ''}" placeholder="Officer Name" style="width:140px"></td>
                                 <td><input type="text" id="critl_sign_${i}" value="${testData.signatories.critl[i]?.sign || ''}" placeholder="Signature" style="width:140px"></td>
                                 <td><input type="text" id="tc_name_${i}" value="${testData.signatories.tc[i]?.name || ''}" placeholder="Officer Name" style="width:140px"></td>
@@ -928,7 +973,6 @@
             if (!currentEquipment) { showStatus('No PTR selected', '#e74c3c'); return; }
             collectFormData();
             
-            // Create a new window for printing
             const printWindow = window.open('', '_blank');
             printWindow.document.write(`
                 <!DOCTYPE html>
@@ -960,26 +1004,21 @@
                         <p><strong>Temperatures:</strong> OTI: ${testData.otiTemp || '-'}°C | WTI HV: ${testData.wtiHvTemp || '-'}°C | WTI LV: ${testData.wtiLvTemp || '-'}°C</p>
                     </div>
                     
-                    <!-- Section 1 -->
                     <div class="section">
                         <div class="section-title">1. Core Balance and Magnetising Current Test</div>
                         <p>VRY: ${testData.coreBalance.VRY || '-'} V | VYB: ${testData.coreBalance.VYB || '-'} V | VRB: ${testData.coreBalance.VRB || '-'} V</p>
-                        <table>
-                            <thead><tr><th>Tap</th><th>VRN (HV)</th><th>VYN (HV)</th><th>VBN (HV)</th><th>Vrn (LV)</th><th>Vyn (LV)</th><th>Vbn (LV)</th></tr></thead>
-                            <tbody>${testData.magRows.map(r => `<tr><td>${r.tap || '-'}</td><td>${r.vrn || '-'}</td><td>${r.vyn || '-'}</td><td>${r.vbn || '-'}</td><td>${r.vrn_lv || '-'}</td><td>${r.vyn_lv || '-'}</td><td>${r.vbn_lv || '-'}</td></tr>`).join('')}</tbody>
+                        <table><thead><tr><th>Tap</th><th>VRN (HV)</th><th>VYN (HV)</th><th>VBN (HV)</th><th>Vrn (LV)</th><th>Vyn (LV)</th><th>Vbn (LV)</th></tr></thead>
+                        <tbody>${testData.magRows.map(r => `<tr><td>${r.tap || '-'}</td><td>${r.vrn || '-'}</td><td>${r.vyn || '-'}</td><td>${r.vbn || '-'}</td><td>${r.vrn_lv || '-'}</td><td>${r.vyn_lv || '-'}</td><td>${r.vbn_lv || '-'}</td></tr>`).join('')}</tbody>
                         </table>
                     </div>
                     
-                    <!-- Section 2 -->
                     <div class="section">
                         <div class="section-title">2. Short Circuit Test</div>
-                        <table>
-                            <thead><tr><th>Tap</th><th>IR</th><th>IY</th><th>IB</th><th>Ir</th><th>Iy</th><th>Ib</th><th>IN</th><th>In</th></tr></thead>
-                            <tbody>${testData.scRows.map(r => `<tr><td>${r.tap || '-'}</td><td>${r.ir || '-'}</td><td>${r.iy || '-'}</td><td>${r.ib || '-'}</td><td>${r.ir_lv || '-'}</td><td>${r.iy_lv || '-'}</td><td>${r.ib_lv || '-'}</td><td>${r.in_hv || '-'}</td><td>${r.in_lv || '-'}</td></tr>`).join('')}</tbody>
+                        <table><thead><tr><th>Tap</th><th>IR</th><th>IY</th><th>IB</th><th>Ir</th><th>Iy</th><th>Ib</th><th>IN</th><th>In</th></tr></thead>
+                        <tbody>${testData.scRows.map(r => `<tr><td>${r.tap || '-'}</td><td>${r.ir || '-'}</td><td>${r.iy || '-'}</td><td>${r.ib || '-'}</td><td>${r.ir_lv || '-'}</td><td>${r.iy_lv || '-'}</td><td>${r.ib_lv || '-'}</td><td>${r.in_hv || '-'}</td><td>${r.in_lv || '-'}</td></tr>`).join('')}</tbody>
                         </table>
                     </div>
                     
-                    <!-- Section 3 -->
                     <div class="section">
                         <div class="section-title">3. Vector Group (YNyn0)</div>
                         <table><thead><tr><th>1V-2V (V)</th><th>1V-2W (V)</th><th>1W-2V (V)</th><th>1W-2W (V)</th><th>1UN = 2Un + Nn (V)</th></tr></thead>
@@ -987,7 +1026,6 @@
                         </table>
                     </div>
                     
-                    <!-- Section 4 -->
                     <div class="section">
                         <div class="section-title">4. Winding Resistance Test</div>
                         <table><thead><tr><th>Tap</th><th>HV U-N (Ω)</th><th>HV V-N (Ω)</th><th>HV W-N (Ω)</th><th>LV u-n (Ω)</th><th>LV v-n (Ω)</th><th>LV w-n (Ω)</th></tr></thead>
@@ -995,7 +1033,6 @@
                         </table>
                     </div>
                     
-                    <!-- Section 5 -->
                     <div class="section">
                         <div class="section-title">5. Insulation Resistance Test (Applied Voltage: 5 kV)</div>
                         <table><thead><tr><th>Test Point</th><th>60 Sec (GΩ)</th><th>600 Sec (GΩ)</th><th>PI</th></tr></thead>
@@ -1007,10 +1044,9 @@
                         </table>
                     </div>
                     
-                    <!-- Section 6 -->
                     <div class="section">
                         <div class="section-title">6. CFT Insulation Resistance Test (Applied Voltage: 500V)</div>
-                        <table><thead><tr><th>Test Point</th><th>Value (GΩ)</th></tr></thead>
+                        <td><thead><tr><th>Test Point</th><th>Value (GΩ)</th></tr></thead>
                         <tbody>
                             <tr><td>Core-Frame</td><td>${testData.cft.core_frame || '-'}</td></tr>
                             <tr><td>Frame-Tank</td><td>${testData.cft.frame_tank || '-'}</td></tr>
@@ -1019,7 +1055,6 @@
                         </table>
                     </div>
                     
-                    <!-- Section 7 -->
                     <div class="section">
                         <div class="section-title">7. Turn Ratio Test</div>
                         <table><thead><tr><th>Tap</th><th>Phase U</th><th>Phase V</th><th>Phase W</th></tr></thead>
@@ -1027,36 +1062,50 @@
                         </table>
                     </div>
                     
-                    <!-- Section 8 -->
                     <div class="section">
                         <div class="section-title">8. DC Voltage Test</div>
                         <table><thead><tr><th>Source</th><th>+VE to -VE (V)</th><th>+VE to Earth (V)</th><th>-VE to Earth (V)</th></tr></thead>
                         <tbody>
-                            <tr><td>Source I</td><td>${testData.dcVoltage.source1.pn || '-'}</td><td>${testData.dcVoltage.source1.pe || '-'}</td><td>${testData.dcVoltage.source1.ne || '-'}</td></tr>
-                            <tr><td>Source II</td><td>${testData.dcVoltage.source2.pn || '-'}</td><td>${testData.dcVoltage.source2.pe || '-'}</td><td>${testData.dcVoltage.source2.ne || '-'}</td></tr>
+                            <tr><td>Source I</td
+                                <td>${testData.dcVoltage.source1.pn || '-'}</td
+                                <td>${testData.dcVoltage.source1.pe || '-'}</td
+                                <td>${testData.dcVoltage.source1.ne || '-'}</td
+                            </tr>
+                            <tr>
+                                <td>Source II</td
+                                <td>${testData.dcVoltage.source2.pn || '-'}</td
+                                <td>${testData.dcVoltage.source2.pe || '-'}</td
+                                <td>${testData.dcVoltage.source2.ne || '-'}</td
+                            </tr>
                         </tbody>
                         </table>
                     </div>
                     
-                    <!-- Section 9 -->
                     <div class="section">
                         <div class="section-title">9. Earthing Resistance Test</div>
                         <table><thead><tr><th>Test Point</th><th>Value (Ω)</th></tr></thead>
                         <tbody>
-                            <tr><td>HV-E</td><td>${testData.earthing.hv_e || '-'}</td></tr>
-                            <tr><td>LV-E</td><td>${testData.earthing.lv_e || '-'}</td></tr>
-                            <tr><td>Body</td><td>${testData.earthing.body || '-'}</td></tr>
+                            <tr>
+                                <td>HV-E</td
+                                <td>${testData.earthing.hv_e || '-'}</td
+                            </tr>
+                            <tr>
+                                <td>LV-E</td
+                                <td>${testData.earthing.lv_e || '-'}</td
+                            </tr>
+                            <tr>
+                                <td>Body</td
+                                <td>${testData.earthing.body || '-'}</td
+                            </tr>
                         </tbody>
                         </table>
                     </div>
                     
-                    <!-- Section 10 -->
                     <div class="section">
                         <div class="section-title">10. Remarks</div>
                         <p>${testData.notes || 'No remarks'}</p>
                     </div>
                     
-                    <!-- Section 11 -->
                     <div class="section">
                         <div class="section-title">11. Signatories</div>
                         <table style="border: none; width: 100%;">
@@ -1064,11 +1113,11 @@
                                 <td style="border: none; width: 33%; vertical-align: top;">
                                     <strong>CRITL</strong><br><br>
                                     ${testData.signatories.critl.map(s => `${s.name || '_________________'}<br>(${s.sign || 'Signature'})<br><br>`).join('')}
-                                </td>
+                                </table>
                                 <td style="border: none; width: 33%; vertical-align: top;">
                                     <strong>T&C Koshi</strong><br><br>
                                     ${testData.signatories.tc.map(s => `${s.name || '_________________'}<br>(${s.sign || 'Signature'})<br><br>`).join('')}
-                                </td>
+                                </tr>
                                 <td style="border: none; width: 33%; vertical-align: top;">
                                     <strong>Field</strong><br><br>
                                     ${testData.signatories.field.map(s => `${s.name || '_________________'}<br>(${s.sign || 'Signature'})<br><br>`).join('')}
