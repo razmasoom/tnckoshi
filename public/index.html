@@ -314,17 +314,41 @@
             font-weight: bold;
         }
         
+        /* Print Styles - Clean Report Format */
         @media print {
-            .sidebar, .grid-section, .action-buttons, .header, .btn-add-equipment, .btn-delete, .user-info {
-                display: none;
+            .sidebar, .grid-section, .action-buttons, .header, .btn-add-equipment, .btn-delete, .user-info, .modal, .status, .no-print {
+                display: none !important;
             }
             .content-area {
                 margin: 0;
                 padding: 0;
+                width: 100%;
             }
             .test-group {
                 break-inside: avoid;
                 page-break-inside: avoid;
+                margin-bottom: 20px;
+            }
+            .test-table {
+                border-collapse: collapse;
+                width: 100%;
+                margin: 10px 0;
+            }
+            .test-table th, .test-table td {
+                border: 1px solid #000;
+                padding: 6px;
+                text-align: center;
+            }
+            .test-table input {
+                border: none;
+                background: transparent;
+                text-align: center;
+                width: auto;
+            }
+            .current-equipment {
+                background: #f0f0f0;
+                padding: 10px;
+                margin-bottom: 15px;
             }
         }
     </style>
@@ -380,8 +404,7 @@
                         <div id="testForm"></div>
                         <div class="action-buttons" id="actionButtons" style="display: none;">
                             <button class="btn-save" onclick="saveTestData()"><i class="fas fa-save"></i> Save Test Results</button>
-                            <button class="btn-pdf" onclick="generatePDFReport()"><i class="fas fa-file-pdf"></i> Download PDF</button>
-                            <button class="btn-print" onclick="printReport()"><i class="fas fa-print"></i> Print Report</button>
+                            <button class="btn-pdf" onclick="printReport()"><i class="fas fa-file-pdf"></i> Print / PDF</button>
                         </div>
                     </div>
                 </div>
@@ -408,9 +431,6 @@
             <input type="text" id="eqRating" placeholder="Rating (e.g., 20 MVA)">
             <input type="text" id="eqMake" placeholder="Make (e.g., CGL, BHEL)">
             <input type="text" id="eqSerial" placeholder="Serial Number">
-            <input type="text" id="eqOtiTemp" placeholder="OTI Temperature (°C)">
-            <input type="text" id="eqWtiHvTemp" placeholder="WTI HV Temperature (°C)">
-            <input type="text" id="eqWtiLvTemp" placeholder="WTI LV Temperature (°C)">
             <select id="eqVoltage">
                 <option value="132/33kV">Voltage Ratio: 132/33 kV</option>
                 <option value="220/132kV">Voltage Ratio: 220/132 kV</option>
@@ -431,9 +451,6 @@
 
         let testData = {
             dateOfTesting: new Date().toISOString().split('T')[0],
-            otiTemp: '',
-            wtiHvTemp: '',
-            wtiLvTemp: '',
             coreBalance: { VRY: '', VYB: '', VRB: '' },
             magRows: [
                 { tap: '', vrn: '', vyn: '', vbn: '', vrn_lv: '', vyn_lv: '', vbn_lv: '' },
@@ -551,9 +568,6 @@
                             Object.assign(testData, JSON.parse(eq.testValues[0]));
                         } catch(e) {}
                     }
-                    if (eq.otiTemp) testData.otiTemp = eq.otiTemp;
-                    if (eq.wtiHvTemp) testData.wtiHvTemp = eq.wtiHvTemp;
-                    if (eq.wtiLvTemp) testData.wtiLvTemp = eq.wtiLvTemp;
                     loadTestForm();
                     document.getElementById('actionButtons').style.display = 'flex';
                 };
@@ -566,14 +580,6 @@
                 <div class="current-equipment">
                     <strong>${currentEquipment.rating || ''} ${currentEquipment.equipmentId}</strong> | Make: ${currentEquipment.make || 'N/A'} | SN: ${currentEquipment.serialNumber || 'N/A'}<br>
                     Voltage Ratio: ${currentEquipment.voltageRatio || 'N/A'} | Test Date: <input type="date" id="testDate" value="${testData.dateOfTesting}">
-                </div>
-
-                <!-- Temperature Information -->
-                <div class="test-group">
-                    <h4>Temperature Readings During Test</h4>
-                    <div class="inline-input">OTI Temperature: <input type="text" id="otiTemp" value="${testData.otiTemp}" style="width:80px"> °C</div>
-                    <div class="inline-input">WTI HV Temperature: <input type="text" id="wtiHvTemp" value="${testData.wtiHvTemp}" style="width:80px"> °C</div>
-                    <div class="inline-input">WTI LV Temperature: <input type="text" id="wtiLvTemp" value="${testData.wtiLvTemp}" style="width:80px"> °C</div>
                 </div>
 
                 <!-- 1. Core Balance -->
@@ -611,7 +617,7 @@
                             <td><input type="text" id="sc_${i}_iy_lv" value="${testData.scRows[i].iy_lv}" style="width:60px"></td>
                             <td><input type="text" id="sc_${i}_ib_lv" value="${testData.scRows[i].ib_lv}" style="width:60px"></td>
                             <td><input type="text" id="sc_${i}_in_hv" value="${testData.scRows[i].in_hv}" style="width:60px"></td>
-                            <td><input type="text" id="sc_${i}_in_lv" value="${testData.scRows[i].in_lv}" style="width:60px"></td>
+                            <td><input type="text" id="sc_${i}_in_lv" value="${testData.scRows[i].in_lv}" style="width:60px"><td>
                         </tr>`).join('')}
                     </table>
                 </div>
@@ -628,13 +634,15 @@
                             <td><input type="text" id="vg_w1w2" value="${testData.vectorGroup.w1w2}" style="width:90px"></td>
                             <td><input type="text" id="vg_un" value="${testData.vectorGroup.un}" style="width:90px"></td>
                         </tr>
-                    </tr>
+                    </table>
                 </div>
 
-                <!-- 4. Winding Resistance - WITHOUT temperature columns -->
+                <!-- 4. Winding Resistance with Temperature Note -->
                 <div class="test-group">
                     <h4>4. Winding Resistance Test</h4>
-                    <div><small>Note: All winding resistance values measured at the temperatures specified above</small></div>
+                    <div class="inline-input">OTI Temp: <input type="text" id="otiTemp" value="${testData.otiTemp || ''}" style="width:60px"> °C</div>
+                    <div class="inline-input">WTI HV Temp: <input type="text" id="wtiHvTemp" value="${testData.wtiHvTemp || ''}" style="width:60px"> °C</div>
+                    <div class="inline-input">WTI LV Temp: <input type="text" id="wtiLvTemp" value="${testData.wtiLvTemp || ''}" style="width:60px"> °C</div>
                     <table class="test-table">
                         <tr><th>Tap</th><th>HV U-N (Ω)</th><th>HV V-N (Ω)</th><th>HV W-N (Ω)</th><th>LV u-n (Ω)</th><th>LV v-n (Ω)</th><th>LV w-n (Ω)</th></tr>
                         ${[0,1,2].map(i => `<tr>
@@ -706,7 +714,7 @@
                             <td><input type="text" id="tr_${i}_v" value="${testData.trRows[i].v}" style="width:80px"></td>
                             <td><input type="text" id="tr_${i}_w" value="${testData.trRows[i].w}" style="width:80px"></td>
                         </tr>`).join('')}
-                    </tr>
+                    </table>
                 </div>
 
                 <!-- 8. DC Voltage -->
@@ -768,7 +776,7 @@
                             <td><input type="text" id="tc_sign_${i}" value="${testData.signatories.tc[i]?.sign || ''}" placeholder="Signature" style="width:140px"></td>
                             <td><input type="text" id="field_name_${i}" value="${testData.signatories.field[i]?.name || ''}" placeholder="Officer Name" style="width:140px"></td>
                             <td><input type="text" id="field_sign_${i}" value="${testData.signatories.field[i]?.sign || ''}" placeholder="Signature" style="width:140px"></td>
-                        </tr>`).join('')}
+                        </td>`).join('')}
                     </table>
                 </div>
             `;
@@ -900,9 +908,6 @@
             if (index !== -1) {
                 equipment[index].testValues = [JSON.stringify(testData)];
                 equipment[index].remarks = testData.notes;
-                equipment[index].otiTemp = testData.otiTemp;
-                equipment[index].wtiHvTemp = testData.wtiHvTemp;
-                equipment[index].wtiLvTemp = testData.wtiLvTemp;
                 localStorage.setItem('equipment', JSON.stringify(equipment));
                 showStatus('Test data saved successfully!', '#27ae60');
             }
@@ -923,9 +928,6 @@
                 rating: document.getElementById('eqRating').value,
                 make: document.getElementById('eqMake').value,
                 serialNumber: document.getElementById('eqSerial').value,
-                otiTemp: document.getElementById('eqOtiTemp').value,
-                wtiHvTemp: document.getElementById('eqWtiHvTemp').value,
-                wtiLvTemp: document.getElementById('eqWtiLvTemp').value,
                 voltageRatio: document.getElementById('eqVoltage').value,
                 testValues: []
             };
@@ -977,12 +979,6 @@
         function showAddEquipmentModal() {
             if (!currentGrid) { showStatus('Please select a grid first', '#e74c3c'); return; }
             document.getElementById('addEquipmentModal').style.display = 'flex';
-        }
-
-        function generatePDFReport() {
-            if (!currentEquipment) { showStatus('No PTR selected', '#e74c3c'); return; }
-            collectFormData();
-            window.print();
         }
 
         function printReport() {
