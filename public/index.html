@@ -663,40 +663,32 @@
                     </table>
                 </div>
 
-                <div class="test-group">
-                    <h4>8. DC Voltage Test</h4>
-                    <table class="test-table">
-                        <thead><tr><th>Source</th><th>+VE to -VE (V)</th><th>+VE to Earth (V)</th><th>-VE to Earth (V)</th></tr></thead>
-                        <tbody>
-                            <tr><td>Source I</td><td><input type="text" id="dc1_pn" value="${testData.dcVoltage.source1.pn}" style="width:90px"></td><td><input type="text" id="dc1_pe" value="${testData.dcVoltage.source1.pe}" style="width:90px"></td><td><input type="text" id="dc1_ne" value="${testData.dcVoltage.source1.ne}" style="width:90px"></td></tr>
-                            <tr><td>Source II</td
-                                <td><input type="text" id="dc2_pn" value="${testData.dcVoltage.source2.pn}" style="width:90px"></td>
-                                <td><input type="text" id="dc2_pe" value="${testData.dcVoltage.source2.pe}" style="width:90px"></td>
-                                <td><input type="text" id="dc2_ne" value="${testData.dcVoltage.source2.ne}" style="width:90px"></td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
+              <div class="test-group">
+    <h4>8. DC Voltage Test</h4>
+    <table class="test-table">
+        <thead>
+            <tr><th>Source</th><th>+VE to -VE (V)</th><th>+VE to Earth (V)</th><th>-VE to Earth (V)</th></tr>
+        </thead>
+        <tbody>
+            <tr><td style="font-weight: bold;">Source I</td><td><input type="text" id="dc1_pn" value="${testData.dcVoltage.source1.pn}" style="width:90px"></td><td><input type="text" id="dc1_pe" value="${testData.dcVoltage.source1.pe}" style="width:90px"></td><td><input type="text" id="dc1_ne" value="${testData.dcVoltage.source1.ne}" style="width:90px"></td></tr>
+            <tr><td style="font-weight: bold;">Source II</td><td><input type="text" id="dc2_pn" value="${testData.dcVoltage.source2.pn}" style="width:90px"></td><td><input type="text" id="dc2_pe" value="${testData.dcVoltage.source2.pe}" style="width:90px"></td><td><input type="text" id="dc2_ne" value="${testData.dcVoltage.source2.ne}" style="width:90px"></td></tr>
+        </tbody>
+    </table>
+</div>
 
-                <div class="test-group">
-                    <h4>9. Earthing Resistance Test</h4>
-                    <table class="test-table">
-                        <thead><tr><th>Test Point</th><th>Value (Ω)</th></tr></thead>
-                        <tbody>
-                            <tr><td>HV-E</td
-                                <td><input type="text" id="er_hve" value="${testData.earthing.hv_e}" style="width:100px"></td>
-                            </tr>
-                            <tr>
-                                <td>LV-E</td
-                                <td><input type="text" id="er_lve" value="${testData.earthing.lv_e}" style="width:100px"></td>
-                            </tr>
-                            <tr>
-                                <td>Body</td
-                                <td><input type="text" id="er_body" value="${testData.earthing.body}" style="width:100px"></td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
+               <div class="test-group">
+    <h4>9. Earthing Resistance Test</h4>
+    <table class="test-table">
+        <thead>
+            <tr><th>Test Point</th><th>Value (Ω)</th></tr>
+        </thead>
+        <tbody>
+            <tr><td style="font-weight: bold;">HV-E</td><td><input type="text" id="er_hve" value="${testData.earthing.hv_e}" style="width:100px"></td></tr>
+            <tr><td style="font-weight: bold;">LV-E</td><td><input type="text" id="er_lve" value="${testData.earthing.lv_e}" style="width:100px"></td></tr>
+            <tr><td style="font-weight: bold;">Body</td><td><input type="text" id="er_body" value="${testData.earthing.body}" style="width:100px"></td></tr>
+        </tbody>
+    </table>
+</div> 
 
                 <div class="test-group">
                     <h4>10. Remarks / Notes</h4>
