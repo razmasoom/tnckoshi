@@ -587,21 +587,37 @@
                     </table>
                 </div>
 
-                <div class="test-group">
-                    <h4>3. Vector Group (YNyn0)</h4>
-                    <table class="test-table">
-                        <thead><tr><th>1V-2V (V)</th><th>1V-2W (V)</th><th>1W-2V (V)</th><th>1W-2W (V)</th><th>1UN = 2Un + Nn (V)</th></tr></thead>
-                        <tbody>
-                            <tr>
-                                <td><input type="text" id="vg_v1v2" value="${testData.vectorGroup.v1v2}" style="width:90px"></td>
-                                <td><input type="text" id="vg_v1w2" value="${testData.vectorGroup.v1w2}" style="width:90px"></td>
-                                <td><input type="text" id="vg_w1v2" value="${testData.vectorGroup.w1v2}" style="width:90px"></td>
-                                <td><input type="text" id="vg_w1w2" value="${testData.vectorGroup.w1w2}" style="width:90px"></td>
-                                <td><input type="text" id="vg_un" value="${testData.vectorGroup.un}" style="width:90px"></td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
+                <!-- 3. Vector Group (YNyn0) - COMPACT WITH CONDITIONS -->
+<div class="test-group">
+    <h4>3. Vector Group (YNyn0)</h4>
+    <div style="margin-bottom: 10px; padding: 8px; background: #e9ecef; border-radius: 5px; font-size: 12px;">
+        <strong>Verification Conditions:</strong><br>
+        • 1V-2V = 1W-2W &nbsp;&nbsp;|&nbsp;&nbsp; 
+        • 1V-2W = 1W-2V &nbsp;&nbsp;|&nbsp;&nbsp;
+        • 1W-2W &lt; 1W-2V &nbsp;&nbsp;|&nbsp;&nbsp;
+        • 1UN = 2Un + Nn
+    </div>
+    <table class="test-table">
+        <thead>
+            <tr>
+                <th>1V-2V (V)</th>
+                <th>1V-2W (V)</th>
+                <th>1W-2V (V)</th>
+                <th>1W-2W (V)</th>
+                <th>1UN = 2Un + Nn (V)</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><input type="text" id="vg_v1v2" value="${testData.vectorGroup.v1v2}" style="width:90px"></td>
+                <td><input type="text" id="vg_v1w2" value="${testData.vectorGroup.v1w2}" style="width:90px"></td>
+                <td><input type="text" id="vg_w1v2" value="${testData.vectorGroup.w1v2}" style="width:90px"></td>
+                <td><input type="text" id="vg_w1w2" value="${testData.vectorGroup.w1w2}" style="width:90px"></td>
+                <td><input type="text" id="vg_un" value="${testData.vectorGroup.un}" style="width:90px"></td>
+            </tr>
+        </tbody>
+    </table>
+</div>
 
                 <div class="test-group">
                     <h4>4. Winding Resistance Test</h4>
@@ -971,14 +987,42 @@
                         </table>
                     </div>
                     
-                    <!-- Section 3 -->
-                    <div class="section">
-                        <div class="section-title">3. Vector Group (YNyn0)</div>
-                        <table><thead><tr><th>1V-2V (V)</th><th>1V-2W (V)</th><th>1W-2V (V)</th><th>1W-2W (V)</th><th>1UN = 2Un + Nn (V)</th></tr></thead>
-                        <tbody><tr><td>${testData.vectorGroup.v1v2 || '-'}</td><td>${testData.vectorGroup.v1w2 || '-'}</td><td>${testData.vectorGroup.w1v2 || '-'}</td><td>${testData.vectorGroup.w1w2 || '-'}</td><td>${testData.vectorGroup.un || '-'}</td></tr></tbody>
-                        </table>
-                    </div>
-                    
+<!-- Section 3 - Vector Group with Conditions -->
+<div class="section">
+    <div class="section-title">3. Vector Group (YNyn0)</div>
+    <table>
+        <thead>
+            <tr><th>Measurement</th><th>Value (V)</th><th>Condition / Status</th></tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>1V-2V</td
+                <td>${testData.vectorGroup.v1v2 || '-'}</td
+                <td>${testData.vectorGroup.v1v2 === testData.vectorGroup.w1w2 ? '✓ Verified (1V-2V = 1W-2W)' : '⚠ Check: Should equal 1W-2W'}</td
+            </tr>
+            <tr>
+                <td>1V-2W</td
+                <td>${testData.vectorGroup.v1w2 || '-'}</td
+                <td>${testData.vectorGroup.v1w2 === testData.vectorGroup.w1v2 ? '✓ Verified (1V-2W = 1W-2V)' : '⚠ Check: Should equal 1W-2V'}</td
+            </tr>
+            <tr>
+                <td>1W-2V</td
+                <td>${testData.vectorGroup.w1v2 || '-'}</td
+                <td>${testData.vectorGroup.w1v2 === testData.vectorGroup.v1w2 ? '✓ Verified (1W-2V = 1V-2W)' : '⚠ Check: Should equal 1V-2W'}</td
+            </tr>
+            <tr>
+                <td>1W-2W</td
+                <td>${testData.vectorGroup.w1w2 || '-'}</td
+                <td>${parseFloat(testData.vectorGroup.w1w2) < parseFloat(testData.vectorGroup.w1v2) ? '✓ Verified (1W-2W < 1W-2V)' : '⚠ Check: Should be less than 1W-2V'}</td
+            </tr>
+            <tr>
+                <td>1UN = 2Un + Nn</td
+                <td>${testData.vectorGroup.un || '-'}</td
+                <td>Vector Group YNyn0</td
+            </tr>
+        </tbody>
+    </table>
+</div>
                     <!-- Section 4 -->
                     <div class="section">
                         <div class="section-title">4. Winding Resistance Test</div>
