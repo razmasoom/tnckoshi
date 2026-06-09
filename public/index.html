@@ -643,52 +643,6 @@
     </table>
 </div>
 
-<script>
-// Add this to your collectFormData function to auto-calculate the comparison
-function updateVectorGroupVerification() {
-    const v1v2 = parseFloat(document.getElementById('vg_v1v2')?.value) || 0;
-    const w1w2 = parseFloat(document.getElementById('vg_w1w2')?.value) || 0;
-    const v1w2 = parseFloat(document.getElementById('vg_v1w2')?.value) || 0;
-    const w1v2 = parseFloat(document.getElementById('vg_w1v2')?.value) || 0;
-    const twoUn = parseFloat(document.getElementById('vg_2un')?.value) || 0;
-    const nn = parseFloat(document.getElementById('vg_nn')?.value) || 0;
-    const un = parseFloat(document.getElementById('vg_un')?.value) || 0;
-    
-    // Check equality conditions
-    const equalPair1 = Math.abs(v1v2 - w1w2) < 0.1;
-    const equalPair2 = Math.abs(v1w2 - w1v2) < 0.1;
-    const inequality = w1w2 < w1v2;
-    const unFormula = Math.abs(un - (twoUn + nn)) < 0.1;
-    
-    // Update compare field
-    const compareField = document.getElementById('vg_compare');
-    if (compareField) {
-        compareField.value = `${equalPair1 ? '✓' : '✗'} 1V-2V=1W-2W | ${equalPair2 ? '✓' : '✗'} 1V-2W=1W-2V | ${inequality ? '✓' : '✗'} 1W-2W<1W-2V`;
-        compareField.style.backgroundColor = (equalPair1 && equalPair2 && inequality) ? '#d4edda' : '#f8d7da';
-    }
-    
-    // Update verification result
-    const verificationSpan = document.getElementById('vg_verification_result');
-    if (verificationSpan) {
-        verificationSpan.innerHTML = unFormula ? '✓ Verified: 1UN = 2Un + Nn' : `✗ 1UN (${un}) should equal 2Un+ Nn (${twoUn + nn})`;
-        verificationSpan.style.color = unFormula ? 'green' : 'red';
-        verificationSpan.style.fontWeight = 'bold';
-    }
-}
-
-// Add event listeners after loading the form
-function addVectorGroupEventListeners() {
-    const fields = ['vg_v1v2', 'vg_w1w2', 'vg_v1w2', 'vg_w1v2', 'vg_2un', 'vg_nn', 'vg_un'];
-    fields.forEach(field => {
-        const el = document.getElementById(field);
-        if (el) el.addEventListener('input', updateVectorGroupVerification);
-    });
-}
-
-// Call this after loading the test form
-// Add this line at the end of loadTestForm() function: addVectorGroupEventListeners();
-</script>
-
                 <div class="test-group">
                     <h4>4. Winding Resistance Test</h4>
                     <div class="inline-input">OTI Temp: <input type="text" id="otiTemp" value="${testData.otiTemp || ''}" style="width:60px"> °C</div>
@@ -815,17 +769,51 @@ function addVectorGroupEventListeners() {
                 VYB: document.getElementById('cb_vyb')?.value || '',
                 VRB: document.getElementById('cb_vrb')?.value || ''
             };
-testData.vectorGroup = {
-    v1v2: document.getElementById('vg_v1v2')?.value || '',
-    v1w2: document.getElementById('vg_v1w2')?.value || '',
-    w1v2: document.getElementById('vg_w1v2')?.value || '',
-    w1w2: document.getElementById('vg_w1w2')?.value || '',
-    un: document.getElementById('vg_un')?.value || '',
-    twoUn: document.getElementById('vg_2un')?.value || '',
-    nn: document.getElementById('vg_nn')?.value || '',
-    compare: document.getElementById('vg_compare')?.value || '',
-    verification: document.getElementById('vg_verification_result')?.innerText || ''
-};
+<script>
+// Add this to your collectFormData function to auto-calculate the comparison
+function updateVectorGroupVerification() {
+    const v1v2 = parseFloat(document.getElementById('vg_v1v2')?.value) || 0;
+    const w1w2 = parseFloat(document.getElementById('vg_w1w2')?.value) || 0;
+    const v1w2 = parseFloat(document.getElementById('vg_v1w2')?.value) || 0;
+    const w1v2 = parseFloat(document.getElementById('vg_w1v2')?.value) || 0;
+    const twoUn = parseFloat(document.getElementById('vg_2un')?.value) || 0;
+    const nn = parseFloat(document.getElementById('vg_nn')?.value) || 0;
+    const un = parseFloat(document.getElementById('vg_un')?.value) || 0;
+    
+    // Check equality conditions
+    const equalPair1 = Math.abs(v1v2 - w1w2) < 0.1;
+    const equalPair2 = Math.abs(v1w2 - w1v2) < 0.1;
+    const inequality = w1w2 < w1v2;
+    const unFormula = Math.abs(un - (twoUn + nn)) < 0.1;
+    
+    // Update compare field
+    const compareField = document.getElementById('vg_compare');
+    if (compareField) {
+        compareField.value = `${equalPair1 ? '✓' : '✗'} 1V-2V=1W-2W | ${equalPair2 ? '✓' : '✗'} 1V-2W=1W-2V | ${inequality ? '✓' : '✗'} 1W-2W<1W-2V`;
+        compareField.style.backgroundColor = (equalPair1 && equalPair2 && inequality) ? '#d4edda' : '#f8d7da';
+    }
+    
+    // Update verification result
+    const verificationSpan = document.getElementById('vg_verification_result');
+    if (verificationSpan) {
+        verificationSpan.innerHTML = unFormula ? '✓ Verified: 1UN = 2Un + Nn' : `✗ 1UN (${un}) should equal 2Un+ Nn (${twoUn + nn})`;
+        verificationSpan.style.color = unFormula ? 'green' : 'red';
+        verificationSpan.style.fontWeight = 'bold';
+    }
+}
+
+// Add event listeners after loading the form
+function addVectorGroupEventListeners() {
+    const fields = ['vg_v1v2', 'vg_w1w2', 'vg_v1w2', 'vg_w1v2', 'vg_2un', 'vg_nn', 'vg_un'];
+    fields.forEach(field => {
+        const el = document.getElementById(field);
+        if (el) el.addEventListener('input', updateVectorGroupVerification);
+    });
+}
+
+// Call this after loading the test form
+// Add this line at the end of loadTestForm() function: addVectorGroupEventListeners();
+</script>
             for (let i = 0; i < 3; i++) {
                 testData.magRows[i] = {
                     tap: document.getElementById(`mag_tap_${i}`)?.value || '',
