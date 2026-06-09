@@ -730,34 +730,43 @@
             addVectorGroupEventListeners();
         }
 
-        function updateVectorGroupVerification() {
-            const v1v2 = parseFloat(document.getElementById('vg_v1v2')?.value) || 0;
-            const w1w2 = parseFloat(document.getElementById('vg_w1w2')?.value) || 0;
-            const v1w2 = parseFloat(document.getElementById('vg_v1w2')?.value) || 0;
-            const w1v2 = parseFloat(document.getElementById('vg_w1v2')?.value) || 0;
-            const twoUn = parseFloat(document.getElementById('vg_2un')?.value) || 0;
-            const nn = parseFloat(document.getElementById('vg_nn')?.value) || 0;
-            const un = parseFloat(document.getElementById('vg_un')?.value) || 0;
-            
-            const equalPair1 = Math.abs(v1v2 - w1w2) < 0.1;
-            const equalPair2 = Math.abs(v1w2 - w1v2) < 0.1;
-            const inequality = w1w2 < w1v2;
-            const unFormula = Math.abs(un - (twoUn + nn)) < 0.1;
-            
-            const compareField = document.getElementById('vg_compare');
-            if (compareField) {
-                compareField.value = `${equalPair1 ? '✓' : '✗'} 1V-2V=1W-2W | ${equalPair2 ? '✓' : '✗'} 1V-2W=1W-2V | ${inequality ? '✓' : '✗'} 1W-2W<1W-2V`;
-                compareField.style.backgroundColor = (equalPair1 && equalPair2 && inequality) ? '#d4edda' : '#f8d7da';
-            }
-            
-            const verificationSpan = document.getElementById('vg_verification_result');
-            if (verificationSpan) {
-                verificationSpan.innerHTML = unFormula ? '✓ Verified: 1UN = 2Un + Nn' : `✗ 1UN (${un}) should equal 2Un+ Nn (${twoUn + nn})`;
-                verificationSpan.style.color = unFormula ? 'green' : 'red';
-                verificationSpan.style.fontWeight = 'bold';
-            }
-        }
-
+      function updateVectorGroupVerification() {
+    const v1v2 = parseFloat(document.getElementById('vg_v1v2')?.value) || 0;
+    const w1w2 = parseFloat(document.getElementById('vg_w1w2')?.value) || 0;
+    const v1w2 = parseFloat(document.getElementById('vg_v1w2')?.value) || 0;
+    const w1v2 = parseFloat(document.getElementById('vg_w1v2')?.value) || 0;
+    const twoUn = parseFloat(document.getElementById('vg_2un')?.value) || 0;
+    const nn = parseFloat(document.getElementById('vg_nn')?.value) || 0;
+    const un = parseFloat(document.getElementById('vg_un')?.value) || 0;
+    
+    // Tolerance for practical measurement (5% or 1V whichever is larger)
+    const tolerance = Math.max(1, (Math.abs(v1v2) * 0.05));
+    
+    // Check conditions with tolerance (close enough = verified)
+    const equalPair1 = Math.abs(v1v2 - w1w2) <= tolerance;
+    const equalPair2 = Math.abs(v1w2 - w1v2) <= tolerance;
+    const inequality = w1w2 < w1v2;
+    const unFormula = Math.abs(un - (twoUn + nn)) <= Math.max(1, Math.abs(un) * 0.05);
+    
+    // Update compare field with practical measurement status
+    const compareField = document.getElementById('vg_compare');
+    if (compareField) {
+        const diff1 = Math.abs(v1v2 - w1w2).toFixed(2);
+        const diff2 = Math.abs(v1w2 - w1v2).toFixed(2);
+        compareField.value = `${equalPair1 ? '✓' : '✗'} 1V-2V≈1W-2W (diff:${diff1}V) | ${equalPair2 ? '✓' : '✗'} 1V-2W≈1W-2V (diff:${diff2}V) | ${inequality ? '✓' : '✗'} ${w1w2.toFixed(2)} < ${w1v2.toFixed(2)}`;
+        compareField.style.backgroundColor = (equalPair1 && equalPair2 && inequality) ? '#d4edda' : '#f8d7da';
+    }
+    
+    // Update verification result for 1UN formula
+    const verificationSpan = document.getElementById('vg_verification_result');
+    if (verificationSpan) {
+        const calculatedUn = twoUn + nn;
+        const unDiff = Math.abs(un - calculatedUn).toFixed(2);
+        verificationSpan.innerHTML = unFormula ? `✓ Verified: ${un}V ≈ ${twoUn} + ${nn} = ${calculatedUn}V (diff: ${unDiff}V)` : `✗ ${un}V should be close to ${twoUn} + ${nn} = ${calculatedUn}V (diff: ${unDiff}V)`;
+        verificationSpan.style.color = unFormula ? 'green' : 'red';
+        verificationSpan.style.fontWeight = 'bold';
+    }
+}
         function addVectorGroupEventListeners() {
             const fields = ['vg_v1v2', 'vg_w1w2', 'vg_v1w2', 'vg_w1v2', 'vg_2un', 'vg_nn', 'vg_un'];
             fields.forEach(field => {
@@ -1064,22 +1073,30 @@
                         </table>
                     </div>
                     
-                    <div class="section">
-                        <div class="section-title">3. Vector Group (YNyn0)</div>
-                        <table style="width: 100%; border-collapse: collapse; margin: 10px 0;">
-                            <thead><tr><th style="border: 1px solid #000; padding: 6px;">1V-2V (V)</th><th style="border: 1px solid #000; padding: 6px;">1W-2W (V)</th><th style="border: 1px solid #000; padding: 6px;">1V-2W (V)</th><th style="border: 1px solid #000; padding: 6px;">1W-2V (V)</th><th style="border: 1px solid #000; padding: 6px;">1UN = 2Un + Nn (V)</th></tr></thead>
-                            <tbody><tr><td style="border: 1px solid #000; padding: 6px;">${testData.vectorGroup.v1v2 || '-'}</td><td style="border: 1px solid #000; padding: 6px;">${testData.vectorGroup.w1w2 || '-'}</td><td style="border: 1px solid #000; padding: 6px;">${testData.vectorGroup.v1w2 || '-'}</td><td style="border: 1px solid #000; padding: 6px;">${testData.vectorGroup.w1v2 || '-'}</td><td style="border: 1px solid #000; padding: 6px;">${testData.vectorGroup.un || '-'}</td></tr></tbody>
-                        </table>
-                        <div style="margin-top: 5px; font-size: 10px;">
-                            <strong>Verification:</strong> 
-                            ${testData.vectorGroup.v1v2 == testData.vectorGroup.w1w2 ? '✓ 1V-2V = 1W-2W' : '✗ 1V-2V ≠ 1W-2W'} | 
-                            ${testData.vectorGroup.v1w2 == testData.vectorGroup.w1v2 ? '✓ 1V-2W = 1W-2V' : '✗ 1V-2W ≠ 1W-2V'} | 
-                            ${parseFloat(testData.vectorGroup.w1w2) < parseFloat(testData.vectorGroup.w1v2) ? '✓ 1W-2W < 1W-2V' : '✗ 1W-2W not < 1W-2V'}
-                        </div>
-                        <div style="margin-top: 5px; font-size: 10px;">
-                            <strong>1UN Verification:</strong> ${testData.vectorGroup.verification || 'Not verified'}
-                        </div>
-                    </div>
+<div class="section">
+    <div class="section-title">3. Vector Group (YNyn0)</div>
+    <table style="width: 100%; border-collapse: collapse; margin: 10px 0;">
+        <thead><tr style="border: 1px solid #000;"><th style="border: 1px solid #000; padding: 6px;">1V-2V (V)</th><th style="border: 1px solid #000; padding: 6px;">1W-2W (V)</th><th style="border: 1px solid #000; padding: 6px;">1V-2W (V)</th><th style="border: 1px solid #000; padding: 6px;">1W-2V (V)</th><th style="border: 1px solid #000; padding: 6px;">1UN (V)</th></tr></thead>
+        <tbody><tr style="border: 1px solid #000;"><td style="border: 1px solid #000; padding: 6px;">${testData.vectorGroup.v1v2 || '-'}</td><td style="border: 1px solid #000; padding: 6px;">${testData.vectorGroup.w1w2 || '-'}</td><td style="border: 1px solid #000; padding: 6px;">${testData.vectorGroup.v1w2 || '-'}</td><td style="border: 1px solid #000; padding: 6px;">${testData.vectorGroup.w1v2 || '-'}</td><td style="border: 1px solid #000; padding: 6px;">${testData.vectorGroup.un || '-'}</td></tr></tbody>
+    </table>
+    <div style="margin-top: 5px; font-size: 10px;">
+        <strong>Verification (with practical tolerance):</strong><br>
+        ${(() => {
+            const v1v2 = parseFloat(testData.vectorGroup.v1v2) || 0;
+            const w1w2 = parseFloat(testData.vectorGroup.w1w2) || 0;
+            const v1w2 = parseFloat(testData.vectorGroup.v1w2) || 0;
+            const w1v2 = parseFloat(testData.vectorGroup.w1v2) || 0;
+            const tolerance = Math.max(1, Math.abs(v1v2) * 0.05);
+            const equal1 = Math.abs(v1v2 - w1w2) <= tolerance;
+            const equal2 = Math.abs(v1w2 - w1v2) <= tolerance;
+            const ineq = w1w2 < w1v2;
+            return `${equal1 ? '✓' : '✗'} 1V-2V ≈ 1W-2W (diff: ${Math.abs(v1v2 - w1w2).toFixed(2)}V) | ${equal2 ? '✓' : '✗'} 1V-2W ≈ 1W-2V (diff: ${Math.abs(v1w2 - w1v2).toFixed(2)}V) | ${ineq ? '✓' : '✗'} ${w1w2.toFixed(2)} < ${w1v2.toFixed(2)}`;
+        })()}
+    </div>
+    <div style="margin-top: 5px; font-size: 10px;">
+        <strong>1UN Verification:</strong> ${testData.vectorGroup.verification || 'Not verified'}
+    </div>
+</div>
                     
                     <div class="section">
                         <div class="section-title">4. Winding Resistance Test</div>
