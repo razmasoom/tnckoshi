@@ -587,37 +587,107 @@
                     </table>
                 </div>
 
-                <!-- 3. Vector Group (YNyn0) - COMPACT WITH CONDITIONS -->
+               <!-- 3. Vector Group (YNyn0) - REORGANIZED FOR EASY COMPARISON -->
 <div class="test-group">
     <h4>3. Vector Group (YNyn0)</h4>
-    <div style="margin-bottom: 10px; padding: 8px; background: #e9ecef; border-radius: 5px; font-size: 12px;">
-        <strong>Verification Conditions:</strong><br>
-        • 1V-2V = 1W-2W &nbsp;&nbsp;|&nbsp;&nbsp; 
-        • 1V-2W = 1W-2V &nbsp;&nbsp;|&nbsp;&nbsp;
-        • 1W-2W &lt; 1W-2V &nbsp;&nbsp;|&nbsp;&nbsp;
-        • 1UN = 2Un + Nn
-    </div>
+    
+    <!-- Main Comparison Table -->
     <table class="test-table">
         <thead>
             <tr>
-                <th>1V-2V (V)</th>
-                <th>1V-2W (V)</th>
-                <th>1W-2V (V)</th>
-                <th>1W-2W (V)</th>
-                <th>1UN = 2Un + Nn (V)</th>
+                <th colspan="2">Equal Measurements</th>
+                <th colspan="2">Equal Measurements</th>
+                <th>Inequality</th>
             </tr>
         </thead>
         <tbody>
             <tr>
-                <td><input type="text" id="vg_v1v2" value="${testData.vectorGroup.v1v2}" style="width:90px"></td>
-                <td><input type="text" id="vg_v1w2" value="${testData.vectorGroup.v1w2}" style="width:90px"></td>
-                <td><input type="text" id="vg_w1v2" value="${testData.vectorGroup.w1v2}" style="width:90px"></td>
-                <td><input type="text" id="vg_w1w2" value="${testData.vectorGroup.w1w2}" style="width:90px"></td>
-                <td><input type="text" id="vg_un" value="${testData.vectorGroup.un}" style="width:90px"></td>
+                <td style="font-weight: bold; background: #f0f0f0;">1V-2V</td>
+                <td><input type="text" id="vg_v1v2" value="${testData.vectorGroup.v1v2}" style="width:90px"> V</td>
+                <td style="font-weight: bold; background: #f0f0f0;">1V-2W</td>
+                <td><input type="text" id="vg_v1w2" value="${testData.vectorGroup.v1w2}" style="width:90px"> V</td>
+                <td style="font-weight: bold; background: #f0f0f0; text-align: center;">1W-2W &lt; 1W-2V</td>
+            </tr>
+            <tr>
+                <td style="font-weight: bold; background: #f0f0f0;">1W-2W</td>
+                <td><input type="text" id="vg_w1w2" value="${testData.vectorGroup.w1w2}" style="width:90px"> V</td>
+                <td style="font-weight: bold; background: #f0f0f0;">1W-2V</td>
+                <td><input type="text" id="vg_w1v2" value="${testData.vectorGroup.w1v2}" style="width:90px"> V</td>
+                <td style="text-align: center;">
+                    <input type="text" id="vg_compare" value="${testData.vectorGroup.compare || ''}" placeholder="Auto-checked" style="width:100px; background:#e9ecef;" readonly>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    
+    <!-- 1UN = 2Un + Nn Verification Table -->
+    <table class="test-table" style="margin-top: 15px;">
+        <thead>
+            <tr>
+                <th>1UN = 2Un + Nn (V)</th>
+                <th>2Un (V)</th>
+                <th>Nn (V)</th>
+                <th>Verification</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td style="background: #f0f0f0;"><input type="text" id="vg_un" value="${testData.vectorGroup.un}" style="width:90px"> V</td>
+                <td><input type="text" id="vg_2un" value="${testData.vectorGroup.twoUn || ''}" style="width:90px" placeholder="Enter 2Un value"> V</td>
+                <td><input type="text" id="vg_nn" value="${testData.vectorGroup.nn || ''}" style="width:90px" placeholder="Enter Nn value"> V</td>
+                <td style="background: #e9ecef; text-align: center;">
+                    <span id="vg_verification_result">${testData.vectorGroup.verification || 'Not verified'}</span>
+                </td>
             </tr>
         </tbody>
     </table>
 </div>
+
+<script>
+// Add this to your collectFormData function to auto-calculate the comparison
+function updateVectorGroupVerification() {
+    const v1v2 = parseFloat(document.getElementById('vg_v1v2')?.value) || 0;
+    const w1w2 = parseFloat(document.getElementById('vg_w1w2')?.value) || 0;
+    const v1w2 = parseFloat(document.getElementById('vg_v1w2')?.value) || 0;
+    const w1v2 = parseFloat(document.getElementById('vg_w1v2')?.value) || 0;
+    const twoUn = parseFloat(document.getElementById('vg_2un')?.value) || 0;
+    const nn = parseFloat(document.getElementById('vg_nn')?.value) || 0;
+    const un = parseFloat(document.getElementById('vg_un')?.value) || 0;
+    
+    // Check equality conditions
+    const equalPair1 = Math.abs(v1v2 - w1w2) < 0.1;
+    const equalPair2 = Math.abs(v1w2 - w1v2) < 0.1;
+    const inequality = w1w2 < w1v2;
+    const unFormula = Math.abs(un - (twoUn + nn)) < 0.1;
+    
+    // Update compare field
+    const compareField = document.getElementById('vg_compare');
+    if (compareField) {
+        compareField.value = `${equalPair1 ? '✓' : '✗'} 1V-2V=1W-2W | ${equalPair2 ? '✓' : '✗'} 1V-2W=1W-2V | ${inequality ? '✓' : '✗'} 1W-2W<1W-2V`;
+        compareField.style.backgroundColor = (equalPair1 && equalPair2 && inequality) ? '#d4edda' : '#f8d7da';
+    }
+    
+    // Update verification result
+    const verificationSpan = document.getElementById('vg_verification_result');
+    if (verificationSpan) {
+        verificationSpan.innerHTML = unFormula ? '✓ Verified: 1UN = 2Un + Nn' : `✗ 1UN (${un}) should equal 2Un+ Nn (${twoUn + nn})`;
+        verificationSpan.style.color = unFormula ? 'green' : 'red';
+        verificationSpan.style.fontWeight = 'bold';
+    }
+}
+
+// Add event listeners after loading the form
+function addVectorGroupEventListeners() {
+    const fields = ['vg_v1v2', 'vg_w1w2', 'vg_v1w2', 'vg_w1v2', 'vg_2un', 'vg_nn', 'vg_un'];
+    fields.forEach(field => {
+        const el = document.getElementById(field);
+        if (el) el.addEventListener('input', updateVectorGroupVerification);
+    });
+}
+
+// Call this after loading the test form
+// Add this line at the end of loadTestForm() function: addVectorGroupEventListeners();
+</script>
 
                 <div class="test-group">
                     <h4>4. Winding Resistance Test</h4>
@@ -745,7 +815,17 @@
                 VYB: document.getElementById('cb_vyb')?.value || '',
                 VRB: document.getElementById('cb_vrb')?.value || ''
             };
-            
+testData.vectorGroup = {
+    v1v2: document.getElementById('vg_v1v2')?.value || '',
+    v1w2: document.getElementById('vg_v1w2')?.value || '',
+    w1v2: document.getElementById('vg_w1v2')?.value || '',
+    w1w2: document.getElementById('vg_w1w2')?.value || '',
+    un: document.getElementById('vg_un')?.value || '',
+    twoUn: document.getElementById('vg_2un')?.value || '',
+    nn: document.getElementById('vg_nn')?.value || '',
+    compare: document.getElementById('vg_compare')?.value || '',
+    verification: document.getElementById('vg_verification_result')?.innerText || ''
+};
             for (let i = 0; i < 3; i++) {
                 testData.magRows[i] = {
                     tap: document.getElementById(`mag_tap_${i}`)?.value || '',
@@ -987,38 +1067,57 @@
                         </table>
                     </div>
                     
-<!-- Section 3 - Vector Group (YNyn0) - SIMPLE TABLE -->
+<!-- Section 3 - Vector Group (YNyn0) - PRINT VERSION -->
 <div class="section">
     <div class="section-title">3. Vector Group (YNyn0)</div>
-    <div style="margin-bottom: 10px; padding: 6px; background: #f0f0f0; border-radius: 3px; font-size: 10px;">
-        <strong>Conditions:</strong> 1V-2V = 1W-2W | 1V-2W = 1W-2V | 1W-2W &lt; 1W-2V | 1UN = 2Un + Nn
-    </div>
+    
+    <!-- Main Comparison Table -->
     <table style="width: 100%; border-collapse: collapse; margin: 10px 0;">
         <thead>
             <tr style="border: 1px solid #000;">
-                <th style="border: 1px solid #000; padding: 6px; text-align: center;">1V-2V (V)</th>
-                <th style="border: 1px solid #000; padding: 6px; text-align: center;">1V-2W (V)</th>
-                <th style="border: 1px solid #000; padding: 6px; text-align: center;">1W-2V (V)</th>
-                <th style="border: 1px solid #000; padding: 6px; text-align: center;">1W-2W (V)</th>
-                <th style="border: 1px solid #000; padding: 6px; text-align: center;">1UN = 2Un + Nn (V)</th>
+                <th colspan="2" style="border: 1px solid #000; padding: 6px;">Equal Measurements</th>
+                <th colspan="2" style="border: 1px solid #000; padding: 6px;">Equal Measurements</th>
+                <th style="border: 1px solid #000; padding: 6px;">Inequality</th>
             </tr>
         </thead>
         <tbody>
             <tr style="border: 1px solid #000;">
-                <td style="border: 1px solid #000; padding: 6px; text-align: center;">${testData.vectorGroup.v1v2 || '-'}</td>
-                <td style="border: 1px solid #000; padding: 6px; text-align: center;">${testData.vectorGroup.v1w2 || '-'}</td>
-                <td style="border: 1px solid #000; padding: 6px; text-align: center;">${testData.vectorGroup.w1v2 || '-'}</td>
-                <td style="border: 1px solid #000; padding: 6px; text-align: center;">${testData.vectorGroup.w1w2 || '-'}</td>
-                <td style="border: 1px solid #000; padding: 6px; text-align: center;">${testData.vectorGroup.un || '-'}</td>
+                <td style="border: 1px solid #000; padding: 6px; font-weight: bold;">1V-2V</td>
+                <td style="border: 1px solid #000; padding: 6px;">${testData.vectorGroup.v1v2 || '-'} V</td>
+                <td style="border: 1px solid #000; padding: 6px; font-weight: bold;">1V-2W</td>
+                <td style="border: 1px solid #000; padding: 6px;">${testData.vectorGroup.v1w2 || '-'} V</td>
+                <td rowspan="2" style="border: 1px solid #000; padding: 6px; text-align: center; vertical-align: middle;">
+                    ${testData.vectorGroup.compare || 'Not verified'}
+                </td>
+            </tr>
+            <tr style="border: 1px solid #000;">
+                <td style="border: 1px solid #000; padding: 6px; font-weight: bold;">1W-2W</td>
+                <td style="border: 1px solid #000; padding: 6px;">${testData.vectorGroup.w1w2 || '-'} V</td>
+                <td style="border: 1px solid #000; padding: 6px; font-weight: bold;">1W-2V</td>
+                <td style="border: 1px solid #000; padding: 6px;">${testData.vectorGroup.w1v2 || '-'} V</td>
             </tr>
         </tbody>
     </table>
-    <div style="margin-top: 5px; font-size: 9px;">
-        <strong>Verification:</strong> 
-        ${testData.vectorGroup.v1v2 === testData.vectorGroup.w1w2 ? '✓ 1V-2V = 1W-2W ' : '✗ 1V-2V ≠ 1W-2W '}
-        ${testData.vectorGroup.v1w2 === testData.vectorGroup.w1v2 ? '✓ 1V-2W = 1W-2V ' : '✗ 1V-2W ≠ 1W-2V '}
-        ${parseFloat(testData.vectorGroup.w1w2) < parseFloat(testData.vectorGroup.w1v2) ? '✓ 1W-2W < 1W-2V ' : '✗ 1W-2W not < 1W-2V '}
-    </div>
+    
+    <!-- 1UN = 2Un + Nn Table -->
+    <table style="width: 100%; border-collapse: collapse; margin: 10px 0;">
+        <thead>
+            <tr style="border: 1px solid #000;">
+                <th style="border: 1px solid #000; padding: 6px;">1UN (V)</th>
+                <th style="border: 1px solid #000; padding: 6px;">2Un (V)</th>
+                <th style="border: 1px solid #000; padding: 6px;">Nn (V)</th>
+                <th style="border: 1px solid #000; padding: 6px;">Verification</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr style="border: 1px solid #000;">
+                <td style="border: 1px solid #000; padding: 6px;">${testData.vectorGroup.un || '-'} V</td>
+                <td style="border: 1px solid #000; padding: 6px;">${testData.vectorGroup.twoUn || '-'} V</td>
+                <td style="border: 1px solid #000; padding: 6px;">${testData.vectorGroup.nn || '-'} V</td>
+                <td style="border: 1px solid #000; padding: 6px;">${testData.vectorGroup.verification || 'Not verified'}</td>
+            </tr>
+        </tbody>
+    </table>
 </div>
                     <!-- Section 4 -->
                     <div class="section">
