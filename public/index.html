@@ -987,38 +987,45 @@
                         </table>
                     </div>
                     
-<!-- Section 3 - Vector Group with Conditions -->
+<!-- Section 3 - Vector Group (YNyn0) with Conditions - FIXED -->
 <div class="section">
     <div class="section-title">3. Vector Group (YNyn0)</div>
-    <table>
+    <div style="margin-bottom: 10px; padding: 6px; background: #f0f0f0; border-radius: 3px; font-size: 10px;">
+        <strong>Verification Conditions:</strong> 1V-2V = 1W-2W | 1V-2W = 1W-2V | 1W-2W &lt; 1W-2V | 1UN = 2Un + Nn
+    </div>
+    <table style="width: 100%; border-collapse: collapse; margin: 10px 0;">
         <thead>
-            <tr><th>Measurement</th><th>Value (V)</th><th>Condition / Status</th></tr>
+            <tr style="border: 1px solid #000;">
+                <th style="border: 1px solid #000; padding: 6px; text-align: center;">Measurement</th>
+                <th style="border: 1px solid #000; padding: 6px; text-align: center;">Value (V)</th>
+                <th style="border: 1px solid #000; padding: 6px; text-align: center;">Condition Check</th>
+            </tr>
         </thead>
         <tbody>
-            <tr>
-                <td>1V-2V</td
-                <td>${testData.vectorGroup.v1v2 || '-'}</td
-                <td>${testData.vectorGroup.v1v2 === testData.vectorGroup.w1w2 ? '✓ Verified (1V-2V = 1W-2W)' : '⚠ Check: Should equal 1W-2W'}</td
+            <tr style="border: 1px solid #000;">
+                <td style="border: 1px solid #000; padding: 6px;">1V-2V</td>
+                <td style="border: 1px solid #000; padding: 6px;">${testData.vectorGroup.v1v2 || '-'}</td>
+                <td style="border: 1px solid #000; padding: 6px;">${testData.vectorGroup.v1v2 === testData.vectorGroup.w1w2 ? '✓ Verified' : 'Should equal 1W-2W'}</td>
             </tr>
-            <tr>
-                <td>1V-2W</td
-                <td>${testData.vectorGroup.v1w2 || '-'}</td
-                <td>${testData.vectorGroup.v1w2 === testData.vectorGroup.w1v2 ? '✓ Verified (1V-2W = 1W-2V)' : '⚠ Check: Should equal 1W-2V'}</td
+            <tr style="border: 1px solid #000;">
+                <td style="border: 1px solid #000; padding: 6px;">1V-2W</td>
+                <td style="border: 1px solid #000; padding: 6px;">${testData.vectorGroup.v1w2 || '-'}</td>
+                <td style="border: 1px solid #000; padding: 6px;">${testData.vectorGroup.v1w2 === testData.vectorGroup.w1v2 ? '✓ Verified' : 'Should equal 1W-2V'}</td>
             </tr>
-            <tr>
-                <td>1W-2V</td
-                <td>${testData.vectorGroup.w1v2 || '-'}</td
-                <td>${testData.vectorGroup.w1v2 === testData.vectorGroup.v1w2 ? '✓ Verified (1W-2V = 1V-2W)' : '⚠ Check: Should equal 1V-2W'}</td
+            <tr style="border: 1px solid #000;">
+                <td style="border: 1px solid #000; padding: 6px;">1W-2V</td>
+                <td style="border: 1px solid #000; padding: 6px;">${testData.vectorGroup.w1v2 || '-'}</td>
+                <td style="border: 1px solid #000; padding: 6px;">${testData.vectorGroup.w1v2 === testData.vectorGroup.v1w2 ? '✓ Verified' : 'Should equal 1V-2W'}</td>
             </tr>
-            <tr>
-                <td>1W-2W</td
-                <td>${testData.vectorGroup.w1w2 || '-'}</td
-                <td>${parseFloat(testData.vectorGroup.w1w2) < parseFloat(testData.vectorGroup.w1v2) ? '✓ Verified (1W-2W < 1W-2V)' : '⚠ Check: Should be less than 1W-2V'}</td
+            <tr style="border: 1px solid #000;">
+                <td style="border: 1px solid #000; padding: 6px;">1W-2W</td>
+                <td style="border: 1px solid #000; padding: 6px;">${testData.vectorGroup.w1w2 || '-'}</td>
+                <td style="border: 1px solid #000; padding: 6px;">${parseFloat(testData.vectorGroup.w1w2) < parseFloat(testData.vectorGroup.w1v2) ? '✓ Verified' : 'Should be < 1W-2V'}</td>
             </tr>
-            <tr>
-                <td>1UN = 2Un + Nn</td
-                <td>${testData.vectorGroup.un || '-'}</td
-                <td>Vector Group YNyn0</td
+            <tr style="border: 1px solid #000;">
+                <td style="border: 1px solid #000; padding: 6px;">1UN = 2Un + Nn</td>
+                <td style="border: 1px solid #000; padding: 6px;">${testData.vectorGroup.un || '-'}</td>
+                <td style="border: 1px solid #000; padding: 6px;">Vector Group YNyn0</td>
             </tr>
         </tbody>
     </table>
